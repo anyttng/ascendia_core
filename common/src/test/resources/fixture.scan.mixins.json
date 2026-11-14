@@ -1,5 +1,5 @@
 {
-  "package": "com.ascendia.core.compat.fixture.scan.mixin",
-  "plugin": "com.ascendia.core.compat.fixture.scan.FixtureScanPlugin",
+  "package": "com.ascendiacore.compat.fixture.scan.mixin",
+  "plugin": "com.ascendiacore.compat.fixture.scan.FixtureScanPlugin",
   "client": []
 }

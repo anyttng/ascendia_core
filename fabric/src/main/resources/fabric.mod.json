@@ -12,10 +12,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.ascendia.core.AscendiaCoreFabric"
+      "com.ascendiacore.AscendiaCoreFabric"
     ],
     "client": [
-      "com.ascendia.core.client.AscendiaCoreFabricClient"
+      "com.ascendiacore.client.AscendiaCoreFabricClient"
     ]
   },
   "mixins": [

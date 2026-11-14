@@ -1,5 +1,5 @@
 {
-  "package": "com.ascendia.core.compat.fixture",
+  "package": "com.ascendiacore.compat.fixture",
   "mixins": [
     "MixinFixtures$WrapOperationPresent"
   ],

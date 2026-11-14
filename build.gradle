@@ -19,7 +19,7 @@ subprojects {
             options.errorprone.disable('InlineFormatString')
             if (name == 'compileJava') {
                 options.errorprone.error('NullAway')
-                options.errorprone.option('NullAway:AnnotatedPackages', 'com.ascendia.core')
+                options.errorprone.option('NullAway:AnnotatedPackages', 'com.ascendiacore')
             } else {
                 options.errorprone.disable('NullAway')
             }
