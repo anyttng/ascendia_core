@@ -1,0 +1,10 @@
+{
+  "package": "com.ascendia.core.compat.fixture",
+  "mixins": [
+    "MixinFixtures$WrapOperationPresent",
+    "MixinFixtures$ShadowFieldMissing"
+  ],
+  "client": [
+    "MixinFixtures$InjectPresent"
+  ]
+}

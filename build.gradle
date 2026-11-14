@@ -1,0 +1,58 @@
+plugins {
+    id 'base'
+    id 'idea'
+    id 'net.ltgt.errorprone' apply false
+}
+
+subprojects {
+    pluginManager.withPlugin('java') {
+        pluginManager.apply('net.ltgt.errorprone')
+
+        dependencies {
+            errorprone "com.google.errorprone:error_prone_core:${errorprone_version}"
+            errorprone "com.uber.nullaway:nullaway:${nullaway_version}"
+        }
+
+        tasks.withType(JavaCompile).configureEach {
+            options.compilerArgs += ['-Xlint:all,-deprecation,-processing,-classfile,-serial', '-Werror']
+            options.errorprone.excludedPaths = '.*/mixin/.*'
+            options.errorprone.disable('InlineFormatString')
+            if (name == 'compileJava') {
+                options.errorprone.error('NullAway')
+                options.errorprone.option('NullAway:AnnotatedPackages', 'com.ascendia.core')
+            } else {
+                options.errorprone.disable('NullAway')
+            }
+        }
+    }
+}
+
+evaluationDependsOnChildren()
+
+def modId = 'ascendia_core'
+def buildSuffix = findProperty("${modId}_build")
+def withBuildSuffix = { baseVersion -> buildSuffix ? "${baseVersion}-${buildSuffix}" : baseVersion }
+
+def neoforgeJar = project(':neoforge').tasks.named('jar', Jar)
+def fabricJar = project(':fabric').tasks.named('jar', Jar)
+
+tasks.register('modJar', Zip) {
+    archiveFileName = "${modId}-${withBuildSuffix("${ascendia_core_version}+mc${minecraft_version}")}.jar"
+    destinationDirectory = layout.buildDirectory.dir('libs')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    def manifestPath = 'META-INF/MANIFEST.MF'
+    def neoforgeFile = neoforgeJar.flatMap { it.archiveFile }
+    def fabricFile = fabricJar.flatMap { it.archiveFile }
+    def neoforgeEntries = neoforgeFile.map { jar ->
+        new java.util.zip.ZipFile(jar.asFile).withCloseable { zip -> zip.entries().collect { it.name }.toSet() }
+    }
+
+    from(zipTree(neoforgeFile)) { exclude manifestPath }
+    from(zipTree(fabricFile)) {
+        exclude { element ->
+            element.relativePath.pathString != manifestPath
+                    && neoforgeEntries.get().contains(element.relativePath.pathString)
+        }
+    }
+}

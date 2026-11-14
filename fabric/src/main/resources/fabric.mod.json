@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "ascendia_core",
+  "version": "${version}",
+  "name": "Ascendia: Core",
+  "description": "Shared framework for the Ascendia mods: GUI toolkit and extension points for vanilla screens. Adds no content on its own.",
+  "authors": [
+    "Anyttng"
+  ],
+  "license": "PolyForm-Shield-1.0.0",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.ascendia.core.AscendiaCoreFabric"
+    ],
+    "client": [
+      "com.ascendia.core.client.AscendiaCoreFabricClient"
+    ]
+  },
+  "mixins": [
+    "ascendia_core.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "fabric-api": "*",
+    "minecraft": "26.3"
+  }
+}

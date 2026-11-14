@@ -1,0 +1,8 @@
+{
+  "package": "com.ascendia.core.compat.fixture.shared.mixin",
+  "plugin": "com.ascendia.core.compat.fixture.shared.FixtureSharedPlugin",
+  "mixins": [
+    "FixtureSharedFirstMixin",
+    "FixtureSharedSecondMixin"
+  ]
+}

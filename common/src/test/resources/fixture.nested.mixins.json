@@ -1,0 +1,5 @@
+{
+  "package": "com.ascendia.core.compat.fixture.scan.nested.mixin",
+  "plugin": "com.ascendia.core.compat.fixture.scan.nested.FixtureNestedPlugin",
+  "client": []
+}

@@ -1,0 +1,25 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            name = 'FabricMC'
+            url = 'https://maven.fabricmc.net/'
+        }
+    }
+
+    plugins {
+        id 'net.neoforged.moddev' version '2.0.148'
+        id 'net.fabricmc.fabric-loom' version "${fabric_loom_version}"
+        id 'net.ltgt.errorprone' version '5.1.1'
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+rootProject.name = 'ascendia_core'
+
+include 'common'
+include 'neoforge'
+include 'fabric'

@@ -1,0 +1,96 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev'
+    id 'idea'
+}
+
+version = ascendia_core_version
+group = mod_group_id
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+neoForge {
+    neoFormVersion = project.neoform_version
+}
+
+repositories {
+    maven {
+        name = 'Bawnorton'
+        url = 'https://maven.bawnorton.com/releases'
+        content {
+            includeGroup 'com.github.bawnorton.mixinsquared'
+        }
+    }
+}
+
+dependencies {
+    compileOnly "net.fabricmc:sponge-mixin:${mixin_version}"
+    compileOnly "io.github.llamalad7:mixinextras-common:${mixinextras_version}"
+}
+
+neoForge.addModdingDependenciesTo(sourceSets.test)
+
+dependencies {
+    testRuntimeOnly "net.fabricmc:sponge-mixin:${mixin_version}"
+    testCompileOnly "net.fabricmc:sponge-mixin:${mixin_version}"
+    testCompileOnly "io.github.llamalad7:mixinextras-common:${mixinextras_version}"
+    testCompileOnly "com.github.bawnorton.mixinsquared:mixinsquared-common:${mixinsquared_version}"
+    testImplementation platform("org.junit:junit-bom:${junit_version}")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+}
+
+def compatIndexDir = layout.buildDirectory.dir('generated/compat-index')
+def compatIndex = tasks.register('compatIndex') {
+    def classesDir = sourceSets.main.java.classesDirectory
+    def compatConfigs = fileTree('src/main/resources') { include 'ascendia_core.compat.*.mixins.json' }
+    def outputDir = compatIndexDir
+    inputs.dir(classesDir)
+    inputs.files(compatConfigs)
+    outputs.dir(outputDir)
+    doLast {
+        def root = classesDir.get().asFile.toPath()
+        def names = new TreeSet<String>()
+        compatConfigs.files.each { config ->
+            def plugin = new groovy.json.JsonSlurper().parse(config).plugin
+            if (plugin == null) {
+                return
+            }
+            def pluginPackage = root.resolve(plugin.substring(0, plugin.lastIndexOf('.')).replace('.', '/'))
+            if (java.nio.file.Files.isDirectory(pluginPackage)) {
+                java.nio.file.Files.walk(pluginPackage).withCloseable { files ->
+                    files.filter { it.toString().endsWith('.class') }.forEach { file ->
+                        def relative = root.relativize(file).toString().replace('\\', '/')
+                        names << relative.substring(0, relative.length() - '.class'.length())
+                    }
+                }
+            }
+        }
+        def index = outputDir.get().file('ascendia_core.compat.classes.txt').asFile.toPath()
+        java.nio.file.Files.createDirectories(index.parent)
+        java.nio.file.Files.writeString(index, names.collect { it + '\n' }.join(''))
+    }
+}
+sourceSets.main.output.dir(compatIndexDir.get().asFile, builtBy: compatIndex)
+
+test {
+    useJUnitPlatform()
+    filter {
+        failOnNoMatchingTests = false
+    }
+    workingDir = layout.buildDirectory.dir('test-run').get().asFile
+    doFirst { workingDir.mkdirs() }
+    systemProperty 'ascendia_core.reports', layout.buildDirectory.dir('reports').get().asFile.absolutePath
+    systemProperty 'ascendia_core.repoRoot', rootDir.absolutePath
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
