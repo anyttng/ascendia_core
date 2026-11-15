@@ -13,4 +13,10 @@ public interface Canvas extends TextMetrics {
     void text(Component text, int x, int y, int color, boolean shadow);
 
     void item(ItemStack stack, int x, int y);
+
+    void pushClip(int x, int y, int width, int height);
+
+    void popClip();
+
+    long frameTimeMillis();
 }

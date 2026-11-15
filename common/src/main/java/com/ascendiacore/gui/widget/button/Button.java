@@ -5,11 +5,11 @@ import org.jspecify.annotations.Nullable;
 import com.ascendiacore.gui.base.component.GuiComponent;
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.draw.Icon;
+import com.ascendiacore.gui.base.draw.Marquee;
 import com.ascendiacore.gui.base.draw.TextMetrics;
 import com.ascendiacore.gui.base.geometry.Size;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
-import com.ascendiacore.gui.base.input.model.Key;
 import com.ascendiacore.gui.base.property.Property;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 
@@ -19,6 +19,7 @@ public final class Button extends GuiComponent {
     private static final int LINE_HEIGHT = 9;
     private static final int ICON_GAP = 4;
     private static final int SIDE_PADDING = 8;
+    private static final int LABEL_MARGIN = 5;
     private static final int HEIGHT = 20;
 
     private final ButtonStyle style;
@@ -58,22 +59,26 @@ public final class Button extends GuiComponent {
 
     @Override
     public Size naturalSize(TextMetrics metrics) {
-        int textWidth = labelDrawn ? metrics.textWidth(label.get()) : 0;
-        return new Size(contentWidth(textWidth) + 2 * SIDE_PADDING, HEIGHT);
+        if (!labelDrawn) {
+            return new Size(HEIGHT, HEIGHT);
+        }
+        return new Size(iconRoom() + metrics.textWidth(label.get()) + 2 * SIDE_PADDING, HEIGHT);
     }
 
     @Override
     protected void drawContent(Canvas canvas) {
-        Component text = label.get();
         canvas.sprite(sprite(), x(), y(), width(), height());
-        int textWidth = labelDrawn ? canvas.textWidth(text) : 0;
-        int left = x() + (width() - contentWidth(textWidth)) / 2;
-        if (icon != null) {
-            icon.draw(canvas, left, y() + (height() - Icon.SIZE) / 2);
-            left += Icon.SIZE + ICON_GAP;
+        if (!labelDrawn) {
+            drawIcon(canvas, x() + (width() - Icon.SIZE) / 2);
+            return;
         }
-        if (labelDrawn) {
-            canvas.text(text, left, y() + (height() - LINE_HEIGHT) / 2 + 1, enabled() ? style.labelColor() : style.disabledLabelColor(), style.labelShadow());
+        Component text = label.get();
+        int textWidth = canvas.textWidth(text);
+        int room = width() - 2 * LABEL_MARGIN - iconRoom();
+        if (textWidth > room) {
+            drawScrolling(canvas, text, textWidth, room);
+        } else {
+            drawCentered(canvas, text, textWidth);
         }
     }
 
@@ -84,11 +89,41 @@ public final class Button extends GuiComponent {
 
     @Override
     protected boolean onKey(KeyInput input) {
-        if (input.key() != Key.ENTER && input.key() != Key.NUMPAD_ENTER && input.key() != Key.SPACE) {
+        if (!input.isSelection()) {
             return false;
         }
         activate();
         return true;
+    }
+
+    private void drawCentered(Canvas canvas, Component text, int textWidth) {
+        int left = x() + (width() - iconRoom() - textWidth) / 2;
+        drawIcon(canvas, left);
+        drawLabel(canvas, text, left + iconRoom());
+    }
+
+    private void drawScrolling(Canvas canvas, Component text, int textWidth, int room) {
+        int left = x() + LABEL_MARGIN;
+        drawIcon(canvas, left);
+        int textLeft = left + iconRoom();
+        canvas.pushClip(textLeft, y(), room, height());
+        drawLabel(canvas, text, textLeft - Marquee.offset(textWidth, room, canvas.frameTimeMillis()));
+        canvas.popClip();
+    }
+
+    private void drawIcon(Canvas canvas, int left) {
+        if (icon != null) {
+            icon.draw(canvas, left, y() + (height() - Icon.SIZE) / 2);
+        }
+    }
+
+    private void drawLabel(Canvas canvas, Component text, int left) {
+        int color = enabled() ? style.labelColor() : style.disabledLabelColor();
+        canvas.text(text, left, y() + (height() - LINE_HEIGHT) / 2 + 1, color, style.labelShadow());
+    }
+
+    private int iconRoom() {
+        return icon == null ? 0 : Icon.SIZE + ICON_GAP;
     }
 
     private void activate() {
@@ -101,12 +136,5 @@ public final class Button extends GuiComponent {
             return style.disabled();
         }
         return hovered() || focused() ? style.hover() : style.normal();
-    }
-
-    private int contentWidth(int textWidth) {
-        if (icon == null) {
-            return textWidth;
-        }
-        return labelDrawn ? Icon.SIZE + ICON_GAP + textWidth : Icon.SIZE;
     }
 }

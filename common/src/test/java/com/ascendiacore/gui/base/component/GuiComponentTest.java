@@ -220,5 +220,18 @@ class GuiComponentTest {
         @Override
         public void item(ItemStack stack, int x, int y) {
         }
+
+        @Override
+        public void pushClip(int x, int y, int width, int height) {
+        }
+
+        @Override
+        public void popClip() {
+        }
+
+        @Override
+        public long frameTimeMillis() {
+            return 0;
+        }
     }
 }

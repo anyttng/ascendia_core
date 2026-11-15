@@ -33,6 +33,9 @@ class ButtonTest {
     private static final int WIDTH = 120;
     private static final int HEIGHT = 20;
     private static final int TEXT_WIDTH = 30;
+    private static final int NARROW_WIDTH = 24;
+    private static final int LABEL_MARGIN = 5;
+    private static final long SCROLLED_TO_THE_END_MILLIS = 2400;
     private static final int LINE_HEIGHT = 9;
     private static final int ICON_GAP = 4;
     private static final int SIDE_PADDING = 8;
@@ -137,10 +140,31 @@ class ButtonTest {
     }
 
     @Test
+    void labelWiderThanTheButtonIsClippedToItsRoomAndScrolledByTheClock() {
+        Button button = textButton();
+        button.setSize(NARROW_WIDTH, HEIGHT);
+        int room = NARROW_WIDTH - 2 * LABEL_MARGIN;
+        button.draw(recorder, OUTSIDE_X, INSIDE_Y);
+        recorder.timeMillis = SCROLLED_TO_THE_END_MILLIS;
+        button.draw(recorder, OUTSIDE_X, INSIDE_Y);
+        Rect clip = new Rect(LEFT + LABEL_MARGIN, TOP, room, HEIGHT);
+        assertEquals(List.of(clip, clip), recorder.clips);
+        assertEquals(LEFT + LABEL_MARGIN, recorder.texts.get(0).x());
+        assertEquals(LEFT + LABEL_MARGIN - (TEXT_WIDTH - room), recorder.texts.get(1).x());
+        assertEquals(0, recorder.openClips);
+    }
+
+    @Test
+    void labelThatFitsIsNotClipped() {
+        textButton().draw(recorder, OUTSIDE_X, INSIDE_Y);
+        assertTrue(recorder.clips.isEmpty());
+    }
+
+    @Test
     void naturalSizeIsTheContentBetweenTheSidePaddings() {
         Icon icon = Icon.sprite(ICON_SPRITE);
         assertEquals(new Size(TEXT_WIDTH + 2 * SIDE_PADDING, HEIGHT), textButton().naturalSize(recorder));
-        assertEquals(new Size(Icon.SIZE + 2 * SIDE_PADDING, HEIGHT),
+        assertEquals(new Size(HEIGHT, HEIGHT),
                 Button.icon(STYLE, icon, LABEL, () -> runs++).naturalSize(recorder));
         assertEquals(new Size(Icon.SIZE + ICON_GAP + TEXT_WIDTH + 2 * SIDE_PADDING, HEIGHT),
                 Button.iconAndText(STYLE, icon, LABEL, () -> runs++).naturalSize(recorder));
@@ -195,6 +219,9 @@ class ButtonTest {
         private final List<String> sprites = new ArrayList<>();
         private final List<Rect> spriteRects = new ArrayList<>();
         private final List<Text> texts = new ArrayList<>();
+        private final List<Rect> clips = new ArrayList<>();
+        private int openClips;
+        private long timeMillis;
         private int clicks;
 
         @Override
@@ -226,6 +253,22 @@ class ButtonTest {
 
         @Override
         public void item(ItemStack stack, int x, int y) {
+        }
+
+        @Override
+        public void pushClip(int x, int y, int width, int height) {
+            clips.add(new Rect(x, y, width, height));
+            openClips++;
+        }
+
+        @Override
+        public void popClip() {
+            openClips--;
+        }
+
+        @Override
+        public long frameTimeMillis() {
+            return timeMillis;
         }
 
         @Override

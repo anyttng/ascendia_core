@@ -13,8 +13,17 @@ public final class RecordingCanvas implements Canvas {
     public record Fill(int x, int y, int width, int height, int color) {
     }
 
+    public record Text(Component text, int x, int y, int color, boolean shadow) {
+    }
+
     private final List<Sprite> sprites = new ArrayList<>();
     private final List<Fill> fills = new ArrayList<>();
+    private final List<Text> texts = new ArrayList<>();
+    private int textWidth;
+
+    public void setTextWidth(int textWidth) {
+        this.textWidth = textWidth;
+    }
 
     public List<Sprite> sprites() {
         return sprites;
@@ -22,6 +31,10 @@ public final class RecordingCanvas implements Canvas {
 
     public List<Fill> fills() {
         return fills;
+    }
+
+    public List<Text> texts() {
+        return texts;
     }
 
     @Override
@@ -41,14 +54,28 @@ public final class RecordingCanvas implements Canvas {
 
     @Override
     public void text(Component text, int x, int y, int color, boolean shadow) {
+        texts.add(new Text(text, x, y, color, shadow));
     }
 
     @Override
     public int textWidth(Component text) {
-        return 0;
+        return textWidth;
     }
 
     @Override
     public void item(ItemStack stack, int x, int y) {
+    }
+
+    @Override
+    public void pushClip(int x, int y, int width, int height) {
+    }
+
+    @Override
+    public void popClip() {
+    }
+
+    @Override
+    public long frameTimeMillis() {
+        return 0;
     }
 }

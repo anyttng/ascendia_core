@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
 
 public final class GameCanvas implements Canvas {
@@ -51,6 +52,21 @@ public final class GameCanvas implements Canvas {
     @Override
     public void item(ItemStack stack, int x, int y) {
         graphics.item(stack, x, y);
+    }
+
+    @Override
+    public void pushClip(int x, int y, int width, int height) {
+        graphics.enableScissor(x, y, x + width, y + height);
+    }
+
+    @Override
+    public void popClip() {
+        graphics.disableScissor();
+    }
+
+    @Override
+    public long frameTimeMillis() {
+        return Util.getMillis();
     }
 
     private static Identifier spriteId(String sprite) {
