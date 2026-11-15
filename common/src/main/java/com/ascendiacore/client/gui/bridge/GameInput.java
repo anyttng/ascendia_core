@@ -1,12 +1,13 @@
 package com.ascendiacore.client.gui.bridge;
 
-import com.ascendiacore.gui.input.Key;
-import com.ascendiacore.gui.input.KeyInput;
-import com.ascendiacore.gui.input.Modifiers;
-import com.ascendiacore.gui.input.PointerButton;
-import com.ascendiacore.gui.input.PointerInput;
-import com.ascendiacore.gui.input.TextInput;
 import com.mojang.blaze3d.platform.InputConstants;
+
+import com.ascendiacore.gui.base.input.KeyInput;
+import com.ascendiacore.gui.base.input.PointerInput;
+import com.ascendiacore.gui.base.input.TextInput;
+import com.ascendiacore.gui.base.input.model.Key;
+import com.ascendiacore.gui.base.input.model.Modifiers;
+import com.ascendiacore.gui.base.input.model.PointerButton;
 
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.InputWithModifiers;
