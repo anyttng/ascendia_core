@@ -2,10 +2,12 @@ package com.ascendiacore.gui.base.component;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
@@ -27,6 +29,7 @@ class GuiComponentTest {
     private static final int RIGHT = LEFT + WIDTH;
     private static final int BOTTOM = TOP + HEIGHT;
     private static final Canvas CANVAS = new BlankCanvas();
+    private static final TooltipStyle TOOLTIP_STYLE = new TooltipStyle("example:sprites", 0xFFFFFFFF);
 
     @Test
     void hoveredWhenThePointerIsInside() {
@@ -115,6 +118,32 @@ class GuiComponentTest {
         assertFalse(probe.keyPressed(new KeyInput(Key.ENTER, Modifiers.NONE)));
         assertFalse(probe.textTyped(new TextInput('a')));
         assertEquals(0, probe.presses + probe.keys + probe.texts);
+    }
+
+    @Test
+    void noTooltipByDefault() {
+        Probe probe = probe();
+        assertEquals("", probe.tooltip().getString());
+        assertNull(probe.tooltipStyle());
+    }
+
+    @Test
+    void fixedTooltipIsReadBackWithItsStyle() {
+        Probe probe = probe();
+        probe.setTooltip(TOOLTIP_STYLE, Component.literal("Counts a press"));
+        assertEquals("Counts a press", probe.tooltip().getString());
+        assertEquals("Counts a press", probe.tooltipAt(LEFT + 5, TOP + 5).getString());
+        assertEquals(TOOLTIP_STYLE, probe.tooltipStyle());
+    }
+
+    @Test
+    void tooltipRuleIsReadOnEveryCall() {
+        Probe probe = probe();
+        Value<Component> text = Value.of(Component.literal("On"));
+        probe.setTooltip(TOOLTIP_STYLE, text);
+        assertEquals("On", probe.tooltip().getString());
+        text.set(Component.literal("Off"));
+        assertEquals("Off", probe.tooltip().getString());
     }
 
     @Test
