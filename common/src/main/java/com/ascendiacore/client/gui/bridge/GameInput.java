@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.TextInput;
+import com.ascendiacore.gui.base.input.WheelInput;
 import com.ascendiacore.gui.base.input.model.Key;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
@@ -28,6 +29,10 @@ public final class GameInput {
 
     public static TextInput text(CharacterEvent event) {
         return new TextInput(event.codepoint());
+    }
+
+    public static WheelInput wheel(double x, double y, double scrollY) {
+        return new WheelInput(x, y, scrollY);
     }
 
     private static PointerButton button(int button) {
