@@ -20,8 +20,8 @@ public final class Inset extends Container {
         setPadding(this.frame.border());
     }
 
-    public int ink() {
-        return fill.ink();
+    public FillStyle fill() {
+        return fill;
     }
 
     @Override

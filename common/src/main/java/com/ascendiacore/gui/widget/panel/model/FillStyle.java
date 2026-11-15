@@ -1,6 +1,6 @@
 package com.ascendiacore.gui.widget.panel.model;
 
-public record FillStyle(int color, int ink) {
+public record FillStyle(int color, int ink, int mutedInk, boolean inkShadow) {
     public static final int NO_FILL = 0;
 
     public boolean drawn() {
