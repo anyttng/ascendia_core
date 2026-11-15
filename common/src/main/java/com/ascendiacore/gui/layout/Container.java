@@ -28,11 +28,11 @@ public abstract class Container extends GuiComponent {
         this.axis = axis;
     }
 
-    public void add(GuiComponent child) {
+    protected void add(GuiComponent child) {
         add(child, Length.natural());
     }
 
-    public void add(GuiComponent child, Length length) {
+    protected void add(GuiComponent child, Length length) {
         adopt(child);
         slots.add(new Slot(child, length));
     }

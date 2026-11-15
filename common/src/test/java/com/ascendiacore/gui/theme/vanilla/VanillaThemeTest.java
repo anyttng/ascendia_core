@@ -94,6 +94,16 @@ class VanillaThemeTest {
     }
 
     @Test
+    void errorInkIsDarkRedOnLightAndMidGrayAndRedOnDark() {
+        assertEquals(VanillaPalette.DARK_RED, THEME.inset().fills().of(FillKind.PARCHMENT).errorInk());
+        assertEquals(VanillaPalette.DARK_RED, THEME.inset().fills().of(FillKind.PAGE).errorInk());
+        assertEquals(VanillaPalette.RED, THEME.inset().fills().of(FillKind.DARK).errorInk());
+        for (FillKind kind : FillKind.values()) {
+            assertEquals(VanillaPalette.RED, THEME.panel().fills().of(kind).errorInk());
+        }
+    }
+
+    @Test
     void linkIsBlueOnLightAndPaleBlueOnDark() {
         assertEquals(VanillaPalette.BLUE, THEME.link().on(FillKind.PARCHMENT).normal());
         assertEquals(VanillaPalette.PALE_BLUE, THEME.link().on(FillKind.DARK).normal());

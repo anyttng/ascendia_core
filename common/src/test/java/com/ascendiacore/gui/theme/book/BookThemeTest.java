@@ -68,6 +68,13 @@ class BookThemeTest {
     }
 
     @Test
+    void errorInkIsDarkRedOnTheLightFillsAndRedOnSlate() {
+        assertEquals(BookPalette.DARK_RED, THEME.panel().fills().of(FillKind.PARCHMENT).errorInk());
+        assertEquals(BookPalette.DARK_RED, THEME.panel().fills().of(FillKind.PAGE).errorInk());
+        assertEquals(BookPalette.RED, THEME.panel().fills().of(FillKind.DARK).errorInk());
+    }
+
+    @Test
     void linkIsLeatherOnLightAndGoldOnDark() {
         assertEquals(BookPalette.LEATHER, THEME.link().on(FillKind.PAGE).normal());
         assertEquals(BookPalette.GOLD, THEME.link().on(FillKind.DARK).normal());
