@@ -30,6 +30,7 @@ public final class VanillaTheme {
     private static final String INSET_LIGHT = SPRITES + "inset_light";
     private static final String INSET_DARK = SPRITES + "inset_dark";
     private static final String INSET_RIM = SPRITES + "inset_rim";
+    private static final String ROW = SPRITES + "row";
     private static final String ROW_HOVER = SPRITES + "row_hover";
     private static final String ROW_SELECTED = SPRITES + "row_selected";
     private static final int GAME_POPUP_BORDER = 6;
@@ -74,7 +75,13 @@ public final class VanillaTheme {
     }
 
     private static ListStyle list() {
-        return new ListStyle(ROW_HOVER, ROW_SELECTED, VanillaPalette.WHITE, true);
+        FillStyle framed = rowText(VanillaPalette.WHITE, VanillaPalette.DISABLED_LABEL);
+        return new ListStyle(ROW, ROW_HOVER, ROW_SELECTED, framed, framed,
+                rowText(VanillaPalette.WHITE, VanillaPalette.PALE_GRAY), rowText(VanillaPalette.YELLOW, VanillaPalette.PALE_GRAY));
+    }
+
+    private static FillStyle rowText(int ink, int mutedInk) {
+        return new FillStyle(FillStyle.NO_FILL, ink, mutedInk, VanillaPalette.RED, true);
     }
 
     private static ScrollbarStyle scrollbar() {

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ascendiacore.gui.theme.Theme;
 import com.ascendiacore.gui.theme.Themes;
+import com.ascendiacore.gui.widget.list.model.RowStyle;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 
 class BookThemeTest {
@@ -30,7 +31,7 @@ class BookThemeTest {
                 THEME.button().selected(), THEME.button().selectedHover(),
                 THEME.panel().frame().sprite(),
                 THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite(),
-                THEME.list().rowHover(), THEME.list().rowSelected(),
+                THEME.list().row(), THEME.list().rowHover(), THEME.list().rowSelected(),
                 THEME.scrollbar().track(), THEME.scrollbar().thumb(), THEME.scrollbar().thumbHover(),
                 THEME.textField().normal(), THEME.textField().focused(), THEME.textField().disabled());
         assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
@@ -38,9 +39,13 @@ class BookThemeTest {
     }
 
     @Test
-    void selectedRowLabelIsParchmentWithoutAShadow() {
-        assertEquals(BookPalette.PARCHMENT, THEME.list().selectedLabelColor());
-        assertFalse(THEME.list().labelShadow());
+    void rowTextIsLeatherAndTurnsParchmentOnTheSelectedFramedRowAndGoldOnTheSelectedButtonRow() {
+        assertEquals(BookPalette.DARK_LEATHER, THEME.list().text(RowStyle.FRAMED, false).ink());
+        assertEquals(BookPalette.PARCHMENT, THEME.list().text(RowStyle.FRAMED, true).ink());
+        assertEquals(BookPalette.DARK_LEATHER, THEME.list().text(RowStyle.BUTTON, false).ink());
+        assertEquals(BookPalette.GOLD, THEME.list().text(RowStyle.BUTTON, true).ink());
+        assertEquals(BookPalette.TAN, THEME.list().text(RowStyle.FRAMED, true).mutedInk());
+        assertFalse(THEME.list().text(RowStyle.FRAMED, true).inkShadow());
     }
 
     @Test
