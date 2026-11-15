@@ -14,7 +14,7 @@ subprojects {
         }
 
         tasks.withType(JavaCompile).configureEach {
-            options.compilerArgs += ['-Xlint:all,-deprecation,-processing,-classfile,-serial', '-Werror']
+            options.compilerArgs += ['-Xlint:all,-deprecation,-processing,-classfile,-serial,-try', '-Werror']
             options.errorprone.excludedPaths = '.*/mixin/.*'
             options.errorprone.disable('InlineFormatString')
             if (name == 'compileJava') {
@@ -30,29 +30,95 @@ subprojects {
 evaluationDependsOnChildren()
 
 def modId = 'ascendia_core'
+def shellId = "${modId}_bundle"
+def modVersion = ascendia_core_version
 def buildSuffix = findProperty("${modId}_build")
 def withBuildSuffix = { baseVersion -> buildSuffix ? "${baseVersion}-${buildSuffix}" : baseVersion }
+def shellVersion = withBuildSuffix(modVersion)
+def modLicense = mod_license
+def modGroup = mod_group_id
 
 def neoforgeJar = project(':neoforge').tasks.named('jar', Jar)
-def fabricJar = project(':fabric').tasks.named('jar', Jar)
+def fabricJar = project(':fabric').tasks.named('remapJar', AbstractArchiveTask)
+def neoforgeJarName = neoforgeJar.get().archiveFileName.get()
+def fabricJarName = fabricJar.get().archiveFileName.get()
 
-tasks.register('modJar', Zip) {
-    archiveFileName = "${modId}-${withBuildSuffix("${ascendia_core_version}+mc${minecraft_version}")}.jar"
+def shellMetadata = tasks.register('shellMetadata') {
+    def outputDir = layout.buildDirectory.dir('shell')
+    def neoforgePath = "META-INF/jarjar/${neoforgeJarName}"
+    def fabricPath = "META-INF/jars/${fabricJarName}"
+    def neoforgeRange = "[${neo_version},)"
+    def minecraftRange = minecraft_version_range
+    def fabricLoaderRange = ">=${fabric_loader_version}"
+    def minecraftVersion = minecraft_version
+    inputs.property('version', shellVersion)
+    inputs.property('neoforgePath', neoforgePath)
+    inputs.property('fabricPath', fabricPath)
+    inputs.property('neoforgeRange', neoforgeRange)
+    inputs.property('minecraftRange', minecraftRange)
+    inputs.property('fabricLoaderRange', fabricLoaderRange)
+    inputs.property('minecraftVersion', minecraftVersion)
+    outputs.dir(outputDir)
+
+    doLast {
+        def root = outputDir.get().asFile
+
+        // FML 4 refuses a mods.toml without modLoader; lowcodefml is its loader for a mod that runs no code.
+        new File(root, 'META-INF').mkdirs()
+        new File(root, 'META-INF/neoforge.mods.toml').text = """\
+modLoader="lowcodefml"
+loaderVersion="[4,)"
+license="${modLicense}"
+
+[[mods]]
+modId="${shellId}"
+version="${shellVersion}"
+displayName="Ascendia: Core (NeoForge and Fabric)"
+description='''Carries the NeoForge and Fabric builds of Ascendia: Core; each loader loads its own.'''
+
+[[dependencies.${shellId}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neoforgeRange}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${shellId}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraftRange}"
+    ordering="NONE"
+    side="BOTH"
+"""
+
+        new File(root, 'META-INF/jarjar').mkdirs()
+        new File(root, 'META-INF/jarjar/metadata.json').text = groovy.json.JsonOutput.prettyPrint(
+                groovy.json.JsonOutput.toJson([jars: [[
+                        identifier  : [group: modGroup, artifact: "${modId}-neoforge"],
+                        version     : [range: "[${shellVersion},)", artifactVersion: shellVersion],
+                        path        : neoforgePath,
+                        isObfuscated: false]]]))
+
+        new File(root, 'fabric.mod.json').text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([
+                schemaVersion: 1,
+                id           : shellId,
+                version      : shellVersion,
+                name         : 'Ascendia: Core (NeoForge and Fabric)',
+                description  : 'Carries the NeoForge and Fabric builds of Ascendia: Core; each loader loads its own.',
+                license      : modLicense,
+                environment  : '*',
+                depends      : [fabricloader: fabricLoaderRange, minecraft: minecraftVersion],
+                jars         : [[file: fabricPath]]]))
+    }
+}
+
+tasks.register('modJar', Jar) {
+    archiveFileName = "${modId}-${withBuildSuffix("${modVersion}+mc${minecraft_version}")}.jar"
     destinationDirectory = layout.buildDirectory.dir('libs')
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    // FML names the shell's module after this; left to the file name it would be derived from the version string.
+    manifest.attributes('Automatic-Module-Name': shellId)
 
-    def manifestPath = 'META-INF/MANIFEST.MF'
-    def neoforgeFile = neoforgeJar.flatMap { it.archiveFile }
-    def fabricFile = fabricJar.flatMap { it.archiveFile }
-    def neoforgeEntries = neoforgeFile.map { jar ->
-        new java.util.zip.ZipFile(jar.asFile).withCloseable { zip -> zip.entries().collect { it.name }.toSet() }
-    }
-
-    from(zipTree(neoforgeFile)) { exclude manifestPath }
-    from(zipTree(fabricFile)) {
-        exclude { element ->
-            element.relativePath.pathString != manifestPath
-                    && neoforgeEntries.get().contains(element.relativePath.pathString)
-        }
-    }
+    from(shellMetadata)
+    from(neoforgeJar) { into 'META-INF/jarjar' }
+    from(fabricJar) { into 'META-INF/jars' }
 }

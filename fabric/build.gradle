@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom'
+    id 'net.fabricmc.fabric-loom-remap'
     id 'idea'
 }
 
@@ -21,7 +21,7 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 evaluationDependsOn(':common')
 def commonMain = project(':common').sourceSets.main
@@ -29,15 +29,21 @@ def commonMain = project(':common').sourceSets.main
 dependencies {
     implementation commonMain.output
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
     compileOnly "io.github.llamalad7:mixinextras-fabric:${mixinextras_version}"
+    compileOnly "org.jspecify:jspecify:${jspecify_version}"
 }
 
 tasks.named('jar', Jar) {
-    archiveFileName = "${mod_id}-fabric-${jarVersion}.jar"
+    archiveFileName = "${mod_id}-fabric-${jarVersion}-dev.jar"
     from(commonMain.output)
+}
+
+tasks.named('remapJar', AbstractArchiveTask) {
+    archiveFileName = "${mod_id}-fabric-${jarVersion}.jar"
 }
 
 tasks.named('assemble') {

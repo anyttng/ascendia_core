@@ -1,22 +1,18 @@
 package com.ascendiacore.client.gui.bridge;
 
+import org.jspecify.annotations.Nullable;
+
 import com.ascendiacore.gui.base.component.ComponentHost;
 import com.ascendiacore.gui.base.component.GuiComponent;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-
-import org.jspecify.annotations.Nullable;
 
 public final class ComponentWidget extends AbstractWidget implements ComponentHost {
     private static final int OUTSIDE = Integer.MIN_VALUE;
@@ -40,6 +36,10 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
         super.setTooltip(tooltip);
     }
 
+    public boolean takesFocusOnPress() {
+        return component.takesFocusOnPress();
+    }
+
     @Override
     public boolean isActive() {
         return component.interactive() && component.visible() && component.enabled();
@@ -52,7 +52,7 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
 
     @Override
     public void clickSound() {
-        playButtonClickSound(Minecraft.getInstance().getSoundManager());
+        playDownSound(Minecraft.getInstance().getSoundManager());
     }
 
     @Override
@@ -67,32 +67,23 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         placeComponent();
-        boolean taken = component.pointerPressed(GameInput.pointer(event));
-        if (taken && !component.takesFocusOnPress()) {
-            dropScreenFocus();
-        }
-        return taken;
+        return component.pointerPressed(GameInput.pointer(mouseX, mouseY, button, GameInput.heldModifiers()));
     }
 
     @Override
-    public boolean shouldTakeFocusAfterInteraction() {
-        return component.takesFocusOnPress();
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return component.keyPressed(GameInput.key(keyCode, modifiers));
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        return component.keyPressed(GameInput.key(event));
+    public boolean charTyped(char character, int modifiers) {
+        return component.textTyped(GameInput.text(character));
     }
 
     @Override
-    public boolean charTyped(CharacterEvent event) {
-        return component.textTyped(GameInput.text(event));
-    }
-
-    @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         placeComponent();
         boolean pointerShown = graphics.containsPointInScissor(mouseX, mouseY);
         component.draw(new GameCanvas(graphics, Minecraft.getInstance().font),
@@ -107,13 +98,6 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
 
     void followComponent() {
         setRectangle(component.width(), component.height(), component.x(), component.y());
-    }
-
-    private static void dropScreenFocus() {
-        Screen screen = Minecraft.getInstance().screen;
-        if (screen != null) {
-            screen.clearFocus();
-        }
     }
 
     private void placeComponent() {

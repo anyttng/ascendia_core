@@ -3,7 +3,7 @@ package com.ascendiacore.platform;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.common.NeoForgeVersion;
+import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
 
 public final class NeoForgePlatform implements Platform {
     private final ModContainer modContainer;
@@ -14,7 +14,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public boolean isClient() {
-        return FMLEnvironment.getDist() == Dist.CLIENT;
+        return FMLEnvironment.dist == Dist.CLIENT;
     }
 
     @Override

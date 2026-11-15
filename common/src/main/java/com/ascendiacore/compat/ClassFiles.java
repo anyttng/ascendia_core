@@ -2,15 +2,15 @@ package com.ascendiacore.compat;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.classfile.ClassFile;
-import java.lang.classfile.ClassModel;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.ClassNode;
 
 final class ClassFiles {
-    record Loaded(boolean present, @Nullable ClassModel model) {
+    record Loaded(boolean present, @Nullable ClassNode model) {
     }
 
     private static final String CLASS_SUFFIX = ".class";
@@ -32,7 +32,9 @@ final class ClassFiles {
                 return new Loaded(false, null);
             }
 
-            return new Loaded(true, ClassFile.of().parse(classFile.readAllBytes()));
+            ClassNode model = new ClassNode();
+            new ClassReader(classFile.readAllBytes()).accept(model, ClassReader.SKIP_FRAMES);
+            return new Loaded(true, model);
         } catch (IOException | RuntimeException unreadable) {
             return new Loaded(true, null);
         }

@@ -1,5 +1,7 @@
 package com.ascendiacore.client.gui.bridge;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.blaze3d.platform.InputConstants;
 
 import com.ascendiacore.gui.base.input.KeyInput;
@@ -9,25 +11,28 @@ import com.ascendiacore.gui.base.input.model.Key;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
 
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.InputWithModifiers;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.screens.Screen;
 
 public final class GameInput {
     private GameInput() {
     }
 
-    public static PointerInput pointer(MouseButtonEvent event) {
-        return new PointerInput(event.x(), event.y(), button(event.button()), modifiers(event));
+    public static PointerInput pointer(double x, double y, int button, int modifiers) {
+        return new PointerInput(x, y, button(button), modifiers(modifiers));
     }
 
-    public static KeyInput key(KeyEvent event) {
-        return new KeyInput(keyOf(event.key()), modifiers(event));
+    public static KeyInput key(int key, int modifiers) {
+        return new KeyInput(keyOf(key), modifiers(modifiers));
     }
 
-    public static TextInput text(CharacterEvent event) {
-        return new TextInput(event.codepoint());
+    public static TextInput text(char character) {
+        return new TextInput(character);
+    }
+
+    public static int heldModifiers() {
+        return (Screen.hasShiftDown() ? GLFW.GLFW_MOD_SHIFT : 0)
+                | (Screen.hasControlDown() ? GLFW.GLFW_MOD_CONTROL : 0)
+                | (Screen.hasAltDown() ? GLFW.GLFW_MOD_ALT : 0);
     }
 
     private static PointerButton button(int button) {
@@ -58,7 +63,8 @@ public final class GameInput {
         };
     }
 
-    private static Modifiers modifiers(InputWithModifiers input) {
-        return new Modifiers(input.hasShiftDown(), input.hasControlDown(), input.hasAltDown());
+    private static Modifiers modifiers(int modifiers) {
+        return new Modifiers((modifiers & GLFW.GLFW_MOD_SHIFT) != 0, (modifiers & GLFW.GLFW_MOD_CONTROL) != 0,
+                (modifiers & GLFW.GLFW_MOD_ALT) != 0);
     }
 }

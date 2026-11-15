@@ -1,22 +1,23 @@
 package com.ascendiacore.compat;
 
-import java.lang.classfile.Annotation;
-import java.lang.classfile.CodeElement;
-import java.lang.classfile.MethodModel;
-import java.lang.classfile.Opcode;
-import java.lang.classfile.instruction.FieldInstruction;
-import java.lang.classfile.instruction.InvokeInstruction;
-import java.lang.classfile.instruction.NewObjectInstruction;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
 import com.ascendiacore.compat.MixinTargetCheck.Reason;
 import com.ascendiacore.compat.MixinTargetCheck.Refusal;
 
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+
 import org.jspecify.annotations.Nullable;
 
 final class InjectionPoints {
-    record Selection(String owner, List<MethodModel> bodies, List<String> selfTargets) {
+    record Selection(String owner, List<MethodNode> bodies, List<String> selfTargets) {
     }
 
     private static final String TARGET_KEY = "target";
@@ -33,11 +34,11 @@ final class InjectionPoints {
     private InjectionPoints() {
     }
 
-    static @Nullable Refusal check(String mixinClassName, Selection selection, Annotation at) {
+    static @Nullable Refusal check(String mixinClassName, Selection selection, AnnotationNode at) {
         String target = MixinAnnotations.element(at, TARGET_KEY).map(MixinAnnotations::asString).orElse("");
         int needed = Math.max(MixinAnnotations.integer(at, ORDINAL_KEY, ANY_ORDINAL), 0) + 1;
         Reason reason;
-        ToIntFunction<MethodModel> counter;
+        ToIntFunction<MethodNode> counter;
         switch (MixinAnnotations.string(at, MixinAnnotations.VALUE_KEY)) {
             case AT_INVOKE -> {
                 reason = Reason.MISSING_INVOKE;
@@ -59,14 +60,14 @@ final class InjectionPoints {
             }
         }
 
-        for (MethodModel body : selection.bodies()) {
+        for (MethodNode body : selection.bodies()) {
             if (counter.applyAsInt(body) >= needed) {
                 return null;
             }
         }
 
         return new Refusal(mixinClassName,
-                selection.owner() + "#" + selection.bodies().getFirst().methodName().stringValue() + "@" + target,
+                selection.owner() + "#" + selection.bodies().getFirst().name + "@" + target,
                 reason);
     }
 
@@ -77,13 +78,11 @@ final class InjectionPoints {
                 : owner;
     }
 
-    private static int countInvokes(MethodModel body, MemberRef wanted, Selection selection) {
+    private static int countInvokes(MethodNode body, MemberRef wanted, Selection selection) {
         int count = 0;
-        for (CodeElement element : codeOf(body)) {
-            if (element instanceof InvokeInstruction invoke
-                    && wanted.matches(merged(invoke.owner().asInternalName(), selection, wanted),
-                            invoke.name().stringValue(),
-                            invoke.type().stringValue())) {
+        for (AbstractInsnNode element : body.instructions) {
+            if (element instanceof MethodInsnNode invoke
+                    && wanted.matches(merged(invoke.owner, selection, wanted), invoke.name, invoke.desc)) {
                 count++;
             }
         }
@@ -91,14 +90,12 @@ final class InjectionPoints {
         return count;
     }
 
-    private static int countFieldAccesses(MethodModel body, MemberRef wanted, int opcode, Selection selection) {
+    private static int countFieldAccesses(MethodNode body, MemberRef wanted, int opcode, Selection selection) {
         int count = 0;
-        for (CodeElement element : codeOf(body)) {
-            if (element instanceof FieldInstruction access
-                    && (opcode == ANY_OPCODE || access.opcode().bytecode() == opcode)
-                    && wanted.matches(merged(access.owner().asInternalName(), selection, wanted),
-                            access.name().stringValue(),
-                            access.type().stringValue())) {
+        for (AbstractInsnNode element : body.instructions) {
+            if (element instanceof FieldInsnNode access
+                    && (opcode == ANY_OPCODE || access.getOpcode() == opcode)
+                    && wanted.matches(merged(access.owner, selection, wanted), access.name, access.desc)) {
                 count++;
             }
         }
@@ -106,29 +103,26 @@ final class InjectionPoints {
         return count;
     }
 
-    private static int countNews(MethodModel body, String target) {
+    private static int countNews(MethodNode body, String target) {
         boolean byConstructor = target.startsWith("(");
         String created = byConstructor ? MemberRef.unwrapDescriptor(target.substring(target.indexOf(')') + 1))
                 : MemberRef.unwrapDescriptor(target);
         String constructor = byConstructor ? MemberRef.parametersOf(target) + MemberRef.VOID_RETURN : null;
         int count = 0;
-        for (CodeElement element : codeOf(body)) {
-            if (byConstructor && element instanceof InvokeInstruction invoke
-                    && invoke.opcode() == Opcode.INVOKESPECIAL
-                    && invoke.owner().asInternalName().equals(created)
-                    && invoke.name().equalsString(MemberRef.CONSTRUCTOR)
-                    && invoke.type().equalsString(constructor)) {
+        for (AbstractInsnNode element : body.instructions) {
+            if (byConstructor && element instanceof MethodInsnNode invoke
+                    && invoke.getOpcode() == Opcodes.INVOKESPECIAL
+                    && invoke.owner.equals(created)
+                    && invoke.name.equals(MemberRef.CONSTRUCTOR)
+                    && invoke.desc.equals(constructor)) {
                 count++;
-            } else if (!byConstructor && element instanceof NewObjectInstruction creation
-                    && creation.className().asInternalName().equals(created)) {
+            } else if (!byConstructor && element instanceof TypeInsnNode creation
+                    && creation.getOpcode() == Opcodes.NEW
+                    && creation.desc.equals(created)) {
                 count++;
             }
         }
 
         return count;
-    }
-
-    private static Iterable<CodeElement> codeOf(MethodModel method) {
-        return method.code().<Iterable<CodeElement>>map(code -> code).orElse(List.of());
     }
 }

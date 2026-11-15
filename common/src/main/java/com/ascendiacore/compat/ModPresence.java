@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.classfile.ClassModel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +17,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.Nullable;
+import org.objectweb.asm.tree.ClassNode;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.MixinEnvironment.Side;
 
@@ -77,9 +77,9 @@ public final class ModPresence {
     }
 
     public static boolean probeMethod(String owner, String name, String descriptor) {
-        ClassModel model = new ClassFiles(ModPresence.class.getClassLoader()).load(owner).model();
-        return model != null && model.methods().stream().anyMatch(method -> method.methodName().equalsString(name)
-                && method.methodType().equalsString(descriptor));
+        ClassNode model = new ClassFiles(ModPresence.class.getClassLoader()).load(owner).model();
+        return model != null && model.methods.stream()
+                .anyMatch(method -> method.name.equals(name) && method.desc.equals(descriptor));
     }
 
     private ModPresence(Builder builder, ClassLoader classLoader, Supplier<@Nullable Side> side) {
@@ -284,8 +284,7 @@ public final class ModPresence {
 
     private static boolean gatePlugin(ClassFiles classFiles, String internalName) {
         ClassFiles.Loaded loaded = classFiles.load(internalName);
-        return loaded.model() != null && loaded.model().superclass()
-                .filter(type -> type.asInternalName().equals(GATE_PLUGIN)).isPresent();
+        return loaded.model() != null && GATE_PLUGIN.equals(loaded.model().superName);
     }
 
     private static String packageOf(String className) {

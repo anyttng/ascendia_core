@@ -1,21 +1,5 @@
 package com.ascendiacore.compat;
 
-import java.lang.classfile.ClassModel;
-import java.lang.classfile.CodeElement;
-import java.lang.classfile.FieldModel;
-import java.lang.classfile.MethodModel;
-import java.lang.classfile.constantpool.ClassEntry;
-import java.lang.classfile.instruction.ConstantInstruction;
-import java.lang.classfile.instruction.ExceptionCatch;
-import java.lang.classfile.instruction.FieldInstruction;
-import java.lang.classfile.instruction.InvokeDynamicInstruction;
-import java.lang.classfile.instruction.InvokeInstruction;
-import java.lang.classfile.instruction.NewMultiArrayInstruction;
-import java.lang.classfile.instruction.NewObjectInstruction;
-import java.lang.classfile.instruction.NewReferenceArrayInstruction;
-import java.lang.classfile.instruction.TypeCheckInstruction;
-import java.lang.constant.ConstantDesc;
-import java.lang.constant.DirectMethodHandleDesc;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -27,6 +11,21 @@ import java.util.function.Predicate;
 import com.ascendiacore.compat.ClassFiles.Loaded;
 import com.ascendiacore.compat.MixinTargetCheck.Reason;
 import com.ascendiacore.compat.MixinTargetCheck.Refusal;
+
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.MultiANewArrayInsnNode;
+import org.objectweb.asm.tree.TryCatchBlockNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 
 import org.jspecify.annotations.Nullable;
 
@@ -44,51 +43,47 @@ final class ReferenceCheck {
     }
 
     List<Refusal> check(String className) {
-        ClassModel model = this.classFiles.load(className.replace('.', '/')).model();
+        ClassNode model = this.classFiles.load(className.replace('.', '/')).model();
         if (model == null) {
             return List.of();
         }
 
         Set<Refusal> refusals = new LinkedHashSet<>();
-        model.superclass().ifPresent(type -> requireClass(className, type.asInternalName(), refusals));
-        for (ClassEntry type : model.interfaces()) {
-            requireClass(className, type.asInternalName(), refusals);
+        if (model.superName != null) {
+            requireClass(className, model.superName, refusals);
+        }
+        for (String type : model.interfaces) {
+            requireClass(className, type, refusals);
         }
 
-        for (MethodModel method : model.methods()) {
-            method.code().ifPresent(code -> {
-                for (CodeElement element : code) {
-                    checkElement(className, element, refusals);
+        for (MethodNode method : model.methods) {
+            for (AbstractInsnNode instruction : method.instructions) {
+                checkInstruction(className, instruction, refusals);
+            }
+            for (TryCatchBlockNode handler : method.tryCatchBlocks) {
+                if (handler.type != null) {
+                    requireClass(className, handler.type, refusals);
                 }
-            });
+            }
         }
 
         return new ArrayList<>(refusals);
     }
 
-    private void checkElement(String className, CodeElement element, Set<Refusal> refusals) {
-        switch (element) {
-            case InvokeInstruction invoke -> requireMethod(className, invoke.owner().asInternalName(),
-                    invoke.name().stringValue(), invoke.type().stringValue(), refusals);
-            case FieldInstruction access -> requireField(className, access.owner().asInternalName(),
-                    access.name().stringValue(), access.type().stringValue(), refusals);
-            case NewObjectInstruction creation -> requireClass(className, creation.className().asInternalName(),
-                    refusals);
-            case TypeCheckInstruction check -> requireClass(className, check.type().asInternalName(), refusals);
-            case NewReferenceArrayInstruction array -> requireClass(className,
-                    array.componentType().asInternalName(), refusals);
-            case NewMultiArrayInstruction array -> requireClass(className, array.arrayType().asInternalName(),
-                    refusals);
-            case ConstantInstruction.LoadConstantInstruction constant
-                    when constant.constantEntry() instanceof ClassEntry type ->
-                    requireClass(className, type.asInternalName(), refusals);
-            case ExceptionCatch handler -> handler.catchType()
-                    .ifPresent(type -> requireClass(className, type.asInternalName(), refusals));
-            case InvokeDynamicInstruction dynamic -> {
+    private void checkInstruction(String className, AbstractInsnNode instruction, Set<Refusal> refusals) {
+        switch (instruction) {
+            case MethodInsnNode invoke -> requireMethod(className, invoke.owner, invoke.name, invoke.desc, refusals);
+            case FieldInsnNode access -> requireField(className, access.owner, access.name, access.desc, refusals);
+            case TypeInsnNode type -> requireClass(className, type.desc, refusals);
+            case MultiANewArrayInsnNode array -> requireClass(className, array.desc, refusals);
+            case LdcInsnNode constant when constant.cst instanceof Type type
+                    && (type.getSort() == Type.OBJECT || type.getSort() == Type.ARRAY) ->
+                    requireClass(className, type.getInternalName(), refusals);
+            case InvokeDynamicInsnNode dynamic -> {
                 requireClass(className,
-                        MemberRef.unwrapDescriptor(dynamic.typeSymbol().returnType().descriptorString()), refusals);
-                for (ConstantDesc argument : dynamic.bootstrapArgs()) {
-                    if (argument instanceof DirectMethodHandleDesc handle) {
+                        MemberRef.unwrapDescriptor(Type.getReturnType(dynamic.desc).getDescriptor()), refusals);
+                for (Object argument : dynamic.bsmArgs) {
+                    if (argument instanceof Handle handle) {
                         requireHandle(className, handle, refusals);
                     }
                 }
@@ -98,12 +93,11 @@ final class ReferenceCheck {
         }
     }
 
-    private void requireHandle(String className, DirectMethodHandleDesc handle, Set<Refusal> refusals) {
-        String owner = MemberRef.unwrapDescriptor(handle.owner().descriptorString());
-        switch (handle.kind()) {
-            case GETTER, SETTER, STATIC_GETTER, STATIC_SETTER ->
-                    requireField(className, owner, handle.methodName(), handle.lookupDescriptor(), refusals);
-            default -> requireMethod(className, owner, handle.methodName(), handle.lookupDescriptor(), refusals);
+    private void requireHandle(String className, Handle handle, Set<Refusal> refusals) {
+        switch (handle.getTag()) {
+            case Opcodes.H_GETFIELD, Opcodes.H_PUTFIELD, Opcodes.H_GETSTATIC, Opcodes.H_PUTSTATIC ->
+                    requireField(className, handle.getOwner(), handle.getName(), handle.getDesc(), refusals);
+            default -> requireMethod(className, handle.getOwner(), handle.getName(), handle.getDesc(), refusals);
         }
     }
 
@@ -131,7 +125,7 @@ final class ReferenceCheck {
         }
 
         boolean constructor = name.equals(MemberRef.CONSTRUCTOR);
-        Predicate<ClassModel> declares = model -> declaresMethod(model, name, descriptor);
+        Predicate<ClassNode> declares = model -> declaresMethod(model, name, descriptor);
         boolean found = constructor ? declaredBy(owner, declares) : resolves(owner, declares,
                 OBJECT_METHODS.contains(name + descriptor));
         if (!found) {
@@ -155,12 +149,12 @@ final class ReferenceCheck {
         }
     }
 
-    private boolean declaredBy(String owner, Predicate<ClassModel> declares) {
-        ClassModel model = this.classFiles.load(owner).model();
+    private boolean declaredBy(String owner, Predicate<ClassNode> declares) {
+        ClassNode model = this.classFiles.load(owner).model();
         return model == null || declares.test(model);
     }
 
-    private boolean resolves(String owner, Predicate<ClassModel> declares, boolean onObject) {
+    private boolean resolves(String owner, Predicate<ClassNode> declares, boolean onObject) {
         if (owner.equals(OBJECT)) {
             return onObject;
         }
@@ -174,18 +168,17 @@ final class ReferenceCheck {
             return false;
         }
 
-        ClassModel model = loaded.model();
+        ClassNode model = loaded.model();
         if (model == null || declares.test(model)) {
             return true;
         }
 
-        if (model.superclass().isPresent()
-                && resolves(model.superclass().get().asInternalName(), declares, onObject)) {
+        if (model.superName != null && resolves(model.superName, declares, onObject)) {
             return true;
         }
 
-        for (ClassEntry type : model.interfaces()) {
-            if (resolves(type.asInternalName(), declares, false)) {
+        for (String type : model.interfaces) {
+            if (resolves(type, declares, false)) {
                 return true;
             }
         }
@@ -193,9 +186,9 @@ final class ReferenceCheck {
         return false;
     }
 
-    private static boolean declaresMethod(ClassModel model, String name, String descriptor) {
-        for (MethodModel method : model.methods()) {
-            if (method.methodName().equalsString(name) && method.methodType().equalsString(descriptor)) {
+    private static boolean declaresMethod(ClassNode model, String name, String descriptor) {
+        for (MethodNode method : model.methods) {
+            if (method.name.equals(name) && method.desc.equals(descriptor)) {
                 return true;
             }
         }
@@ -203,9 +196,9 @@ final class ReferenceCheck {
         return false;
     }
 
-    private static boolean declaresField(ClassModel model, String name, String descriptor) {
-        for (FieldModel field : model.fields()) {
-            if (field.fieldName().equalsString(name) && field.fieldType().equalsString(descriptor)) {
+    private static boolean declaresField(ClassNode model, String name, String descriptor) {
+        for (FieldNode field : model.fields) {
+            if (field.name.equals(name) && field.desc.equals(descriptor)) {
                 return true;
             }
         }

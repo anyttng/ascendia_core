@@ -10,7 +10,7 @@ import com.ascendiacore.gui.base.geometry.Size;
 import com.ascendiacore.gui.layout.Container;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -102,7 +102,7 @@ public final class ComponentTree implements LayoutElement {
         }
 
         @Override
-        protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             arrange();
         }
 

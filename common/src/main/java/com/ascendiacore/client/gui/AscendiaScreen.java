@@ -1,8 +1,9 @@
 package com.ascendiacore.client.gui;
 
+import com.ascendiacore.client.gui.bridge.ComponentWidget;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 
 public abstract class AscendiaScreen extends Screen {
@@ -32,12 +33,21 @@ public abstract class AscendiaScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (Minecraft.getInstance().options.keyInventory.matches(event)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
             this.onClose();
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean taken = super.mouseClicked(mouseX, mouseY, button);
+        if (taken && getFocused() instanceof ComponentWidget widget && !widget.takesFocusOnPress()) {
+            clearFocus();
+        }
+        return taken;
     }
 
     @Override

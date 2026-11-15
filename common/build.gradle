@@ -7,7 +7,7 @@ plugins {
 version = ascendia_core_version
 group = mod_group_id
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 neoForge {
     neoFormVersion = project.neoform_version
@@ -26,6 +26,8 @@ repositories {
 dependencies {
     compileOnly "net.fabricmc:sponge-mixin:${mixin_version}"
     compileOnly "io.github.llamalad7:mixinextras-common:${mixinextras_version}"
+    compileOnly "org.jspecify:jspecify:${jspecify_version}"
+    testCompileOnly "org.jspecify:jspecify:${jspecify_version}"
 }
 
 neoForge.addModdingDependenciesTo(sourceSets.test)
