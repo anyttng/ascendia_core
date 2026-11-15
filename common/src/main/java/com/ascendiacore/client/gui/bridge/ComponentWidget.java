@@ -1,7 +1,12 @@
 package com.ascendiacore.client.gui.bridge;
 
+import java.util.Optional;
+
+import org.jspecify.annotations.Nullable;
+
 import com.ascendiacore.gui.base.component.ComponentHost;
 import com.ascendiacore.gui.base.component.GuiComponent;
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -15,20 +20,18 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 public final class ComponentWidget extends AbstractWidget implements ComponentHost {
     private static final int OUTSIDE = Integer.MIN_VALUE;
 
     private final GuiComponent component;
+    private Component tooltipText = Component.empty();
 
     public ComponentWidget(GuiComponent component) {
         super(component.x(), component.y(), component.width(), component.height(), component.narration());
         this.component = component;
         component.attach(this);
-    }
-
-    public void tooltip(Component text) {
-        setTooltip(Tooltip.create(text));
     }
 
     @Override
@@ -115,6 +118,9 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     @Override
     protected void extractTooltipForNextRenderPass(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (component.visible()) {
+            if (isHovered() || isFocused()) {
+                followTooltip(component.tooltipAt(mouseX, mouseY));
+            }
             super.extractTooltipForNextRenderPass(graphics, mouseX, mouseY);
         }
     }
@@ -126,6 +132,21 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
 
     void followComponent() {
         setRectangle(component.width(), component.height(), component.x(), component.y());
+    }
+
+    private void followTooltip(Component text) {
+        if (text.equals(tooltipText)) {
+            return;
+        }
+        tooltipText = text;
+        TooltipStyle style = component.tooltipStyle();
+        if (style == null || text.getString().isEmpty()) {
+            setTooltip(null);
+            return;
+        }
+        Component colored = Component.empty().withColor(style.textColor()).append(text);
+        @Nullable Identifier sprites = style.sprites() == null ? null : Identifier.parse(style.sprites());
+        setTooltip(Tooltip.create(colored, Optional.empty(), sprites));
     }
 
     private static void dropScreenFocus() {

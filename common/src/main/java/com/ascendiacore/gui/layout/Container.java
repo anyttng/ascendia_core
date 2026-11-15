@@ -12,6 +12,8 @@ import com.ascendiacore.gui.layout.model.Align;
 import com.ascendiacore.gui.layout.model.Axis;
 import com.ascendiacore.gui.layout.model.Length;
 
+import net.minecraft.network.chat.Component;
+
 public abstract class Container extends GuiComponent {
     private record Slot(GuiComponent component, Length length) {
     }
@@ -105,7 +107,30 @@ public abstract class Container extends GuiComponent {
     }
 
     @Override
+    public Component tooltipAt(double pointX, double pointY) {
+        return childShowsTooltipAt(pointX, pointY) ? Component.empty() : tooltip();
+    }
+
+    @Override
     protected void drawContent(Canvas canvas) {
+    }
+
+    private boolean childShowsTooltipAt(double pointX, double pointY) {
+        for (Slot slot : slots) {
+            GuiComponent child = slot.component();
+            if (child.visible() && child.contains(pointX, pointY) && showsTooltipAt(child, pointX, pointY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean showsTooltipAt(GuiComponent component, double pointX, double pointY) {
+        if (component instanceof Container container) {
+            return container.childShowsTooltipAt(pointX, pointY)
+                    || (container.paints() && !container.tooltip().getString().isEmpty());
+        }
+        return !component.tooltipAt(pointX, pointY).getString().isEmpty();
     }
 
     private void place(GuiComponent child, int offset, int length, Size natural) {
