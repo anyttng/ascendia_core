@@ -1,37 +1,63 @@
 package com.ascendiacore.gui.widget.list;
 
-import java.util.List;
 import java.util.function.IntConsumer;
 
+import com.ascendiacore.gui.layout.Column;
 import com.ascendiacore.gui.layout.Container;
 import com.ascendiacore.gui.layout.model.Axis;
 import com.ascendiacore.gui.layout.model.Length;
 import com.ascendiacore.gui.theme.Theme;
-import com.ascendiacore.gui.widget.list.model.ListRow;
-import com.ascendiacore.gui.widget.panel.Inset;
-import com.ascendiacore.gui.widget.panel.model.FillKind;
-import com.ascendiacore.gui.widget.panel.model.InsetFrame;
-import com.ascendiacore.gui.widget.scrollbar.Scroll;
-import com.ascendiacore.gui.widget.scrollbar.Scrollbar;
+import com.ascendiacore.gui.widget.label.Label;
+import com.ascendiacore.gui.widget.label.model.LabelRole;
+import com.ascendiacore.gui.widget.list.model.RowStyle;
+import com.ascendiacore.gui.widget.panel.model.FillStyle;
+import com.ascendiacore.gui.widget.scrollarea.ScrollArea;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 
 public final class ListBox extends Container {
-    public static final int NONE = ListRows.NONE;
-    private static final int SCROLLBAR_GAP = 2;
+    public static final int NONE = -1;
+    private static final int ENTRY_GAP = 3;
 
-    private final ListRows rows;
+    private final Theme theme;
+    private final FillStyle fill;
+    private final RowStyle rowStyle;
+    private final IntConsumer onSelect;
+    private final Column entries = new Column();
+    private int rows;
+    private int selected = NONE;
 
-    public ListBox(Theme theme, List<ListRow> rows, IntConsumer onSelect) {
-        super(Axis.HORIZONTAL);
-        Scroll scroll = new Scroll(ListRows.ROW_HEIGHT);
-        Inset page = new Inset(theme.inset(), InsetFrame.LIGHT, FillKind.PAGE);
-        this.rows = new ListRows(theme.list(), page.fill().ink(), rows, scroll, onSelect);
-        page.add(this.rows, Length.fill());
-        setGap(SCROLLBAR_GAP);
-        add(page, Length.fill());
-        add(new Scrollbar(theme.scrollbar(), scroll), Length.fixed(Scrollbar.WIDTH));
+    public ListBox(Theme theme, FillStyle fill, RowStyle rowStyle, IntConsumer onSelect) {
+        super(Axis.VERTICAL);
+        this.theme = theme;
+        this.fill = fill;
+        this.rowStyle = rowStyle;
+        this.onSelect = onSelect;
+        entries.setGap(ENTRY_GAP);
+        add(new ScrollArea(theme.scrollbar(), entries), Length.fill());
+    }
+
+    public ListRow addRow(Component name) {
+        int index = rows++;
+        if (selected == NONE) {
+            selected = index;
+        }
+        ListRow row = new ListRow(theme.list(), theme.button(), rowStyle, name, () -> selected == index, () -> select(index));
+        entries.add(row);
+        return row;
+    }
+
+    public void addHeading(Component text) {
+        entries.add(new Label(fill, LabelRole.NORMAL, text.copy().withStyle(ChatFormatting.BOLD)));
     }
 
     public int selected() {
-        return rows.selected();
+        return selected;
+    }
+
+    private void select(int index) {
+        selected = index;
+        onSelect.accept(index);
     }
 }
