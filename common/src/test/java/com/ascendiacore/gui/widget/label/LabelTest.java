@@ -18,7 +18,7 @@ import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import net.minecraft.network.chat.Component;
 
 class LabelTest {
-    private static final FillStyle FILL = new FillStyle(0xFF000000, 0xFF111111, 0xFF222222, true);
+    private static final FillStyle FILL = new FillStyle(0xFF000000, 0xFF111111, 0xFF222222, 0xFF333333, true);
     private static final Component TEXT = Component.literal("Value");
     private static final int CHAR_WIDTH = 6;
     private static final int TEXT_WIDTH = 5 * CHAR_WIDTH;
@@ -67,12 +67,24 @@ class LabelTest {
     void eachRoleTakesItsInkFromTheFillAndTheFillDecidesTheShadow() {
         place(new Label(FILL, LabelRole.NORMAL, TEXT), BOX_WIDTH).draw(canvas, 0, 0);
         place(new Label(FILL, LabelRole.MUTED, TEXT), BOX_WIDTH).draw(canvas, 0, 0);
+        place(new Label(FILL, LabelRole.ERROR, TEXT), BOX_WIDTH).draw(canvas, 0, 0);
         assertEquals(FILL.ink(), canvas.texts().get(0).color());
         assertEquals(FILL.mutedInk(), canvas.texts().get(1).color());
+        assertEquals(FILL.errorInk(), canvas.texts().get(2).color());
         assertTrue(canvas.texts().get(0).shadow());
-        FillStyle flat = new FillStyle(0xFF000000, 0xFF111111, 0xFF222222, false);
+        FillStyle flat = new FillStyle(0xFF000000, 0xFF111111, 0xFF222222, 0xFF333333, false);
         place(new Label(flat, LabelRole.MUTED, TEXT), BOX_WIDTH).draw(canvas, 0, 0);
-        assertFalse(canvas.texts().get(2).shadow());
+        assertFalse(canvas.texts().get(3).shadow());
+    }
+
+    @Test
+    void roleFollowsItsRule() {
+        Label label = place(new Label(FILL, LabelRole.NORMAL, TEXT), BOX_WIDTH);
+        LabelRole[] current = {LabelRole.NORMAL};
+        label.setRole(() -> current[0]);
+        current[0] = LabelRole.ERROR;
+        label.draw(canvas, 0, 0);
+        assertEquals(FILL.errorInk(), canvas.texts().getFirst().color());
     }
 
     @Test

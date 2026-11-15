@@ -48,7 +48,8 @@ public final class VanillaTheme {
     }
 
     private static PanelStyle panel() {
-        FillStyle inTheSprite = new FillStyle(FillStyle.NO_FILL, VanillaPalette.WHITE, VanillaPalette.DISABLED_LABEL, true);
+        FillStyle inTheSprite = new FillStyle(FillStyle.NO_FILL, VanillaPalette.WHITE, VanillaPalette.DISABLED_LABEL,
+                VanillaPalette.RED, true);
         return new PanelStyle(new FrameStyle(GAME_POPUP, GAME_POPUP_BORDER), new Fills(inTheSprite, inTheSprite, inTheSprite));
     }
 
@@ -58,9 +59,12 @@ public final class VanillaTheme {
                 new FrameStyle(INSET_DARK, HEAVY_INSET_BORDER),
                 new FrameStyle(INSET_RIM, HEAVY_INSET_BORDER),
                 new Fills(
-                        new FillStyle(VanillaPalette.LIGHT_GRAY, VanillaPalette.CHARCOAL, VanillaPalette.DISABLED_LINK, false),
-                        new FillStyle(VanillaPalette.GRAY, VanillaPalette.WHITE, VanillaPalette.PALE_GRAY, true),
-                        new FillStyle(VanillaPalette.DARK_GRAY, VanillaPalette.WHITE, VanillaPalette.DISABLED_LABEL, true)));
+                        new FillStyle(VanillaPalette.LIGHT_GRAY, VanillaPalette.CHARCOAL, VanillaPalette.DISABLED_LINK,
+                                VanillaPalette.DARK_RED, false),
+                        new FillStyle(VanillaPalette.GRAY, VanillaPalette.WHITE, VanillaPalette.PALE_GRAY, VanillaPalette.DARK_RED,
+                                true),
+                        new FillStyle(VanillaPalette.DARK_GRAY, VanillaPalette.WHITE, VanillaPalette.DISABLED_LABEL,
+                                VanillaPalette.RED, true)));
     }
 
     private static LinkStyle link() {

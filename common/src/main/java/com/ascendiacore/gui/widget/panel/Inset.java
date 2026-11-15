@@ -1,7 +1,7 @@
 package com.ascendiacore.gui.widget.panel;
 
 import com.ascendiacore.gui.base.draw.Canvas;
-import com.ascendiacore.gui.layout.Container;
+import com.ascendiacore.gui.layout.OpenContainer;
 import com.ascendiacore.gui.layout.model.Axis;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 import com.ascendiacore.gui.widget.panel.model.FillStyle;
@@ -9,7 +9,7 @@ import com.ascendiacore.gui.widget.panel.model.FrameStyle;
 import com.ascendiacore.gui.widget.panel.model.InsetFrame;
 import com.ascendiacore.gui.widget.panel.model.InsetStyle;
 
-public final class Inset extends Container {
+public final class Inset extends OpenContainer {
     private final FrameStyle frame;
     private final FillStyle fill;
 
