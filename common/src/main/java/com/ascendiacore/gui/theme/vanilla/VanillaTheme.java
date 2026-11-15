@@ -1,5 +1,6 @@
 package com.ascendiacore.gui.theme.vanilla;
 
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.theme.Theme;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 import com.ascendiacore.gui.widget.link.model.LinkColors;
@@ -32,7 +33,7 @@ public final class VanillaTheme {
     private static final int LIGHT_INSET_BORDER = 3;
     private static final int HEAVY_INSET_BORDER = 4;
 
-    public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar());
+    public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar(), tooltip());
 
     private VanillaTheme() {
     }
@@ -70,5 +71,9 @@ public final class VanillaTheme {
 
     private static ScrollbarStyle scrollbar() {
         return new ScrollbarStyle(GAME_SCROLLER_BACKGROUND, GAME_SCROLLER, GAME_SCROLLER);
+    }
+
+    private static TooltipStyle tooltip() {
+        return new TooltipStyle(null, VanillaPalette.WHITE);
     }
 }
