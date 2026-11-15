@@ -1,5 +1,6 @@
 package com.ascendiacore.gui.theme;
 
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 import com.ascendiacore.gui.widget.link.model.LinkStyle;
 import com.ascendiacore.gui.widget.list.model.ListStyle;
@@ -14,5 +15,6 @@ public record Theme(
         InsetStyle inset,
         LinkStyle link,
         ListStyle list,
-        ScrollbarStyle scrollbar) {
+        ScrollbarStyle scrollbar,
+        TooltipStyle tooltip) {
 }

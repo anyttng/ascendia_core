@@ -2,6 +2,7 @@ package com.ascendiacore.gui.base.component;
 
 import org.jspecify.annotations.Nullable;
 
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.draw.TextMetrics;
 import com.ascendiacore.gui.base.geometry.Size;
@@ -26,6 +27,8 @@ public abstract class GuiComponent {
     private int height;
     private Property<Boolean> visible = Property.of(true);
     private Property<Boolean> enabled = Property.of(true);
+    private Property<Component> tooltip = Property.of(Component.empty());
+    private @Nullable TooltipStyle tooltipStyle;
     private boolean countedWhenInactive;
     private boolean hovered;
     private boolean focused;
@@ -120,6 +123,27 @@ public abstract class GuiComponent {
 
     public void setEnabled(Property<Boolean> enabled) {
         this.enabled = enabled;
+    }
+
+    public Component tooltip() {
+        return tooltip.get();
+    }
+
+    public @Nullable TooltipStyle tooltipStyle() {
+        return tooltipStyle;
+    }
+
+    public Component tooltipAt(double pointX, double pointY) {
+        return tooltip();
+    }
+
+    public void setTooltip(TooltipStyle style, Component text) {
+        setTooltip(style, Property.of(text));
+    }
+
+    public void setTooltip(TooltipStyle style, Property<Component> text) {
+        this.tooltipStyle = style;
+        this.tooltip = text;
     }
 
     public boolean hovered() {

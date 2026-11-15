@@ -1,5 +1,6 @@
 package com.ascendiacore.gui.theme.book;
 
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.theme.Theme;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 import com.ascendiacore.gui.widget.link.model.LinkColors;
@@ -29,11 +30,12 @@ public final class BookTheme {
     private static final String SCROLL_TRACK = SPRITES + "scroll_track";
     private static final String SCROLL_THUMB = SPRITES + "scroll_thumb";
     private static final String SCROLL_THUMB_HOVER = SPRITES + "scroll_thumb_hover";
+    private static final String TOOLTIP_SPRITES = "ascendia_core:book";
     private static final int PANEL_BORDER = 8;
     private static final int LIGHT_INSET_BORDER = 3;
     private static final int HEAVY_INSET_BORDER = 4;
 
-    public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar());
+    public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar(), tooltip());
 
     private BookTheme() {
     }
@@ -74,5 +76,9 @@ public final class BookTheme {
 
     private static ScrollbarStyle scrollbar() {
         return new ScrollbarStyle(SCROLL_TRACK, SCROLL_THUMB, SCROLL_THUMB_HOVER);
+    }
+
+    private static TooltipStyle tooltip() {
+        return new TooltipStyle(TOOLTIP_SPRITES, BookPalette.PARCHMENT);
     }
 }
