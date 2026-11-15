@@ -16,10 +16,13 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
+import org.jspecify.annotations.Nullable;
+
 public final class ComponentWidget extends AbstractWidget implements ComponentHost {
     private static final int OUTSIDE = Integer.MIN_VALUE;
 
     private final GuiComponent component;
+    private @Nullable Tooltip tooltip;
 
     public ComponentWidget(GuiComponent component) {
         super(component.x(), component.y(), component.width(), component.height(), component.narration());
@@ -29,6 +32,12 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
 
     public void tooltip(Component text) {
         setTooltip(Tooltip.create(text));
+    }
+
+    @Override
+    public void setTooltip(@Nullable Tooltip tooltip) {
+        this.tooltip = tooltip;
+        super.setTooltip(tooltip);
     }
 
     @Override
@@ -88,13 +97,7 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
         boolean pointerShown = graphics.containsPointInScissor(mouseX, mouseY);
         component.draw(new GameCanvas(graphics, Minecraft.getInstance().font),
                 pointerShown ? mouseX : OUTSIDE, pointerShown ? mouseY : OUTSIDE);
-    }
-
-    @Override
-    protected void extractTooltipForNextRenderPass(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
-        if (component.visible()) {
-            super.extractTooltipForNextRenderPass(graphics, mouseX, mouseY);
-        }
+        super.setTooltip(component.visible() ? tooltip : null);
     }
 
     @Override
@@ -107,7 +110,7 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     }
 
     private static void dropScreenFocus() {
-        Screen screen = Minecraft.getInstance().gui.screen();
+        Screen screen = Minecraft.getInstance().screen;
         if (screen != null) {
             screen.clearFocus();
         }
