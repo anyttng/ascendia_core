@@ -70,15 +70,37 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         placeComponent();
         boolean taken = component.pointerPressed(GameInput.pointer(event));
-        if (taken && !component.takesFocusOnPress()) {
+        if (taken && !shouldTakeFocusAfterInteraction()) {
             dropScreenFocus();
         }
         return taken;
     }
 
     @Override
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        placeComponent();
+        return component.pointerDragged(GameInput.pointer(event));
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        placeComponent();
+        boolean taken = component.pointerReleased(GameInput.pointer(event));
+        if (!component.takesFocusOnPress()) {
+            dropScreenFocus();
+        }
+        return taken;
+    }
+
+    @Override
+    public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+        placeComponent();
+        return component.wheelScrolled(GameInput.wheel(x, y, scrollY));
+    }
+
+    @Override
     public boolean shouldTakeFocusAfterInteraction() {
-        return component.takesFocusOnPress();
+        return component.takesFocusOnPress() || component.followsDrag();
     }
 
     @Override

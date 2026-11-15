@@ -28,9 +28,17 @@ class BookThemeTest {
         List<String> sprites = List.of(
                 THEME.button().normal(), THEME.button().hover(), THEME.button().disabled(),
                 THEME.panel().frame().sprite(),
-                THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite());
+                THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite(),
+                THEME.list().rowHover(), THEME.list().rowSelected(),
+                THEME.scrollbar().track(), THEME.scrollbar().thumb(), THEME.scrollbar().thumbHover());
         assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
         assertEquals(sprites.size(), Set.copyOf(sprites).size());
+    }
+
+    @Test
+    void selectedRowLabelIsParchmentWithoutAShadow() {
+        assertEquals(BookPalette.PARCHMENT, THEME.list().selectedLabelColor());
+        assertFalse(THEME.list().labelShadow());
     }
 
     @Test

@@ -8,6 +8,7 @@ import com.ascendiacore.gui.base.geometry.Size;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.TextInput;
+import com.ascendiacore.gui.base.input.WheelInput;
 import com.ascendiacore.gui.base.input.model.PointerButton;
 import com.ascendiacore.gui.base.property.Property;
 
@@ -28,6 +29,8 @@ public abstract class GuiComponent {
     private boolean countedWhenInactive;
     private boolean hovered;
     private boolean focused;
+    private int pointerX;
+    private int pointerY;
 
     public void attach(ComponentHost host) {
         this.host = host;
@@ -38,6 +41,10 @@ public abstract class GuiComponent {
     }
 
     public boolean takesFocusOnPress() {
+        return false;
+    }
+
+    public boolean followsDrag() {
         return false;
     }
 
@@ -135,6 +142,8 @@ public abstract class GuiComponent {
         if (!visible()) {
             return;
         }
+        this.pointerX = pointerX;
+        this.pointerY = pointerY;
         hovered = contains(pointerX, pointerY);
         drawContent(canvas);
     }
@@ -145,6 +154,22 @@ public abstract class GuiComponent {
         }
         onPress(input);
         return true;
+    }
+
+    public final boolean pointerDragged(PointerInput input) {
+        return takesInput() && input.button() == PointerButton.LEFT && onDrag(input);
+    }
+
+    public final boolean pointerReleased(PointerInput input) {
+        if (input.button() != PointerButton.LEFT) {
+            return false;
+        }
+        onRelease(input);
+        return true;
+    }
+
+    public final boolean wheelScrolled(WheelInput input) {
+        return takesInput() && contains(input.x(), input.y()) && onWheel(input);
     }
 
     public final boolean keyPressed(KeyInput input) {
@@ -165,7 +190,26 @@ public abstract class GuiComponent {
         host.clickSound();
     }
 
+    protected int pointerX() {
+        return pointerX;
+    }
+
+    protected int pointerY() {
+        return pointerY;
+    }
+
     protected void onPress(PointerInput input) {
+    }
+
+    protected boolean onDrag(PointerInput input) {
+        return false;
+    }
+
+    protected void onRelease(PointerInput input) {
+    }
+
+    protected boolean onWheel(WheelInput input) {
+        return false;
     }
 
     protected boolean onKey(KeyInput input) {
