@@ -20,9 +20,14 @@ public final class RecordingCanvas implements Canvas {
     private final List<Fill> fills = new ArrayList<>();
     private final List<Text> texts = new ArrayList<>();
     private int textWidth;
+    private int charWidth;
 
     public void setTextWidth(int textWidth) {
         this.textWidth = textWidth;
+    }
+
+    public void setCharWidth(int charWidth) {
+        this.charWidth = charWidth;
     }
 
     public List<Sprite> sprites() {
@@ -59,7 +64,11 @@ public final class RecordingCanvas implements Canvas {
 
     @Override
     public int textWidth(Component text) {
-        return textWidth;
+        if (charWidth == 0) {
+            return textWidth;
+        }
+        String plain = text.getString();
+        return plain.codePointCount(0, plain.length()) * charWidth;
     }
 
     @Override

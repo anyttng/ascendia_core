@@ -24,7 +24,7 @@ public final class ListBox extends Container {
         super(Axis.HORIZONTAL);
         Scroll scroll = new Scroll(ListRows.ROW_HEIGHT);
         Inset page = new Inset(theme.inset(), InsetFrame.LIGHT, FillKind.PAGE);
-        this.rows = new ListRows(theme.list(), page.ink(), rows, scroll, onSelect);
+        this.rows = new ListRows(theme.list(), page.fill().ink(), rows, scroll, onSelect);
         page.add(this.rows, Length.fill());
         setGap(SCROLLBAR_GAP);
         add(page, Length.fill());
