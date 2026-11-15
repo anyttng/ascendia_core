@@ -12,6 +12,7 @@ import com.ascendiacore.gui.widget.panel.model.FrameStyle;
 import com.ascendiacore.gui.widget.panel.model.InsetStyle;
 import com.ascendiacore.gui.widget.panel.model.PanelStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
+import com.ascendiacore.gui.widget.textfield.model.TextFieldStyle;
 
 public final class BookTheme {
     private static final String NAME = "book";
@@ -30,12 +31,16 @@ public final class BookTheme {
     private static final String SCROLL_TRACK = SPRITES + "scroll_track";
     private static final String SCROLL_THUMB = SPRITES + "scroll_thumb";
     private static final String SCROLL_THUMB_HOVER = SPRITES + "scroll_thumb_hover";
+    private static final String TEXT_FIELD = SPRITES + "text_field";
+    private static final String TEXT_FIELD_FOCUSED = SPRITES + "text_field_focused";
+    private static final String TEXT_FIELD_DISABLED = SPRITES + "text_field_disabled";
     private static final String TOOLTIP_SPRITES = "ascendia_core:book";
     private static final int PANEL_BORDER = 8;
     private static final int LIGHT_INSET_BORDER = 3;
     private static final int HEAVY_INSET_BORDER = 4;
 
-    public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar(), tooltip());
+    public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar(), tooltip(),
+            textField());
 
     private BookTheme() {
     }
@@ -80,5 +85,10 @@ public final class BookTheme {
 
     private static TooltipStyle tooltip() {
         return new TooltipStyle(TOOLTIP_SPRITES, BookPalette.PARCHMENT);
+    }
+
+    private static TextFieldStyle textField() {
+        return new TextFieldStyle(TEXT_FIELD, TEXT_FIELD_FOCUSED, TEXT_FIELD_DISABLED,
+                BookPalette.CHARCOAL, BookPalette.FADED, BookPalette.SAND, false);
     }
 }

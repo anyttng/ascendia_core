@@ -12,6 +12,7 @@ import com.ascendiacore.gui.widget.panel.model.FrameStyle;
 import com.ascendiacore.gui.widget.panel.model.InsetStyle;
 import com.ascendiacore.gui.widget.panel.model.PanelStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
+import com.ascendiacore.gui.widget.textfield.model.TextFieldStyle;
 
 public final class VanillaTheme {
     private static final String NAME = "vanilla";
@@ -21,6 +22,8 @@ public final class VanillaTheme {
     private static final String GAME_POPUP = "minecraft:popup/background";
     private static final String GAME_SCROLLER = "minecraft:widget/scroller";
     private static final String GAME_SCROLLER_BACKGROUND = "minecraft:widget/scroller_background";
+    private static final String GAME_TEXT_FIELD = "minecraft:widget/text_field";
+    private static final String GAME_TEXT_FIELD_HIGHLIGHTED = "minecraft:widget/text_field_highlighted";
     private static final String SPRITES = "ascendia_core:theme/vanilla/";
     private static final String BUTTON_SELECTED = SPRITES + "button_selected";
     private static final String BUTTON_SELECTED_HOVER = SPRITES + "button_selected_hover";
@@ -33,7 +36,8 @@ public final class VanillaTheme {
     private static final int LIGHT_INSET_BORDER = 3;
     private static final int HEAVY_INSET_BORDER = 4;
 
-    public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar(), tooltip());
+    public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar(), tooltip(),
+            textField());
 
     private VanillaTheme() {
     }
@@ -75,5 +79,10 @@ public final class VanillaTheme {
 
     private static TooltipStyle tooltip() {
         return new TooltipStyle(null, VanillaPalette.WHITE);
+    }
+
+    private static TextFieldStyle textField() {
+        return new TextFieldStyle(GAME_TEXT_FIELD, GAME_TEXT_FIELD_HIGHLIGHTED, GAME_TEXT_FIELD,
+                VanillaPalette.PALE_GRAY, VanillaPalette.DISABLED_LINK, VanillaPalette.STONE_GRAY, true);
     }
 }
