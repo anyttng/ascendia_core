@@ -6,6 +6,8 @@ import com.ascendiacore.gui.widget.panel.Panel;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
@@ -56,11 +58,16 @@ public abstract class AscendiaScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (Minecraft.getInstance().options.keyInventory.matches(event)) {
+        if (!isInputCaptured() && Minecraft.getInstance().options.keyInventory.matches(event)) {
             this.onClose();
             return true;
         }
         return super.keyPressed(event);
+    }
+
+    private boolean isInputCaptured() {
+        ComponentPath path = getCurrentFocusPath();
+        return path != null && path.leafComponent() instanceof EditBox box && box.canConsumeInput();
     }
 
     @Override

@@ -5,9 +5,11 @@ import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
 
+import com.ascendiacore.gui.base.component.GuiComponent;
 import com.ascendiacore.gui.base.draw.TextMetrics;
 import com.ascendiacore.gui.base.geometry.Size;
 import com.ascendiacore.gui.layout.Container;
+import com.ascendiacore.gui.widget.textfield.TextField;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -19,7 +21,7 @@ import net.minecraft.network.chat.Component;
 
 public final class ComponentTree implements LayoutElement {
     private final Container root;
-    private final List<ComponentWidget> mounted;
+    private final List<Mount> mounted;
     private final FrameStart frameStart = new FrameStart();
     private int x;
     private int y;
@@ -27,7 +29,7 @@ public final class ComponentTree implements LayoutElement {
 
     public ComponentTree(Container root) {
         this.root = root;
-        this.mounted = root.mountedComponents().stream().map(ComponentWidget::new).toList();
+        this.mounted = root.mountedComponents().stream().map(ComponentTree::mount).toList();
     }
 
     public void setSize(int width, int height) {
@@ -67,7 +69,16 @@ public final class ComponentTree implements LayoutElement {
     @Override
     public void visitWidgets(Consumer<AbstractWidget> widgetVisitor) {
         widgetVisitor.accept(frameStart);
-        mounted.forEach(widgetVisitor);
+        mounted.forEach(mount -> widgetVisitor.accept(mount.widget()));
+    }
+
+    private static Mount mount(GuiComponent component) {
+        if (component instanceof TextField field) {
+            TextFieldWidget widget = new TextFieldWidget(field);
+            return new Mount(widget, widget::followComponent);
+        }
+        ComponentWidget widget = new ComponentWidget(component);
+        return new Mount(widget, widget::followComponent);
     }
 
     private void arrange() {
@@ -75,7 +86,7 @@ public final class ComponentTree implements LayoutElement {
         root.setPosition(x, y);
         root.setSize(bounds.width(), bounds.height());
         root.layout(metrics());
-        mounted.forEach(ComponentWidget::followComponent);
+        mounted.forEach(mount -> mount.follow().run());
     }
 
     private Size size() {
@@ -84,6 +95,9 @@ public final class ComponentTree implements LayoutElement {
 
     private static TextMetrics metrics() {
         return Minecraft.getInstance().font::width;
+    }
+
+    private record Mount(AbstractWidget widget, Runnable follow) {
     }
 
     private final class FrameStart extends AbstractWidget {
