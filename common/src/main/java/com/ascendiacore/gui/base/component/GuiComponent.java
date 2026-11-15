@@ -1,5 +1,7 @@
 package com.ascendiacore.gui.base.component;
 
+import org.jspecify.annotations.Nullable;
+
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.draw.TextMetrics;
 import com.ascendiacore.gui.base.geometry.Size;
@@ -16,6 +18,7 @@ public abstract class GuiComponent {
     };
 
     private ComponentHost host = NO_HOST;
+    private @Nullable GuiComponent parent;
     private int x;
     private int y;
     private int width;
@@ -76,7 +79,15 @@ public abstract class GuiComponent {
         this.height = height;
     }
 
+    public boolean interactive() {
+        return true;
+    }
+
     public boolean visible() {
+        return visibleByOwnRule() && (parent == null || parent.visible());
+    }
+
+    public boolean visibleByOwnRule() {
         return visible.get();
     }
 
@@ -89,6 +100,10 @@ public abstract class GuiComponent {
     }
 
     public boolean enabled() {
+        return enabledByOwnRule() && (parent == null || parent.enabled());
+    }
+
+    public boolean enabledByOwnRule() {
         return enabled.get();
     }
 
@@ -142,6 +157,10 @@ public abstract class GuiComponent {
 
     protected abstract void drawContent(Canvas canvas);
 
+    protected final void adopt(GuiComponent child) {
+        child.parent = this;
+    }
+
     protected void playClick() {
         host.clickSound();
     }
@@ -158,6 +177,6 @@ public abstract class GuiComponent {
     }
 
     private boolean takesInput() {
-        return visible() && enabled();
+        return interactive() && visible() && enabled();
     }
 }

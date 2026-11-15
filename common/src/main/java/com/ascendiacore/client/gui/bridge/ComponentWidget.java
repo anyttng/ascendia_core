@@ -33,12 +33,12 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
 
     @Override
     public boolean isActive() {
-        return component.visible() && component.enabled();
+        return component.interactive() && component.visible() && component.enabled();
     }
 
     @Override
     public NarratableEntry.NarrationPriority narrationPriority() {
-        return component.visible() ? super.narrationPriority() : NarratableEntry.NarrationPriority.NONE;
+        return isActive() ? super.narrationPriority() : NarratableEntry.NarrationPriority.NONE;
     }
 
     @Override

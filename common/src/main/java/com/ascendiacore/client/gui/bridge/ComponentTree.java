@@ -19,7 +19,7 @@ import net.minecraft.network.chat.Component;
 
 public final class ComponentTree implements LayoutElement {
     private final Container root;
-    private final List<ComponentWidget> leaves;
+    private final List<ComponentWidget> mounted;
     private final FrameStart frameStart = new FrameStart();
     private int x;
     private int y;
@@ -27,7 +27,7 @@ public final class ComponentTree implements LayoutElement {
 
     public ComponentTree(Container root) {
         this.root = root;
-        this.leaves = root.leaves().stream().map(ComponentWidget::new).toList();
+        this.mounted = root.mountedComponents().stream().map(ComponentWidget::new).toList();
     }
 
     public void setSize(int width, int height) {
@@ -67,7 +67,7 @@ public final class ComponentTree implements LayoutElement {
     @Override
     public void visitWidgets(Consumer<AbstractWidget> widgetVisitor) {
         widgetVisitor.accept(frameStart);
-        leaves.forEach(widgetVisitor);
+        mounted.forEach(widgetVisitor);
     }
 
     private void arrange() {
@@ -75,7 +75,7 @@ public final class ComponentTree implements LayoutElement {
         root.setPosition(x, y);
         root.setSize(bounds.width(), bounds.height());
         root.layout(metrics());
-        leaves.forEach(ComponentWidget::followComponent);
+        mounted.forEach(ComponentWidget::followComponent);
     }
 
     private Size size() {

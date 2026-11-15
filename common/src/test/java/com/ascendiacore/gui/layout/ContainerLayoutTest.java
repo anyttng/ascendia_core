@@ -81,7 +81,7 @@ class ContainerLayoutTest {
     }
 
     @Test
-    void leavesAreTheComponentsOfTheTreeInItsOrderWithoutTheContainers() {
+    void mountedComponentsOfPlainContainersAreTheLeavesInTreeOrder() {
         Column column = new Column();
         Row inner = new Row();
         Box first = new Box(0, 0);
@@ -91,7 +91,25 @@ class ContainerLayoutTest {
         column.add(first);
         column.add(inner);
         column.add(third);
-        assertEquals(List.of(first, second, third), column.leaves());
+        assertEquals(List.of(first, second, third), column.mountedComponents());
+    }
+
+    @Test
+    void paddingMovesChildrenInAndTakesItsRoomFromBothSides() {
+        Row row = row(100, 30);
+        row.setPadding(5);
+        Box box = new Box(0, 0);
+        row.add(box, Length.fill());
+        row.layout(NO_TEXT);
+        assertEquals(new Bounds(LEFT + 5, TOP + 5, 90, 20), Bounds.of(box));
+    }
+
+    @Test
+    void naturalSizeIncludesThePadding() {
+        Row row = row(0, 0);
+        row.setPadding(5);
+        row.add(new Box(20, 10));
+        assertEquals(new Size(30, 20), row.naturalSize(NO_TEXT));
     }
 
     @Test

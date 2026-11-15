@@ -19,9 +19,10 @@ public abstract class Container extends GuiComponent {
     private final Axis axis;
     private final List<Slot> slots = new ArrayList<>();
     private int gap;
+    private int padding;
     private Align align = Align.STRETCH;
 
-    Container(Axis axis) {
+    protected Container(Axis axis) {
         this.axis = axis;
     }
 
@@ -30,6 +31,7 @@ public abstract class Container extends GuiComponent {
     }
 
     public void add(GuiComponent child, Length length) {
+        adopt(child);
         slots.add(new Slot(child, length));
     }
 
@@ -37,20 +39,36 @@ public abstract class Container extends GuiComponent {
         this.gap = gap;
     }
 
+    public void setPadding(int padding) {
+        this.padding = padding;
+    }
+
     public void setAlign(Align align) {
         this.align = align;
     }
 
-    public List<GuiComponent> leaves() {
-        List<GuiComponent> leaves = new ArrayList<>();
+    public boolean paints() {
+        return false;
+    }
+
+    @Override
+    public boolean interactive() {
+        return false;
+    }
+
+    public List<GuiComponent> mountedComponents() {
+        List<GuiComponent> mounted = new ArrayList<>();
+        if (paints()) {
+            mounted.add(this);
+        }
         for (Slot slot : slots) {
             if (slot.component() instanceof Container container) {
-                leaves.addAll(container.leaves());
+                mounted.addAll(container.mountedComponents());
             } else {
-                leaves.add(slot.component());
+                mounted.add(slot.component());
             }
         }
-        return leaves;
+        return mounted;
     }
 
     public boolean fieldsValid() {
@@ -60,8 +78,8 @@ public abstract class Container extends GuiComponent {
     public void layout(TextMetrics metrics) {
         List<Slot> shown = shownSlots();
         List<Size> naturals = shown.stream().map(slot -> slot.component().naturalSize(metrics)).toList();
-        int[] lengths = Distribution.sizes(axis.along(width(), height()), gap, items(shown, naturals));
-        int offset = 0;
+        int[] lengths = Distribution.sizes(axis.along(width(), height()) - 2 * padding, gap, items(shown, naturals));
+        int offset = padding;
         for (int index = 0; index < shown.size(); index++) {
             GuiComponent child = shown.get(index).component();
             place(child, offset, lengths[index], naturals.get(index));
@@ -75,24 +93,25 @@ public abstract class Container extends GuiComponent {
     @Override
     public Size naturalSize(TextMetrics metrics) {
         List<Slot> shown = shownSlots();
-        int along = gap * Math.max(shown.size() - 1, 0);
+        int along = gap * Math.max(shown.size() - 1, 0) + 2 * padding;
         int across = 0;
         for (Slot slot : shown) {
             Size natural = slot.component().naturalSize(metrics);
             along += Distribution.preferredSize(item(slot, natural));
             across = Math.max(across, axis.across(natural.width(), natural.height()));
         }
+        across += 2 * padding;
         return new Size(axis.horizontal(along, across), axis.vertical(along, across));
     }
 
     @Override
-    protected final void drawContent(Canvas canvas) {
+    protected void drawContent(Canvas canvas) {
     }
 
     private void place(GuiComponent child, int offset, int length, Size natural) {
-        int room = axis.across(width(), height());
+        int room = axis.across(width(), height()) - 2 * padding;
         int breadth = align == Align.STRETCH ? room : axis.across(natural.width(), natural.height());
-        int shift = switch (align) {
+        int shift = padding + switch (align) {
             case START, STRETCH -> 0;
             case CENTER -> (room - breadth) / 2;
             case END -> room - breadth;
@@ -102,7 +121,7 @@ public abstract class Container extends GuiComponent {
     }
 
     private List<Slot> shownSlots() {
-        return slots.stream().filter(slot -> slot.component().visible()).toList();
+        return slots.stream().filter(slot -> slot.component().visibleByOwnRule()).toList();
     }
 
     private List<Distribution.Item> items(List<Slot> shown, List<Size> naturals) {
@@ -128,6 +147,6 @@ public abstract class Container extends GuiComponent {
     }
 
     private static boolean counted(GuiComponent component) {
-        return component.countedWhenInactive() || (component.visible() && component.enabled());
+        return component.countedWhenInactive() || (component.visibleByOwnRule() && component.enabledByOwnRule());
     }
 }
