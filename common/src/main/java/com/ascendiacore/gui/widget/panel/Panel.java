@@ -19,8 +19,8 @@ public final class Panel extends Container {
         setPadding(frame.border());
     }
 
-    public int ink() {
-        return fill.ink();
+    public FillStyle fill() {
+        return fill;
     }
 
     @Override
