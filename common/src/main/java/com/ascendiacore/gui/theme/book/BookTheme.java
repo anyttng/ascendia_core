@@ -26,6 +26,7 @@ public final class BookTheme {
     private static final String INSET_LIGHT = SPRITES + "inset_light";
     private static final String INSET_DARK = SPRITES + "inset_dark";
     private static final String INSET_RIM = SPRITES + "inset_rim";
+    private static final String ROW = SPRITES + "row";
     private static final String ROW_HOVER = SPRITES + "row_hover";
     private static final String ROW_SELECTED = SPRITES + "row_selected";
     private static final String SCROLL_TRACK = SPRITES + "scroll_track";
@@ -76,7 +77,13 @@ public final class BookTheme {
     }
 
     private static ListStyle list() {
-        return new ListStyle(ROW_HOVER, ROW_SELECTED, BookPalette.PARCHMENT, false);
+        FillStyle onLight = new FillStyle(FillStyle.NO_FILL, BookPalette.DARK_LEATHER, BookPalette.FADED, BookPalette.DARK_RED, false);
+        return new ListStyle(ROW, ROW_HOVER, ROW_SELECTED, onLight, onLeather(BookPalette.PARCHMENT),
+                onLight, onLeather(BookPalette.GOLD));
+    }
+
+    private static FillStyle onLeather(int ink) {
+        return new FillStyle(FillStyle.NO_FILL, ink, BookPalette.TAN, BookPalette.RED, false);
     }
 
     private static ScrollbarStyle scrollbar() {
