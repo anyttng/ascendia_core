@@ -7,6 +7,8 @@ import com.ascendiacore.gui.widget.panel.Panel;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -56,7 +58,7 @@ public abstract class AscendiaScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
+        if (!isInputCaptured() && Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
             this.onClose();
             return true;
         }
@@ -70,6 +72,15 @@ public abstract class AscendiaScreen extends Screen {
             clearFocus();
         }
         return taken;
+    }
+
+    private boolean isInputCaptured() {
+        ComponentPath path = getCurrentFocusPath();
+        while (path instanceof ComponentPath.Path nested) {
+            path = nested.childPath();
+        }
+        return path instanceof ComponentPath.Leaf leaf && leaf.component() instanceof EditBox box
+                && box.canConsumeInput();
     }
 
     @Override
