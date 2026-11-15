@@ -3,6 +3,8 @@ package com.ascendiacore.gui.base.draw;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ascendiacore.gui.base.geometry.Rect;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -19,6 +21,7 @@ public final class RecordingCanvas implements Canvas {
     private final List<Sprite> sprites = new ArrayList<>();
     private final List<Fill> fills = new ArrayList<>();
     private final List<Text> texts = new ArrayList<>();
+    private final List<Rect> clips = new ArrayList<>();
     private int textWidth;
     private int charWidth;
 
@@ -40,6 +43,10 @@ public final class RecordingCanvas implements Canvas {
 
     public List<Text> texts() {
         return texts;
+    }
+
+    public List<Rect> clips() {
+        return clips;
     }
 
     @Override
@@ -77,6 +84,7 @@ public final class RecordingCanvas implements Canvas {
 
     @Override
     public void pushClip(int x, int y, int width, int height) {
+        clips.add(new Rect(x, y, width, height));
     }
 
     @Override
