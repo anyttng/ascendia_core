@@ -5,6 +5,7 @@ import org.jspecify.annotations.Nullable;
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.draw.TextMetrics;
+import com.ascendiacore.gui.base.geometry.Rect;
 import com.ascendiacore.gui.base.geometry.Size;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
@@ -156,10 +157,30 @@ public abstract class GuiComponent {
 
     public void setFocused(boolean focused) {
         this.focused = focused;
+        if (focused) {
+            revealToAncestors();
+        }
+    }
+
+    public boolean tabStop() {
+        return true;
     }
 
     public boolean contains(double pointX, double pointY) {
         return pointX >= x && pointY >= y && pointX < x + width && pointY < y + height;
+    }
+
+    public @Nullable Rect window() {
+        return parent == null ? null : parent.windowOfChildren();
+    }
+
+    public boolean shows(double pointX, double pointY) {
+        Rect window = window();
+        return contains(pointX, pointY) && (window == null || window.contains(pointX, pointY));
+    }
+
+    public boolean takesPointerAt(double pointX, double pointY) {
+        return takesInput() && shows(pointX, pointY);
     }
 
     public final void draw(Canvas canvas, int pointerX, int pointerY) {
@@ -168,12 +189,12 @@ public abstract class GuiComponent {
         }
         this.pointerX = pointerX;
         this.pointerY = pointerY;
-        hovered = contains(pointerX, pointerY);
-        drawContent(canvas);
+        hovered = shows(pointerX, pointerY);
+        drawInWindow(canvas);
     }
 
     public final boolean pointerPressed(PointerInput input) {
-        if (!takesInput() || input.button() != PointerButton.LEFT || !contains(input.x(), input.y())) {
+        if (input.button() != PointerButton.LEFT || !takesPointerAt(input.x(), input.y())) {
             return false;
         }
         onPress(input);
@@ -193,7 +214,10 @@ public abstract class GuiComponent {
     }
 
     public final boolean wheelScrolled(WheelInput input) {
-        return takesInput() && contains(input.x(), input.y()) && onWheel(input);
+        if (takesInput() && shows(input.x(), input.y()) && onWheel(input)) {
+            return true;
+        }
+        return parent != null && parent.wheelScrolled(input);
     }
 
     public final boolean keyPressed(KeyInput input) {
@@ -205,6 +229,13 @@ public abstract class GuiComponent {
     }
 
     protected abstract void drawContent(Canvas canvas);
+
+    protected @Nullable Rect windowOfChildren() {
+        return window();
+    }
+
+    protected void reveal(GuiComponent descendant) {
+    }
 
     protected final void adopt(GuiComponent child) {
         child.parent = this;
@@ -242,6 +273,23 @@ public abstract class GuiComponent {
 
     protected boolean onText(TextInput input) {
         return false;
+    }
+
+    private void drawInWindow(Canvas canvas) {
+        Rect window = window();
+        if (window == null) {
+            drawContent(canvas);
+            return;
+        }
+        canvas.pushClip(window.x(), window.y(), window.width(), window.height());
+        drawContent(canvas);
+        canvas.popClip();
+    }
+
+    private void revealToAncestors() {
+        for (GuiComponent ancestor = parent; ancestor != null; ancestor = ancestor.parent) {
+            ancestor.reveal(this);
+        }
     }
 
     private boolean takesInput() {

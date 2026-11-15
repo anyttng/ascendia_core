@@ -6,12 +6,14 @@ import com.ascendiacore.gui.base.component.ComponentHost;
 import com.ascendiacore.gui.base.component.GuiComponent;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -42,6 +44,21 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     @Override
     public boolean isActive() {
         return component.interactive() && component.visible() && component.enabled();
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return component.takesPointerAt(mouseX, mouseY);
+    }
+
+    @Override
+    public boolean isHovered() {
+        return component.hovered();
+    }
+
+    @Override
+    public @Nullable ComponentPath nextFocusPath(FocusNavigationEvent navigationEvent) {
+        return component.tabStop() ? super.nextFocusPath(navigationEvent) : null;
     }
 
     @Override
