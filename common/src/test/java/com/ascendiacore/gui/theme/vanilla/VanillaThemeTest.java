@@ -34,12 +34,18 @@ class VanillaThemeTest {
     }
 
     @Test
-    void insetFramesAndRowsAreOurOwnSinceTheGameHasNone() {
+    void selectedButtonInsetFramesAndRowsAreOurOwnSinceTheGameHasNone() {
         List<String> sprites = List.of(
+                THEME.button().selected(), THEME.button().selectedHover(),
                 THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite(),
                 THEME.list().rowHover(), THEME.list().rowSelected());
         assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
         assertEquals(sprites.size(), Set.copyOf(sprites).size());
+    }
+
+    @Test
+    void selectedButtonLabelIsYellow() {
+        assertEquals(VanillaPalette.YELLOW, THEME.button().selectedLabelColor());
     }
 
     @Test
