@@ -21,6 +21,8 @@ public final class VanillaTheme {
     private static final String GAME_SCROLLER = "minecraft:widget/scroller";
     private static final String GAME_SCROLLER_BACKGROUND = "minecraft:widget/scroller_background";
     private static final String SPRITES = "ascendia_core:theme/vanilla/";
+    private static final String BUTTON_SELECTED = SPRITES + "button_selected";
+    private static final String BUTTON_SELECTED_HOVER = SPRITES + "button_selected_hover";
     private static final String INSET_LIGHT = SPRITES + "inset_light";
     private static final String INSET_DARK = SPRITES + "inset_dark";
     private static final String INSET_RIM = SPRITES + "inset_rim";
@@ -36,8 +38,8 @@ public final class VanillaTheme {
     }
 
     private static ButtonStyle button() {
-        return new ButtonStyle(GAME_BUTTON, GAME_BUTTON_HOVER, GAME_BUTTON_DISABLED, VanillaPalette.WHITE,
-                VanillaPalette.DISABLED_LABEL, true);
+        return new ButtonStyle(GAME_BUTTON, GAME_BUTTON_HOVER, GAME_BUTTON_DISABLED, BUTTON_SELECTED, BUTTON_SELECTED_HOVER,
+                VanillaPalette.WHITE, VanillaPalette.DISABLED_LABEL, VanillaPalette.YELLOW, true);
     }
 
     private static PanelStyle panel() {
