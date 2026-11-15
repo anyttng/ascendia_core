@@ -44,6 +44,21 @@ class VanillaThemeTest {
     }
 
     @Test
+    void textFieldDrawsWithTheGamesSpritesAndKeepsItsFrameWhenDisabled() {
+        assertEquals("minecraft:widget/text_field", THEME.textField().normal());
+        assertEquals("minecraft:widget/text_field_highlighted", THEME.textField().focused());
+        assertEquals(THEME.textField().normal(), THEME.textField().disabled());
+    }
+
+    @Test
+    void textFieldColorsAreTheGamesFieldColors() {
+        assertEquals(VanillaPalette.PALE_GRAY, THEME.textField().textColor());
+        assertEquals(VanillaPalette.DISABLED_LINK, THEME.textField().disabledTextColor());
+        assertEquals(VanillaPalette.STONE_GRAY, THEME.textField().placeholderColor());
+        assertTrue(THEME.textField().textShadow());
+    }
+
+    @Test
     void selectedButtonLabelIsYellow() {
         assertEquals(VanillaPalette.YELLOW, THEME.button().selectedLabelColor());
     }

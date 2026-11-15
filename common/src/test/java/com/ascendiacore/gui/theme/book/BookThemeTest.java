@@ -31,7 +31,8 @@ class BookThemeTest {
                 THEME.panel().frame().sprite(),
                 THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite(),
                 THEME.list().rowHover(), THEME.list().rowSelected(),
-                THEME.scrollbar().track(), THEME.scrollbar().thumb(), THEME.scrollbar().thumbHover());
+                THEME.scrollbar().track(), THEME.scrollbar().thumb(), THEME.scrollbar().thumbHover(),
+                THEME.textField().normal(), THEME.textField().focused(), THEME.textField().disabled());
         assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
         assertEquals(sprites.size(), Set.copyOf(sprites).size());
     }
@@ -48,6 +49,14 @@ class BookThemeTest {
         assertEquals(BookPalette.FADED, THEME.button().disabledLabelColor());
         assertEquals(BookPalette.GOLD, THEME.button().selectedLabelColor());
         assertFalse(THEME.button().labelShadow());
+    }
+
+    @Test
+    void textFieldTextIsCharcoalWithAPalePlaceholderAndNoShadow() {
+        assertEquals(BookPalette.CHARCOAL, THEME.textField().textColor());
+        assertEquals(BookPalette.FADED, THEME.textField().disabledTextColor());
+        assertEquals(BookPalette.SAND, THEME.textField().placeholderColor());
+        assertFalse(THEME.textField().textShadow());
     }
 
     @Test

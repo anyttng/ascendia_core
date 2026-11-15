@@ -56,7 +56,7 @@ public abstract class AscendiaScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (Minecraft.getInstance().options.keyInventory.matches(event)) {
+        if (!isInputCaptured() && Minecraft.getInstance().options.keyInventory.matches(event)) {
             this.onClose();
             return true;
         }

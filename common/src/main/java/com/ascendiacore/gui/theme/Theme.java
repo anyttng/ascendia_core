@@ -7,6 +7,7 @@ import com.ascendiacore.gui.widget.list.model.ListStyle;
 import com.ascendiacore.gui.widget.panel.model.InsetStyle;
 import com.ascendiacore.gui.widget.panel.model.PanelStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
+import com.ascendiacore.gui.widget.textfield.model.TextFieldStyle;
 
 public record Theme(
         String name,
@@ -16,5 +17,6 @@ public record Theme(
         LinkStyle link,
         ListStyle list,
         ScrollbarStyle scrollbar,
-        TooltipStyle tooltip) {
+        TooltipStyle tooltip,
+        TextFieldStyle textField) {
 }

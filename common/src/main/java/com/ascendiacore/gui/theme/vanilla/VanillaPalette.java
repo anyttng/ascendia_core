@@ -8,6 +8,7 @@ final class VanillaPalette {
     static final int GRAY = 0xFF8B8B8B;
     static final int DARK_GRAY = 0xFF373737;
     static final int CHARCOAL = 0xFF3F3F3F;
+    static final int STONE_GRAY = 0xFF555555;
     static final int DISABLED_LABEL = 0xFFA0A0A0;
     static final int DISABLED_LINK = 0xFF707070;
     static final int BLUE = 0xFF2A3FC0;
