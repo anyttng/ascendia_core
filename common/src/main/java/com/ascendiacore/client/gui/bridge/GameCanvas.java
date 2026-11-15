@@ -3,7 +3,7 @@ package com.ascendiacore.client.gui.bridge;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ascendiacore.gui.draw.Canvas;
+import com.ascendiacore.gui.base.draw.Canvas;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;

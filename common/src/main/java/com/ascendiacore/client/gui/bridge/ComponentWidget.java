@@ -1,12 +1,13 @@
 package com.ascendiacore.client.gui.bridge;
 
-import com.ascendiacore.gui.component.ComponentHost;
-import com.ascendiacore.gui.component.GuiComponent;
+import com.ascendiacore.gui.base.component.ComponentHost;
+import com.ascendiacore.gui.base.component.GuiComponent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -24,7 +25,6 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
         super(component.x(), component.y(), component.width(), component.height(), component.narration());
         this.component = component;
         component.attach(this);
-        stateChanged();
     }
 
     public void tooltip(Component text) {
@@ -32,9 +32,13 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     }
 
     @Override
-    public void stateChanged() {
-        this.active = component.enabled();
-        this.visible = component.visible();
+    public boolean isActive() {
+        return component.visible() && component.enabled();
+    }
+
+    @Override
+    public NarratableEntry.NarrationPriority narrationPriority() {
+        return component.visible() ? super.narrationPriority() : NarratableEntry.NarrationPriority.NONE;
     }
 
     @Override
@@ -87,8 +91,19 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     }
 
     @Override
+    protected void extractTooltipForNextRenderPass(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        if (component.visible()) {
+            super.extractTooltipForNextRenderPass(graphics, mouseX, mouseY);
+        }
+    }
+
+    @Override
     protected void updateWidgetNarration(NarrationElementOutput output) {
         output.add(NarratedElementType.TITLE, component.narration());
+    }
+
+    void followComponent() {
+        setRectangle(component.width(), component.height(), component.x(), component.y());
     }
 
     private static void dropScreenFocus() {
