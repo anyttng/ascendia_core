@@ -10,6 +10,7 @@ import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.TextInput;
+import com.ascendiacore.gui.base.input.WheelInput;
 import com.ascendiacore.gui.base.input.model.Key;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
@@ -131,6 +132,68 @@ class GuiComponentTest {
     }
 
     @Test
+    void aDragIsNotFollowedByDefault() {
+        assertFalse(probe().followsDrag());
+    }
+
+    @Test
+    void leftDragAndWheelInsideReachTheirHandlers() {
+        Probe probe = probe();
+        assertTrue(probe.pointerDragged(press(RIGHT + 50, TOP + 5, PointerButton.LEFT)));
+        assertTrue(probe.wheelScrolled(new WheelInput(LEFT + 5, TOP + 5, 1)));
+        assertEquals(1, probe.drags);
+        assertEquals(1, probe.wheels);
+    }
+
+    @Test
+    void otherButtonsDragNothingAndReleaseNothing() {
+        Probe probe = probe();
+        assertFalse(probe.pointerDragged(press(LEFT + 5, TOP + 5, PointerButton.RIGHT)));
+        assertFalse(probe.pointerReleased(press(LEFT + 5, TOP + 5, PointerButton.RIGHT)));
+        assertEquals(0, probe.drags + probe.releases);
+    }
+
+    @Test
+    void wheelOutsideIsLeft() {
+        Probe probe = probe();
+        assertFalse(probe.wheelScrolled(new WheelInput(RIGHT, TOP + 5, 1)));
+        assertEquals(0, probe.wheels);
+    }
+
+    @Test
+    void hiddenOrDisabledComponentTakesNoDragAndNoWheel() {
+        Probe hidden = probe();
+        hidden.setVisible(false);
+        Probe disabled = probe();
+        disabled.setEnabled(false);
+        for (Probe probe : new Probe[] {hidden, disabled}) {
+            assertFalse(probe.pointerDragged(press(LEFT + 5, TOP + 5, PointerButton.LEFT)));
+            assertFalse(probe.wheelScrolled(new WheelInput(LEFT + 5, TOP + 5, 1)));
+            assertEquals(0, probe.drags + probe.wheels);
+        }
+    }
+
+    @Test
+    void releaseReachesAComponentHiddenOrDisabledMidDrag() {
+        Probe hidden = probe();
+        hidden.setVisible(false);
+        Probe disabled = probe();
+        disabled.setEnabled(false);
+        assertTrue(hidden.pointerReleased(press(LEFT + 5, TOP + 5, PointerButton.LEFT)));
+        assertTrue(disabled.pointerReleased(press(RIGHT + 50, TOP + 5, PointerButton.LEFT)));
+        assertEquals(1, hidden.releases);
+        assertEquals(1, disabled.releases);
+    }
+
+    @Test
+    void theFramesPointerIsKeptForTheContent() {
+        Probe probe = probe();
+        probe.draw(CANVAS, LEFT + 7, TOP + 3);
+        assertEquals(LEFT + 7, probe.pointerX());
+        assertEquals(TOP + 3, probe.pointerY());
+    }
+
+    @Test
     void visibilityFollowsItsRule() {
         Probe probe = probe();
         Value<Boolean> shown = Value.of(true);
@@ -171,6 +234,9 @@ class GuiComponentTest {
         private int presses;
         private int keys;
         private int texts;
+        private int drags;
+        private int releases;
+        private int wheels;
 
         @Override
         protected void drawContent(Canvas canvas) {
@@ -180,6 +246,23 @@ class GuiComponentTest {
         @Override
         protected void onPress(PointerInput input) {
             presses++;
+        }
+
+        @Override
+        protected boolean onDrag(PointerInput input) {
+            drags++;
+            return true;
+        }
+
+        @Override
+        protected void onRelease(PointerInput input) {
+            releases++;
+        }
+
+        @Override
+        protected boolean onWheel(WheelInput input) {
+            wheels++;
+            return true;
         }
 
         @Override
