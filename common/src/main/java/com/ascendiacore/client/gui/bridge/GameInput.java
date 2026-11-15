@@ -7,6 +7,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.TextInput;
+import com.ascendiacore.gui.base.input.WheelInput;
 import com.ascendiacore.gui.base.input.model.Key;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
@@ -33,6 +34,10 @@ public final class GameInput {
         return (Screen.hasShiftDown() ? GLFW.GLFW_MOD_SHIFT : 0)
                 | (Screen.hasControlDown() ? GLFW.GLFW_MOD_CONTROL : 0)
                 | (Screen.hasAltDown() ? GLFW.GLFW_MOD_ALT : 0);
+    }
+
+    public static WheelInput wheel(double x, double y, double scrollY) {
+        return new WheelInput(x, y, scrollY);
     }
 
     private static PointerButton button(int button) {

@@ -34,11 +34,26 @@ class VanillaThemeTest {
     }
 
     @Test
-    void insetFramesAreOurOwnSinceTheGameHasNone() {
+    void insetFramesAndRowsAreOurOwnSinceTheGameHasNone() {
         List<String> sprites = List.of(
-                THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite());
+                THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite(),
+                THEME.list().rowHover(), THEME.list().rowSelected());
         assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
         assertEquals(sprites.size(), Set.copyOf(sprites).size());
+    }
+
+    @Test
+    void scrollbarDrawsWithTheGamesScrollerWhichHasNoHoverSprite() {
+        assertEquals("minecraft:widget/scroller_background", THEME.scrollbar().track());
+        assertEquals("minecraft:widget/scroller", THEME.scrollbar().thumb());
+        assertEquals(THEME.scrollbar().thumb(), THEME.scrollbar().thumbHover());
+    }
+
+    @Test
+    void rowLabelsAreWhiteWithAShadow() {
+        assertEquals(VanillaPalette.WHITE, THEME.list().selectedLabelColor());
+        assertEquals(VanillaPalette.WHITE, THEME.inset().fills().of(FillKind.PAGE).ink());
+        assertTrue(THEME.list().labelShadow());
     }
 
     @Test

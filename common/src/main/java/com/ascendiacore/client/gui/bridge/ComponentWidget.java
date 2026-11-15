@@ -12,6 +12,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 public final class ComponentWidget extends AbstractWidget implements ComponentHost {
@@ -36,8 +37,8 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
         super.setTooltip(tooltip);
     }
 
-    public boolean takesFocusOnPress() {
-        return component.takesFocusOnPress();
+    public boolean shouldTakeFocusAfterInteraction() {
+        return component.takesFocusOnPress() || component.followsDrag();
     }
 
     @Override
@@ -73,6 +74,28 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     }
 
     @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        placeComponent();
+        return component.pointerDragged(GameInput.pointer(mouseX, mouseY, button, GameInput.heldModifiers()));
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        placeComponent();
+        boolean taken = component.pointerReleased(GameInput.pointer(mouseX, mouseY, button, GameInput.heldModifiers()));
+        if (!component.takesFocusOnPress()) {
+            dropScreenFocus();
+        }
+        return taken;
+    }
+
+    @Override
+    public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+        placeComponent();
+        return component.wheelScrolled(GameInput.wheel(x, y, scrollY));
+    }
+
+    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         return component.keyPressed(GameInput.key(keyCode, modifiers));
     }
@@ -98,6 +121,13 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
 
     void followComponent() {
         setRectangle(component.width(), component.height(), component.x(), component.y());
+    }
+
+    private static void dropScreenFocus() {
+        Screen screen = Minecraft.getInstance().screen;
+        if (screen != null) {
+            screen.clearFocus();
+        }
     }
 
     private void placeComponent() {
