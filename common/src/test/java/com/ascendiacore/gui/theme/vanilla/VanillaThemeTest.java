@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ascendiacore.gui.theme.Theme;
 import com.ascendiacore.gui.theme.Themes;
+import com.ascendiacore.gui.widget.list.model.RowStyle;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 
 class VanillaThemeTest {
@@ -38,7 +39,7 @@ class VanillaThemeTest {
         List<String> sprites = List.of(
                 THEME.button().selected(), THEME.button().selectedHover(),
                 THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite(),
-                THEME.list().rowHover(), THEME.list().rowSelected());
+                THEME.list().row(), THEME.list().rowHover(), THEME.list().rowSelected());
         assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
         assertEquals(sprites.size(), Set.copyOf(sprites).size());
     }
@@ -71,10 +72,13 @@ class VanillaThemeTest {
     }
 
     @Test
-    void rowLabelsAreWhiteWithAShadow() {
-        assertEquals(VanillaPalette.WHITE, THEME.list().selectedLabelColor());
-        assertEquals(VanillaPalette.WHITE, THEME.inset().fills().of(FillKind.PAGE).ink());
-        assertTrue(THEME.list().labelShadow());
+    void rowTextIsWhiteWithAShadowAndYellowOnTheSelectedButtonRow() {
+        assertEquals(VanillaPalette.WHITE, THEME.list().text(RowStyle.FRAMED, false).ink());
+        assertEquals(VanillaPalette.WHITE, THEME.list().text(RowStyle.FRAMED, true).ink());
+        assertEquals(VanillaPalette.WHITE, THEME.list().text(RowStyle.BUTTON, false).ink());
+        assertEquals(VanillaPalette.YELLOW, THEME.list().text(RowStyle.BUTTON, true).ink());
+        assertEquals(VanillaPalette.DISABLED_LABEL, THEME.list().text(RowStyle.FRAMED, false).mutedInk());
+        assertTrue(THEME.list().text(RowStyle.FRAMED, false).inkShadow());
     }
 
     @Test

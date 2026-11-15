@@ -6,170 +6,166 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
 import com.ascendiacore.gui.base.component.GuiComponent;
-import com.ascendiacore.gui.base.draw.Icon;
 import com.ascendiacore.gui.base.draw.RecordingCanvas;
 import com.ascendiacore.gui.base.draw.TextMetrics;
+import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
-import com.ascendiacore.gui.base.input.WheelInput;
+import com.ascendiacore.gui.base.input.model.Key;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
 import com.ascendiacore.gui.theme.Theme;
 import com.ascendiacore.gui.theme.Themes;
-import com.ascendiacore.gui.widget.list.model.ListRow;
-import com.ascendiacore.gui.widget.panel.Inset;
-import com.ascendiacore.gui.widget.scrollbar.Scrollbar;
+import com.ascendiacore.gui.widget.button.Button;
+import com.ascendiacore.gui.widget.label.Label;
+import com.ascendiacore.gui.widget.label.model.LabelRole;
+import com.ascendiacore.gui.widget.list.model.RowStyle;
+import com.ascendiacore.gui.widget.panel.model.FillKind;
+import com.ascendiacore.gui.widget.panel.model.FillStyle;
 
 import net.minecraft.network.chat.Component;
 
 class ListBoxTest {
     private static final Theme THEME = Themes.BOOK;
+    private static final FillStyle FILL = THEME.panel().fills().of(FillKind.PARCHMENT);
     private static final TextMetrics NO_TEXT = text -> 0;
-    private static final Icon NO_ICON = (canvas, x, y) -> {
-    };
     private static final int LEFT = 10;
     private static final int TOP = 20;
-    private static final int WIDTH = 110;
-    private static final int HEIGHT = 100;
-    private static final int ROW = ListRows.ROW_HEIGHT;
-    private static final int BORDER = 3;
-    private static final int ROWS_TOP = TOP + BORDER;
-    private static final int VIEW = HEIGHT - 2 * BORDER;
+    private static final int WIDTH = 120;
+    private static final int HEIGHT = 200;
+    private static final int LINE = 9;
+    private static final int BUTTON_HEIGHT = 20;
+    private static final int ENTRY_GAP = 3;
     private static final int OUTSIDE = -1;
 
     private final List<Integer> picked = new ArrayList<>();
+    private int buttonPresses;
 
     @Test
-    void rowsSitInsideALightPageInsetWithTheScrollbarBesideIt() {
-        ListBox list = list(10);
-        List<GuiComponent> mounted = list.mountedComponents();
-        assertTrue(mounted.get(0) instanceof Inset);
-        assertTrue(mounted.get(1) instanceof ListRows);
-        Scrollbar bar = (Scrollbar) mounted.get(2);
-        assertEquals(LEFT + WIDTH - Scrollbar.WIDTH, bar.x());
-        assertEquals(HEIGHT, bar.height());
-        ListRows rows = rows(list);
-        assertEquals(LEFT + BORDER, rows.x());
-        assertEquals(ROWS_TOP, rows.y());
-        assertEquals(WIDTH - Scrollbar.WIDTH - 2 - 2 * BORDER, rows.width());
-        assertEquals(VIEW, rows.height());
-    }
-
-    @Test
-    void theFirstRowStartsSelected() {
-        assertEquals(0, list(3).selected());
-        assertEquals(ListBox.NONE, list(0).selected());
-    }
-
-    @Test
-    void aPressSelectsTheRowUnderThePointer() {
-        ListBox list = list(10);
-        assertTrue(rows(list).pointerPressed(press(ROWS_TOP + 2 * ROW + 5)));
-        assertEquals(2, list.selected());
-        assertEquals(List.of(2), picked);
-    }
-
-    @Test
-    void aPressBelowTheLastRowSelectsNothing() {
-        ListBox list = list(2);
-        rows(list).pointerPressed(press(ROWS_TOP + 3 * ROW));
+    void theFirstRowStartsSelectedAndAnEmptyListHasNone() {
+        ListBox list = new ListBox(THEME, FILL, RowStyle.FRAMED, picked::add);
+        assertEquals(ListBox.NONE, list.selected());
+        list.addHeading(Component.literal("Group"));
+        list.addRow(Component.literal("First"));
+        list.addRow(Component.literal("Second"));
         assertEquals(0, list.selected());
+    }
+
+    @Test
+    void aPressOnARowSelectsItAndTakesTheSelectionOffTheOther() {
+        Stage stage = stage(RowStyle.FRAMED);
+        assertTrue(stage.second.pointerPressed(press(stage.second)));
+        assertEquals(1, stage.list.selected());
+        assertEquals(List.of(1), picked);
+        assertEquals(THEME.list().row(), sprite(stage.first, false));
+        assertEquals(THEME.list().rowSelected(), sprite(stage.second, false));
+    }
+
+    @Test
+    void enterOnARowSelectsIt() {
+        Stage stage = stage(RowStyle.FRAMED);
+        assertTrue(stage.second.keyPressed(new KeyInput(Key.ENTER, Modifiers.NONE)));
+        assertEquals(1, stage.list.selected());
+    }
+
+    @Test
+    void aHeadingTakesNeitherAPressNorTheSelection() {
+        Stage stage = stage(RowStyle.FRAMED);
+        assertFalse(stage.heading.pointerPressed(press(stage.heading)));
+        assertEquals(0, stage.list.selected());
         assertTrue(picked.isEmpty());
-    }
-
-    @Test
-    void theWheelScrollsTheRowsAndAPressReadsTheScrolledRow() {
-        ListBox list = list(10);
-        ListRows rows = rows(list);
-        assertTrue(rows.wheelScrolled(new WheelInput(LEFT + 20, ROWS_TOP + 5, -1)));
-        rows.pointerPressed(press(ROWS_TOP + 1));
-        assertEquals(1, list.selected());
-    }
-
-    @Test
-    void theWheelStopsAtTheLastRow() {
-        ListBox list = list(10);
-        ListRows rows = rows(list);
-        rows.wheelScrolled(new WheelInput(LEFT + 20, ROWS_TOP + 5, -100));
-        assertEquals(9, rows.rowAt(LEFT + 20, ROWS_TOP + VIEW - 1));
-    }
-
-    @Test
-    void theScrollbarFollowsTheWheelOverTheRows() {
-        ListBox list = list(10);
-        Scrollbar bar = (Scrollbar) list.mountedComponents().get(2);
-        int before = bar.thumbTop();
-        rows(list).wheelScrolled(new WheelInput(LEFT + 20, ROWS_TOP + 5, -1));
-        assertTrue(bar.thumbTop() > before);
-    }
-
-    @Test
-    void aShortListFillsTheTrackWithTheThumb() {
-        ListBox list = list(2);
-        Scrollbar bar = (Scrollbar) list.mountedComponents().get(2);
-        assertEquals(HEIGHT - 2, bar.thumbLength());
-    }
-
-    @Test
-    void theSelectedRowAndTheHoveredRowDrawTheirSprites() {
-        ListBox list = list(10);
-        ListRows rows = rows(list);
         RecordingCanvas canvas = new RecordingCanvas();
-        rows.draw(canvas, LEFT + 20, ROWS_TOP + 2 * ROW + 5);
-        assertEquals(List.of(
-                new RecordingCanvas.Sprite(THEME.list().rowSelected(), rows.x(), ROWS_TOP, rows.width(), ROW),
-                new RecordingCanvas.Sprite(THEME.list().rowHover(), rows.x(), ROWS_TOP + 2 * ROW, rows.width(), ROW)),
-                canvas.sprites());
+        stage.heading.draw(canvas, stage.heading.x() + 1, stage.heading.y() + 1);
+        assertTrue(canvas.sprites().isEmpty());
     }
 
     @Test
-    void theSelectedRowIsNotDrawnAsHovered() {
-        ListBox list = list(3);
-        RecordingCanvas canvas = new RecordingCanvas();
-        rows(list).draw(canvas, LEFT + 20, ROWS_TOP + 5);
-        assertEquals(1, canvas.sprites().size());
-        assertEquals(THEME.list().rowSelected(), canvas.sprites().getFirst().sprite());
+    void aRowIsAsTallAsItsContent() {
+        Stage stage = stage(RowStyle.FRAMED);
+        assertEquals(LINE + 2 * ListRow.PADDING, stage.first.height());
+        assertEquals(2 * LINE + BUTTON_HEIGHT + 2 * ListRow.PADDING, stage.second.height());
+        assertEquals(stage.first.y() + stage.first.height() + ENTRY_GAP, stage.second.y());
     }
 
     @Test
-    void labelsReadOnThePageAndTheSelectedOneOnItsSprite() {
-        ListBox list = list(3);
-        RecordingCanvas canvas = new RecordingCanvas();
-        rows(list).draw(canvas, OUTSIDE, OUTSIDE);
-        int pageInk = THEME.inset().fills().page().ink();
-        assertEquals(List.of(THEME.list().selectedLabelColor(), pageInk, pageInk),
-                canvas.texts().stream().map(RecordingCanvas.Text::color).toList());
-        assertFalse(canvas.texts().getFirst().shadow());
+    void aFramedRowDrawsItsOwnSpriteByState() {
+        Stage stage = stage(RowStyle.FRAMED);
+        assertEquals(THEME.list().rowSelected(), sprite(stage.first, false));
+        assertEquals(THEME.list().rowSelected(), sprite(stage.first, true));
+        assertEquals(THEME.list().row(), sprite(stage.second, false));
+        assertEquals(THEME.list().rowHover(), sprite(stage.second, true));
     }
 
     @Test
-    void onlyTheRowsInViewAreDrawn() {
-        ListBox list = list(10);
-        RecordingCanvas canvas = new RecordingCanvas();
-        rows(list).draw(canvas, OUTSIDE, OUTSIDE);
-        assertEquals((VIEW + ROW - 1) / ROW, canvas.texts().size());
+    void aButtonRowDrawsTheButtonSpritesByState() {
+        Stage stage = stage(RowStyle.BUTTON);
+        assertEquals(THEME.button().selected(), sprite(stage.first, false));
+        assertEquals(THEME.button().selectedHover(), sprite(stage.first, true));
+        assertEquals(THEME.button().normal(), sprite(stage.second, false));
+        assertEquals(THEME.button().hover(), sprite(stage.second, true));
     }
 
-    private ListBox list(int count) {
-        List<ListRow> rows = IntStream.range(0, count)
-                .mapToObj(index -> new ListRow(NO_ICON, Component.literal("Row " + index)))
-                .toList();
-        ListBox list = new ListBox(THEME, rows, picked::add);
+    @Test
+    void aFocusedRowDrawsAsHovered() {
+        Stage stage = stage(RowStyle.FRAMED);
+        stage.second.setFocused(true);
+        assertEquals(THEME.list().rowHover(), sprite(stage.second, false));
+    }
+
+    @Test
+    void textInARowFollowsItsState() {
+        Stage stage = stage(RowStyle.FRAMED);
+        assertEquals(THEME.list().text(RowStyle.FRAMED, true), stage.first.fill().get());
+        assertEquals(THEME.list().text(RowStyle.FRAMED, false), stage.second.fill().get());
+        stage.second.pointerPressed(press(stage.second));
+        RecordingCanvas canvas = new RecordingCanvas();
+        stage.secondName.draw(canvas, OUTSIDE, OUTSIDE);
+        assertEquals(THEME.list().text(RowStyle.FRAMED, true).ink(), canvas.texts().getFirst().color());
+    }
+
+    @Test
+    void aButtonInsideARowTakesItsOwnPress() {
+        Stage stage = stage(RowStyle.FRAMED);
+        PointerInput onButton = new PointerInput(stage.button.x() + 1, stage.button.y() + 1, PointerButton.LEFT, Modifiers.NONE);
+        assertFalse(stage.second.pointerPressed(onButton));
+        assertTrue(stage.button.pointerPressed(onButton));
+        assertEquals(1, buttonPresses);
+        assertEquals(0, stage.list.selected());
+    }
+
+    private Stage stage(RowStyle rowStyle) {
+        ListBox list = new ListBox(THEME, FILL, rowStyle, picked::add);
+        list.addHeading(Component.literal("Group"));
+        ListRow first = list.addRow(Component.literal("First"));
+        first.add(new Label(first.fill(), LabelRole.NORMAL, Component.literal("First")));
+        ListRow second = list.addRow(Component.literal("Second"));
+        Label secondName = new Label(second.fill(), LabelRole.NORMAL, Component.literal("Second"));
+        Button button = Button.text(THEME.button(), Component.literal("Inside"), () -> buttonPresses++);
+        second.add(secondName);
+        second.add(new Label(second.fill(), LabelRole.MUTED, Component.literal("Summary")));
+        second.add(button);
         list.setPosition(LEFT, TOP);
         list.setSize(WIDTH, HEIGHT);
         list.layout(NO_TEXT);
-        return list;
+        GuiComponent heading = list.mountedComponents().get(1);
+        return new Stage(list, heading, first, second, secondName, button);
     }
 
-    private static ListRows rows(ListBox list) {
-        return (ListRows) list.mountedComponents().get(1);
+    private static String sprite(ListRow row, boolean hovered) {
+        RecordingCanvas canvas = new RecordingCanvas();
+        int pointerX = hovered ? row.x() + 1 : OUTSIDE;
+        int pointerY = hovered ? row.y() + 1 : OUTSIDE;
+        row.draw(canvas, pointerX, pointerY);
+        return canvas.sprites().getFirst().sprite();
     }
 
-    private static PointerInput press(double y) {
-        return new PointerInput(LEFT + 20, y, PointerButton.LEFT, Modifiers.NONE);
+    private static PointerInput press(GuiComponent target) {
+        return new PointerInput(target.x() + 1, target.y() + 1, PointerButton.LEFT, Modifiers.NONE);
+    }
+
+    private record Stage(ListBox list, GuiComponent heading, ListRow first, ListRow second, Label secondName, Button button) {
     }
 }
