@@ -10,8 +10,8 @@ import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.form.Validated;
 import com.ascendiacore.gui.base.property.Property;
 import com.ascendiacore.gui.base.property.Value;
+import com.ascendiacore.gui.theme.Themes;
 import com.ascendiacore.gui.widget.button.Button;
-import com.ascendiacore.gui.widget.button.model.ButtonSprites;
 
 import net.minecraft.network.chat.Component;
 
@@ -28,7 +28,7 @@ class FieldsValidTest {
     void aButtonOfTheFormCanBeEnabledByTheFormsOwnValidity() {
         Column form = new Column();
         Value<Boolean> valid = Value.of(true);
-        Button done = Button.text(ButtonSprites.GAME, Component.literal("Done"), () -> {
+        Button done = Button.text(Themes.VANILLA.button(), Component.literal("Done"), () -> {
         });
         done.setEnabled(form::fieldsValid);
         form.add(new RuleField(valid));

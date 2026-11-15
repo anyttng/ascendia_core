@@ -19,13 +19,12 @@ import com.ascendiacore.gui.base.input.model.Key;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
 import com.ascendiacore.gui.base.property.Value;
-import com.ascendiacore.gui.widget.button.model.ButtonSprites;
+import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 class ButtonTest {
-    private static final ButtonSprites SPRITES = new ButtonSprites("test:normal", "test:hover", "test:disabled");
     private static final String ICON_SPRITE = "test:icon";
     private static final Component LABEL = Component.literal("Apply");
     private static final Component OTHER_LABEL = Component.literal("Done");
@@ -40,8 +39,10 @@ class ButtonTest {
     private static final int INSIDE_X = LEFT + 5;
     private static final int INSIDE_Y = TOP + 5;
     private static final int OUTSIDE_X = LEFT - 5;
-    private static final int ENABLED_TEXT = 0xFFFFFFFF;
-    private static final int DISABLED_TEXT = 0xFFA0A0A0;
+    private static final int ENABLED_TEXT = 0xFF112233;
+    private static final int DISABLED_TEXT = 0xFF445566;
+    private static final ButtonStyle STYLE =
+            new ButtonStyle("test:normal", "test:hover", "test:disabled", ENABLED_TEXT, DISABLED_TEXT, false);
 
     private final Recorder recorder = new Recorder();
     private int runs;
@@ -93,7 +94,7 @@ class ButtonTest {
         button.draw(recorder, OUTSIDE_X, INSIDE_Y);
         button.setEnabled(false);
         button.draw(recorder, INSIDE_X, INSIDE_Y);
-        assertEquals(List.of(SPRITES.normal(), SPRITES.hover(), SPRITES.normal(), SPRITES.hover(), SPRITES.disabled()),
+        assertEquals(List.of(STYLE.normal(), STYLE.hover(), STYLE.normal(), STYLE.hover(), STYLE.disabled()),
                 recorder.sprites);
     }
 
@@ -106,7 +107,7 @@ class ButtonTest {
     @Test
     void textIsCenteredAndWhite() {
         textButton().draw(recorder, OUTSIDE_X, INSIDE_Y);
-        assertEquals(List.of(new Text(LEFT + (WIDTH - TEXT_WIDTH) / 2, textTop(), ENABLED_TEXT)), recorder.texts);
+        assertEquals(List.of(new Text(LEFT + (WIDTH - TEXT_WIDTH) / 2, textTop(), ENABLED_TEXT, false)), recorder.texts);
     }
 
     @Test
@@ -119,7 +120,7 @@ class ButtonTest {
 
     @Test
     void iconAloneIsCenteredAndItsNameIsNotDrawn() {
-        Button button = place(Button.icon(SPRITES, Icon.sprite(ICON_SPRITE), LABEL, () -> runs++));
+        Button button = place(Button.icon(STYLE, Icon.sprite(ICON_SPRITE), LABEL, () -> runs++));
         button.draw(recorder, OUTSIDE_X, INSIDE_Y);
         assertEquals(new Rect(LEFT + (WIDTH - Icon.SIZE) / 2, iconTop(), Icon.SIZE, Icon.SIZE), recorder.spriteRects.getLast());
         assertTrue(recorder.texts.isEmpty());
@@ -128,11 +129,11 @@ class ButtonTest {
 
     @Test
     void iconSitsLeftOfTheTextAndThePairIsCentered() {
-        Button button = place(Button.iconAndText(SPRITES, Icon.sprite(ICON_SPRITE), LABEL, () -> runs++));
+        Button button = place(Button.iconAndText(STYLE, Icon.sprite(ICON_SPRITE), LABEL, () -> runs++));
         button.draw(recorder, OUTSIDE_X, INSIDE_Y);
         int contentLeft = LEFT + (WIDTH - Icon.SIZE - ICON_GAP - TEXT_WIDTH) / 2;
         assertEquals(new Rect(contentLeft, iconTop(), Icon.SIZE, Icon.SIZE), recorder.spriteRects.getLast());
-        assertEquals(List.of(new Text(contentLeft + Icon.SIZE + ICON_GAP, textTop(), ENABLED_TEXT)), recorder.texts);
+        assertEquals(List.of(new Text(contentLeft + Icon.SIZE + ICON_GAP, textTop(), ENABLED_TEXT, false)), recorder.texts);
     }
 
     @Test
@@ -140,9 +141,9 @@ class ButtonTest {
         Icon icon = Icon.sprite(ICON_SPRITE);
         assertEquals(new Size(TEXT_WIDTH + 2 * SIDE_PADDING, HEIGHT), textButton().naturalSize(recorder));
         assertEquals(new Size(Icon.SIZE + 2 * SIDE_PADDING, HEIGHT),
-                Button.icon(SPRITES, icon, LABEL, () -> runs++).naturalSize(recorder));
+                Button.icon(STYLE, icon, LABEL, () -> runs++).naturalSize(recorder));
         assertEquals(new Size(Icon.SIZE + ICON_GAP + TEXT_WIDTH + 2 * SIDE_PADDING, HEIGHT),
-                Button.iconAndText(SPRITES, icon, LABEL, () -> runs++).naturalSize(recorder));
+                Button.iconAndText(STYLE, icon, LABEL, () -> runs++).naturalSize(recorder));
     }
 
     @Test
@@ -166,7 +167,7 @@ class ButtonTest {
     }
 
     private Button textButton() {
-        return place(Button.text(SPRITES, LABEL, () -> runs++));
+        return place(Button.text(STYLE, LABEL, () -> runs++));
     }
 
     private Button place(Button button) {
@@ -187,7 +188,7 @@ class ButtonTest {
     private record Rect(int x, int y, int width, int height) {
     }
 
-    private record Text(int x, int y, int color) {
+    private record Text(int x, int y, int color, boolean shadow) {
     }
 
     private static final class Recorder implements Canvas, ComponentHost {
@@ -215,7 +216,7 @@ class ButtonTest {
 
         @Override
         public void text(Component text, int x, int y, int color, boolean shadow) {
-            texts.add(new Text(x, y, color));
+            texts.add(new Text(x, y, color, shadow));
         }
 
         @Override
