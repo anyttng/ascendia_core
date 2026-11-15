@@ -25,7 +25,7 @@ public final class Inset extends OpenContainer {
     }
 
     @Override
-    public boolean paints() {
+    public boolean mountsItself() {
         return true;
     }
 

@@ -2,6 +2,7 @@ package com.ascendiacore.client.gui.bridge;
 
 import org.jspecify.annotations.Nullable;
 
+import com.ascendiacore.gui.base.geometry.Rect;
 import com.ascendiacore.gui.widget.textfield.TextField;
 import com.ascendiacore.gui.widget.textfield.model.TextFieldStyle;
 
@@ -44,7 +45,7 @@ public final class TextFieldWidget extends EditBox {
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return isActive() && field.contains(mouseX, mouseY);
+        return field.takesPointerAt(mouseX, mouseY);
     }
 
     @Override
@@ -56,6 +57,11 @@ public final class TextFieldWidget extends EditBox {
     public void setFocused(boolean focused) {
         super.setFocused(focused);
         field.setFocused(isFocused());
+    }
+
+    @Override
+    public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+        return field.wheelScrolled(GameInput.wheel(x, y, scrollY));
     }
 
     @Override
@@ -76,11 +82,22 @@ public final class TextFieldWidget extends EditBox {
         boolean pointerShown = graphics.containsPointInScissor(mouseX, mouseY);
         field.draw(new GameCanvas(graphics, font),
                 pointerShown ? mouseX : ComponentWidget.OUTSIDE, pointerShown ? mouseY : ComponentWidget.OUTSIDE);
-        super.extractWidgetRenderState(graphics, mouseX, mouseY, partialTick);
+        extractTextInWindow(graphics, mouseX, mouseY, partialTick);
         if (isHovered() || isFocused()) {
             tooltip.follow(mouseX, mouseY);
         }
         super.setTooltip(shownTooltip);
+    }
+
+    private void extractTextInWindow(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        Rect window = field.window();
+        if (window == null) {
+            super.extractWidgetRenderState(graphics, mouseX, mouseY, partialTick);
+            return;
+        }
+        graphics.enableScissor(window.x(), window.y(), window.right(), window.bottom());
+        super.extractWidgetRenderState(graphics, mouseX, mouseY, partialTick);
+        graphics.disableScissor();
     }
 
     @Override

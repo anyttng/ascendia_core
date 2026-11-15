@@ -49,7 +49,7 @@ public abstract class Container extends GuiComponent {
         this.align = align;
     }
 
-    public boolean paints() {
+    public boolean mountsItself() {
         return false;
     }
 
@@ -58,9 +58,14 @@ public abstract class Container extends GuiComponent {
         return false;
     }
 
+    @Override
+    public boolean takesPointerAt(double pointX, double pointY) {
+        return super.takesPointerAt(pointX, pointY) && !descendantTakesPointerAt(pointX, pointY);
+    }
+
     public List<GuiComponent> mountedComponents() {
         List<GuiComponent> mounted = new ArrayList<>();
-        if (paints()) {
+        if (mountsItself()) {
             mounted.add(this);
         }
         for (Slot slot : slots) {
@@ -115,6 +120,17 @@ public abstract class Container extends GuiComponent {
     protected void drawContent(Canvas canvas) {
     }
 
+    private boolean descendantTakesPointerAt(double pointX, double pointY) {
+        for (Slot slot : slots) {
+            GuiComponent child = slot.component();
+            if (child.takesPointerAt(pointX, pointY)
+                    || (child instanceof Container container && container.descendantTakesPointerAt(pointX, pointY))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean childShowsTooltipAt(double pointX, double pointY) {
         for (Slot slot : slots) {
             GuiComponent child = slot.component();
@@ -128,7 +144,7 @@ public abstract class Container extends GuiComponent {
     private static boolean showsTooltipAt(GuiComponent component, double pointX, double pointY) {
         if (component instanceof Container container) {
             return container.childShowsTooltipAt(pointX, pointY)
-                    || (container.paints() && !container.tooltip().getString().isEmpty());
+                    || (container.mountsItself() && !container.tooltip().getString().isEmpty());
         }
         return !component.tooltipAt(pointX, pointY).getString().isEmpty();
     }
