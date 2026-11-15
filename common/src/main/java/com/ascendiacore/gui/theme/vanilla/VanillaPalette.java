@@ -14,6 +14,8 @@ final class VanillaPalette {
     static final int BLUE = 0xFF2A3FC0;
     static final int BRIGHT_BLUE = 0xFF5555FF;
     static final int PALE_BLUE = 0xFFA0A0FF;
+    static final int RED = 0xFFFF5555;
+    static final int DARK_RED = 0xFFAA0000;
 
     private VanillaPalette() {
     }
