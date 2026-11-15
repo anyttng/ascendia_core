@@ -18,6 +18,8 @@ public final class BookTheme {
     private static final String BUTTON = SPRITES + "button";
     private static final String BUTTON_HOVER = SPRITES + "button_hover";
     private static final String BUTTON_DISABLED = SPRITES + "button_disabled";
+    private static final String BUTTON_SELECTED = SPRITES + "button_selected";
+    private static final String BUTTON_SELECTED_HOVER = SPRITES + "button_selected_hover";
     private static final String PANEL_COVER = SPRITES + "panel_cover";
     private static final String INSET_LIGHT = SPRITES + "inset_light";
     private static final String INSET_DARK = SPRITES + "inset_dark";
@@ -37,7 +39,8 @@ public final class BookTheme {
     }
 
     private static ButtonStyle button() {
-        return new ButtonStyle(BUTTON, BUTTON_HOVER, BUTTON_DISABLED, BookPalette.DARK_LEATHER, BookPalette.FADED, false);
+        return new ButtonStyle(BUTTON, BUTTON_HOVER, BUTTON_DISABLED, BUTTON_SELECTED, BUTTON_SELECTED_HOVER,
+                BookPalette.DARK_LEATHER, BookPalette.FADED, BookPalette.GOLD, false);
     }
 
     private static PanelStyle panel() {

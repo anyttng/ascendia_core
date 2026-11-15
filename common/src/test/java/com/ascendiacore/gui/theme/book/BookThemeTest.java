@@ -27,6 +27,7 @@ class BookThemeTest {
     void everySpriteIsOurOwn() {
         List<String> sprites = List.of(
                 THEME.button().normal(), THEME.button().hover(), THEME.button().disabled(),
+                THEME.button().selected(), THEME.button().selectedHover(),
                 THEME.panel().frame().sprite(),
                 THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite(),
                 THEME.list().rowHover(), THEME.list().rowSelected(),
@@ -45,6 +46,7 @@ class BookThemeTest {
     void buttonLabelIsDarkLeatherWithoutAShadow() {
         assertEquals(BookPalette.DARK_LEATHER, THEME.button().labelColor());
         assertEquals(BookPalette.FADED, THEME.button().disabledLabelColor());
+        assertEquals(BookPalette.GOLD, THEME.button().selectedLabelColor());
         assertFalse(THEME.button().labelShadow());
     }
 

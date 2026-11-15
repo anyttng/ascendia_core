@@ -27,6 +27,7 @@ public final class Button extends GuiComponent {
     private final @Nullable Icon icon;
     private final Runnable action;
     private Property<Component> label;
+    private Property<Boolean> selected = Property.of(false);
 
     private Button(ButtonStyle style, Component label, boolean labelDrawn, @Nullable Icon icon, Runnable action) {
         this.style = style;
@@ -50,6 +51,18 @@ public final class Button extends GuiComponent {
 
     public void setLabel(Property<Component> label) {
         this.label = label;
+    }
+
+    public boolean selected() {
+        return selected.get();
+    }
+
+    public void setSelected(boolean selected) {
+        setSelected(Property.of(selected));
+    }
+
+    public void setSelected(Property<Boolean> selected) {
+        this.selected = selected;
     }
 
     @Override
@@ -118,8 +131,14 @@ public final class Button extends GuiComponent {
     }
 
     private void drawLabel(Canvas canvas, Component text, int left) {
-        int color = enabled() ? style.labelColor() : style.disabledLabelColor();
-        canvas.text(text, left, y() + (height() - LINE_HEIGHT) / 2 + 1, color, style.labelShadow());
+        canvas.text(text, left, y() + (height() - LINE_HEIGHT) / 2 + 1, labelColor(), style.labelShadow());
+    }
+
+    private int labelColor() {
+        if (!enabled()) {
+            return style.disabledLabelColor();
+        }
+        return selected() ? style.selectedLabelColor() : style.labelColor();
     }
 
     private int iconRoom() {
@@ -135,6 +154,10 @@ public final class Button extends GuiComponent {
         if (!enabled()) {
             return style.disabled();
         }
-        return hovered() || focused() ? style.hover() : style.normal();
+        boolean highlighted = hovered() || focused();
+        if (selected()) {
+            return highlighted ? style.selectedHover() : style.selected();
+        }
+        return highlighted ? style.hover() : style.normal();
     }
 }

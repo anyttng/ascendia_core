@@ -2,6 +2,7 @@ package com.ascendiacore.gui.theme.vanilla;
 
 final class VanillaPalette {
     static final int WHITE = 0xFFFFFFFF;
+    static final int YELLOW = 0xFFFFFF55;
     static final int PALE_GRAY = 0xFFE0E0E0;
     static final int LIGHT_GRAY = 0xFFC6C6C6;
     static final int GRAY = 0xFF8B8B8B;
