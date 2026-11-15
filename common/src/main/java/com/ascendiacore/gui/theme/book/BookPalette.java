@@ -12,6 +12,8 @@ final class BookPalette {
     static final int FADED = 0xFFA89A85;
     static final int CHARCOAL = 0xFF3E3A35;
     static final int SAND = 0xFFB9A78C;
+    static final int RED = 0xFFFF5555;
+    static final int DARK_RED = 0xFFAA0000;
 
     private BookPalette() {
     }

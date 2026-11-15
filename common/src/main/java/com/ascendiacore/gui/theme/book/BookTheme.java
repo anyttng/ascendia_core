@@ -64,9 +64,9 @@ public final class BookTheme {
 
     private static Fills fills() {
         return new Fills(
-                new FillStyle(BookPalette.PARCHMENT, BookPalette.DARK_LEATHER, BookPalette.FADED, false),
-                new FillStyle(BookPalette.PAGE, BookPalette.SLATE, BookPalette.FADED, false),
-                new FillStyle(BookPalette.SLATE, BookPalette.PARCHMENT, BookPalette.FADED, false));
+                new FillStyle(BookPalette.PARCHMENT, BookPalette.DARK_LEATHER, BookPalette.FADED, BookPalette.DARK_RED, false),
+                new FillStyle(BookPalette.PAGE, BookPalette.SLATE, BookPalette.FADED, BookPalette.DARK_RED, false),
+                new FillStyle(BookPalette.SLATE, BookPalette.PARCHMENT, BookPalette.FADED, BookPalette.RED, false));
     }
 
     private static LinkStyle link() {

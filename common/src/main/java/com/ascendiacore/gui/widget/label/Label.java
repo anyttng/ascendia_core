@@ -16,18 +16,22 @@ public final class Label extends GuiComponent {
     private static final int LINE_HEIGHT = 9;
 
     private final FillStyle fill;
-    private final LabelRole role;
+    private Property<LabelRole> role;
     private Property<Component> text;
     private TextAlign align = TextAlign.LEFT;
 
     public Label(FillStyle fill, LabelRole role, Component text) {
         this.fill = fill;
-        this.role = role;
+        this.role = Property.of(role);
         this.text = Property.of(text);
     }
 
     public void setText(Property<Component> text) {
         this.text = text;
+    }
+
+    public void setRole(Property<LabelRole> role) {
+        this.role = role;
     }
 
     public void setAlign(TextAlign align) {
@@ -58,7 +62,14 @@ public final class Label extends GuiComponent {
             case CENTER -> x() + spare / 2;
             case RIGHT -> x() + spare;
         };
-        int color = role == LabelRole.MUTED ? fill.mutedInk() : fill.ink();
-        canvas.text(shown, left, y() + (height() - LINE_HEIGHT) / 2, color, fill.inkShadow());
+        canvas.text(shown, left, y() + (height() - LINE_HEIGHT) / 2, color(), fill.inkShadow());
+    }
+
+    private int color() {
+        return switch (role.get()) {
+            case NORMAL -> fill.ink();
+            case MUTED -> fill.mutedInk();
+            case ERROR -> fill.errorInk();
+        };
     }
 }
