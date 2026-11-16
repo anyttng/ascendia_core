@@ -1,3 +1,6 @@
 {
-  "key.category.ascendia_core.main": "Ascendia"
+  "key.category.ascendia_core.main": "Ascendia",
+
+  "gui.ascendia_core.number_field.too_small": "Too small. At least %s.",
+  "gui.ascendia_core.number_field.too_large": "Too large. At most %s."
 }
