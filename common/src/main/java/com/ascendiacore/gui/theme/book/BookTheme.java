@@ -91,7 +91,7 @@ public final class BookTheme {
     }
 
     private static TooltipStyle tooltip() {
-        return new TooltipStyle(TOOLTIP_SPRITES, BookPalette.PARCHMENT);
+        return new TooltipStyle(TOOLTIP_SPRITES, BookPalette.PARCHMENT, BookPalette.GOLD, BookPalette.FADED);
     }
 
     private static TextFieldStyle textField() {
