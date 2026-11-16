@@ -29,7 +29,8 @@ class GuiComponentTest {
     private static final int RIGHT = LEFT + WIDTH;
     private static final int BOTTOM = TOP + HEIGHT;
     private static final Canvas CANVAS = new BlankCanvas();
-    private static final TooltipStyle TOOLTIP_STYLE = new TooltipStyle("example:sprites", 0xFFFFFFFF);
+    private static final TooltipStyle TOOLTIP_STYLE = new TooltipStyle("example:sprites", 0xFFFFFFFF, 0xFFFFFF55,
+            0xFFAAAAAA);
 
     @Test
     void hoveredWhenThePointerIsInside() {

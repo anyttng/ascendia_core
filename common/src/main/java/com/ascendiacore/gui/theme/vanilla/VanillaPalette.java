@@ -5,6 +5,7 @@ final class VanillaPalette {
     static final int YELLOW = 0xFFFFFF55;
     static final int PALE_GRAY = 0xFFE0E0E0;
     static final int LIGHT_GRAY = 0xFFC6C6C6;
+    static final int SILVER = 0xFFAAAAAA;
     static final int GRAY = 0xFF8B8B8B;
     static final int DARK_GRAY = 0xFF373737;
     static final int CHARCOAL = 0xFF3F3F3F;

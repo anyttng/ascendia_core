@@ -89,7 +89,7 @@ public final class VanillaTheme {
     }
 
     private static TooltipStyle tooltip() {
-        return new TooltipStyle(null, VanillaPalette.WHITE);
+        return new TooltipStyle(null, VanillaPalette.WHITE, VanillaPalette.YELLOW, VanillaPalette.SILVER);
     }
 
     private static TextFieldStyle textField() {

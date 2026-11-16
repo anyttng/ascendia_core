@@ -1,0 +1,6 @@
+{
+  "key.category.ascendia_core.main": "Ascendia",
+
+  "gui.ascendia_core.number_field.too_small": "Zu klein. Mindestens %s.",
+  "gui.ascendia_core.number_field.too_large": "Zu groß. Höchstens %s."
+}
