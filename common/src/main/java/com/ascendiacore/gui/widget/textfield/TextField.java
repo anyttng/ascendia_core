@@ -6,12 +6,14 @@ import java.util.function.IntPredicate;
 import com.ascendiacore.gui.base.component.GuiComponent;
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.draw.TextMetrics;
+import com.ascendiacore.gui.base.form.Validated;
 import com.ascendiacore.gui.base.geometry.Size;
+import com.ascendiacore.gui.base.property.Property;
 import com.ascendiacore.gui.widget.textfield.model.TextFieldStyle;
 
 import net.minecraft.network.chat.Component;
 
-public final class TextField extends GuiComponent {
+public final class TextField extends GuiComponent implements Validated {
     private static final int DEFAULT_MAX_LENGTH = 32;
     private static final int HEIGHT = 20;
     private static final int TEXT_PADDING = 4;
@@ -23,6 +25,7 @@ public final class TextField extends GuiComponent {
     private int maxLength = DEFAULT_MAX_LENGTH;
     private IntPredicate accepted = character -> true;
     private Component placeholder = Component.empty();
+    private Property<Boolean> valid = Property.of(true);
 
     public TextField(TextFieldStyle style, Consumer<String> onChange) {
         this.style = style;
@@ -60,6 +63,15 @@ public final class TextField extends GuiComponent {
 
     public void setPlaceholder(Component placeholder) {
         this.placeholder = placeholder;
+    }
+
+    public void setValid(Property<Boolean> valid) {
+        this.valid = valid;
+    }
+
+    @Override
+    public boolean valid() {
+        return valid.get();
     }
 
     public String accepted(String input) {

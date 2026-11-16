@@ -1,5 +1,7 @@
 package com.ascendiacore.gui.widget.button;
 
+import java.util.function.Consumer;
+
 import org.jspecify.annotations.Nullable;
 
 import com.ascendiacore.gui.base.component.GuiComponent;
@@ -10,6 +12,7 @@ import com.ascendiacore.gui.base.draw.TextMetrics;
 import com.ascendiacore.gui.base.geometry.Size;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
+import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.property.Property;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 
@@ -25,11 +28,12 @@ public final class Button extends GuiComponent {
     private final ButtonStyle style;
     private final boolean labelDrawn;
     private final @Nullable Icon icon;
-    private final Runnable action;
+    private final Consumer<Modifiers> action;
     private Property<Component> label;
     private Property<Boolean> selected = Property.of(false);
 
-    private Button(ButtonStyle style, Component label, boolean labelDrawn, @Nullable Icon icon, Runnable action) {
+    private Button(ButtonStyle style, Component label, boolean labelDrawn, @Nullable Icon icon,
+            Consumer<Modifiers> action) {
         this.style = style;
         this.label = Property.of(label);
         this.labelDrawn = labelDrawn;
@@ -38,15 +42,19 @@ public final class Button extends GuiComponent {
     }
 
     public static Button text(ButtonStyle style, Component label, Runnable action) {
+        return text(style, label, modifiers -> action.run());
+    }
+
+    public static Button text(ButtonStyle style, Component label, Consumer<Modifiers> action) {
         return new Button(style, label, true, null, action);
     }
 
     public static Button icon(ButtonStyle style, Icon icon, Component name, Runnable action) {
-        return new Button(style, name, false, icon, action);
+        return new Button(style, name, false, icon, modifiers -> action.run());
     }
 
     public static Button iconAndText(ButtonStyle style, Icon icon, Component label, Runnable action) {
-        return new Button(style, label, true, icon, action);
+        return new Button(style, label, true, icon, modifiers -> action.run());
     }
 
     public void setLabel(Property<Component> label) {
@@ -97,7 +105,7 @@ public final class Button extends GuiComponent {
 
     @Override
     protected void onPress(PointerInput input) {
-        activate();
+        activate(input.modifiers());
     }
 
     @Override
@@ -105,7 +113,7 @@ public final class Button extends GuiComponent {
         if (!input.isSelection()) {
             return false;
         }
-        activate();
+        activate(input.modifiers());
         return true;
     }
 
@@ -145,9 +153,9 @@ public final class Button extends GuiComponent {
         return icon == null ? 0 : Icon.SIZE + ICON_GAP;
     }
 
-    private void activate() {
+    private void activate(Modifiers modifiers) {
         playClick();
-        action.run();
+        action.accept(modifiers);
     }
 
     private String sprite() {
