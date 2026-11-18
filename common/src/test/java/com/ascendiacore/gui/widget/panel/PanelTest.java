@@ -72,7 +72,7 @@ class PanelTest {
         inset.draw(canvas, OUTSIDE, OUTSIDE);
         assertEquals(style.dark().sprite(), canvas.sprites().getFirst().sprite());
         assertEquals(style.fills().dark().color(), canvas.fills().getFirst().color());
-        assertEquals(style.fills().dark().ink(), inset.ink());
+        assertEquals(style.fills().dark(), inset.fill());
     }
 
     @Test

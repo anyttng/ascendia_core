@@ -44,8 +44,9 @@ class ButtonTest {
     private static final int OUTSIDE_X = LEFT - 5;
     private static final int ENABLED_TEXT = 0xFF112233;
     private static final int DISABLED_TEXT = 0xFF445566;
-    private static final ButtonStyle STYLE =
-            new ButtonStyle("test:normal", "test:hover", "test:disabled", ENABLED_TEXT, DISABLED_TEXT, false);
+    private static final int SELECTED_TEXT = 0xFF778899;
+    private static final ButtonStyle STYLE = new ButtonStyle("test:normal", "test:hover", "test:disabled", "test:selected",
+            "test:selected_hover", ENABLED_TEXT, DISABLED_TEXT, SELECTED_TEXT, false);
 
     private final Recorder recorder = new Recorder();
     private int runs;
@@ -99,6 +100,57 @@ class ButtonTest {
         button.draw(recorder, INSIDE_X, INSIDE_Y);
         assertEquals(List.of(STYLE.normal(), STYLE.hover(), STYLE.normal(), STYLE.hover(), STYLE.disabled()),
                 recorder.sprites);
+    }
+
+    @Test
+    void selectedSpriteFollowsHoverAndFocus() {
+        Button button = textButton();
+        button.setSelected(true);
+        button.draw(recorder, OUTSIDE_X, INSIDE_Y);
+        button.draw(recorder, INSIDE_X, INSIDE_Y);
+        button.setFocused(true);
+        button.draw(recorder, OUTSIDE_X, INSIDE_Y);
+        assertEquals(List.of(STYLE.selected(), STYLE.selectedHover(), STYLE.selectedHover()), recorder.sprites);
+    }
+
+    @Test
+    void selectedLabelTakesTheSelectedColorHoveredOrNot() {
+        Button button = textButton();
+        button.setSelected(true);
+        button.draw(recorder, OUTSIDE_X, INSIDE_Y);
+        button.draw(recorder, INSIDE_X, INSIDE_Y);
+        assertEquals(List.of(SELECTED_TEXT, SELECTED_TEXT), recorder.texts.stream().map(Text::color).toList());
+    }
+
+    @Test
+    void disabledLookWinsOverSelected() {
+        Button button = textButton();
+        button.setSelected(true);
+        button.setEnabled(false);
+        button.draw(recorder, INSIDE_X, INSIDE_Y);
+        assertEquals(List.of(STYLE.disabled()), recorder.sprites);
+        assertEquals(DISABLED_TEXT, recorder.texts.getFirst().color());
+    }
+
+    @Test
+    void selectedFollowsItsRule() {
+        Button button = textButton();
+        Value<Boolean> selected = Value.of(false);
+        button.setSelected(selected);
+        button.draw(recorder, OUTSIDE_X, INSIDE_Y);
+        selected.set(true);
+        button.draw(recorder, OUTSIDE_X, INSIDE_Y);
+        assertEquals(List.of(STYLE.normal(), STYLE.selected()), recorder.sprites);
+    }
+
+    @Test
+    void selectedButtonStillRunsItsAction() {
+        Button button = textButton();
+        button.setSelected(true);
+        assertTrue(button.pointerPressed(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
+        assertTrue(button.keyPressed(new KeyInput(Key.ENTER, Modifiers.NONE)));
+        assertEquals(2, runs);
+        assertEquals(2, recorder.clicks);
     }
 
     @Test

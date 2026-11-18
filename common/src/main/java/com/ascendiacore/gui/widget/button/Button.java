@@ -1,5 +1,7 @@
 package com.ascendiacore.gui.widget.button;
 
+import java.util.function.Consumer;
+
 import org.jspecify.annotations.Nullable;
 
 import com.ascendiacore.gui.base.component.GuiComponent;
@@ -10,6 +12,7 @@ import com.ascendiacore.gui.base.draw.TextMetrics;
 import com.ascendiacore.gui.base.geometry.Size;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
+import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.property.Property;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 
@@ -25,10 +28,12 @@ public final class Button extends GuiComponent {
     private final ButtonStyle style;
     private final boolean labelDrawn;
     private final @Nullable Icon icon;
-    private final Runnable action;
+    private final Consumer<Modifiers> action;
     private Property<Component> label;
+    private Property<Boolean> selected = Property.of(false);
 
-    private Button(ButtonStyle style, Component label, boolean labelDrawn, @Nullable Icon icon, Runnable action) {
+    private Button(ButtonStyle style, Component label, boolean labelDrawn, @Nullable Icon icon,
+            Consumer<Modifiers> action) {
         this.style = style;
         this.label = Property.of(label);
         this.labelDrawn = labelDrawn;
@@ -37,19 +42,35 @@ public final class Button extends GuiComponent {
     }
 
     public static Button text(ButtonStyle style, Component label, Runnable action) {
+        return text(style, label, modifiers -> action.run());
+    }
+
+    public static Button text(ButtonStyle style, Component label, Consumer<Modifiers> action) {
         return new Button(style, label, true, null, action);
     }
 
     public static Button icon(ButtonStyle style, Icon icon, Component name, Runnable action) {
-        return new Button(style, name, false, icon, action);
+        return new Button(style, name, false, icon, modifiers -> action.run());
     }
 
     public static Button iconAndText(ButtonStyle style, Icon icon, Component label, Runnable action) {
-        return new Button(style, label, true, icon, action);
+        return new Button(style, label, true, icon, modifiers -> action.run());
     }
 
     public void setLabel(Property<Component> label) {
         this.label = label;
+    }
+
+    public boolean selected() {
+        return selected.get();
+    }
+
+    public void setSelected(boolean selected) {
+        setSelected(Property.of(selected));
+    }
+
+    public void setSelected(Property<Boolean> selected) {
+        this.selected = selected;
     }
 
     @Override
@@ -84,7 +105,7 @@ public final class Button extends GuiComponent {
 
     @Override
     protected void onPress(PointerInput input) {
-        activate();
+        activate(input.modifiers());
     }
 
     @Override
@@ -92,7 +113,7 @@ public final class Button extends GuiComponent {
         if (!input.isSelection()) {
             return false;
         }
-        activate();
+        activate(input.modifiers());
         return true;
     }
 
@@ -118,23 +139,33 @@ public final class Button extends GuiComponent {
     }
 
     private void drawLabel(Canvas canvas, Component text, int left) {
-        int color = enabled() ? style.labelColor() : style.disabledLabelColor();
-        canvas.text(text, left, y() + (height() - LINE_HEIGHT) / 2 + 1, color, style.labelShadow());
+        canvas.text(text, left, y() + (height() - LINE_HEIGHT) / 2 + 1, labelColor(), style.labelShadow());
+    }
+
+    private int labelColor() {
+        if (!enabled()) {
+            return style.disabledLabelColor();
+        }
+        return selected() ? style.selectedLabelColor() : style.labelColor();
     }
 
     private int iconRoom() {
         return icon == null ? 0 : Icon.SIZE + ICON_GAP;
     }
 
-    private void activate() {
+    private void activate(Modifiers modifiers) {
         playClick();
-        action.run();
+        action.accept(modifiers);
     }
 
     private String sprite() {
         if (!enabled()) {
             return style.disabled();
         }
-        return hovered() || focused() ? style.hover() : style.normal();
+        boolean highlighted = hovered() || focused();
+        if (selected()) {
+            return highlighted ? style.selectedHover() : style.selected();
+        }
+        return highlighted ? style.hover() : style.normal();
     }
 }

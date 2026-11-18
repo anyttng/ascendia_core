@@ -1,3 +1,8 @@
 {
-  "key.category.ascendia_core.main": "Ascendia"
+  "key.category.ascendia_core.main": "Ascendia",
+
+  "gui.ascendia_core.number_field.too_small": "Замало. Щонайменше %s.",
+  "gui.ascendia_core.number_field.too_large": "Забагато. Щонайбільше %s.",
+
+  "gui.ascendia_core.cycle_button.previous_value": "Shift + клацання: попереднє значення"
 }

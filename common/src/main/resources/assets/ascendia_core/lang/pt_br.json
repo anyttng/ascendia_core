@@ -1,0 +1,8 @@
+{
+  "key.category.ascendia_core.main": "Ascendia",
+
+  "gui.ascendia_core.number_field.too_small": "Pequeno demais. No mínimo %s.",
+  "gui.ascendia_core.number_field.too_large": "Grande demais. No máximo %s.",
+
+  "gui.ascendia_core.cycle_button.previous_value": "Shift + clique: valor anterior"
+}
