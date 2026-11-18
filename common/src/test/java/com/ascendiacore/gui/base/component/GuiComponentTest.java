@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import com.ascendiacore.gui.base.component.model.AlertColors;
+import com.ascendiacore.gui.base.component.model.LevelColors;
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.input.KeyInput;
@@ -30,7 +32,8 @@ class GuiComponentTest {
     private static final int BOTTOM = TOP + HEIGHT;
     private static final Canvas CANVAS = new BlankCanvas();
     private static final TooltipStyle TOOLTIP_STYLE = new TooltipStyle("example:sprites", 0xFFFFFFFF, 0xFFFFFF55,
-            0xFFAAAAAA);
+            0xFFAAAAAA, new AlertColors(0xFFFFAA00, 0xFFFF5555, 0xFFA0A0FF), new LevelColors(0xFF55FF55, 0xFFFFFF55, 0xFFFF5555),
+            0xFF55FF55, 0xFF5A5A5A);
 
     @Test
     void hoveredWhenThePointerIsInside() {

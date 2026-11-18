@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
-import com.ascendiacore.gui.base.hint.ValueHint;
+import com.ascendiacore.gui.base.hint.Hint;
 import com.ascendiacore.gui.base.hint.model.HintValue;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.property.Property;
@@ -15,12 +15,17 @@ import com.ascendiacore.gui.layout.model.Axis;
 import com.ascendiacore.gui.widget.button.Button;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public final class CycleButton<T> extends Container {
     private static final int FORWARD = 1;
     private static final int BACK = -1;
+    private static final String HINT_PREFIX = ".hint.";
+    private static final String INTRO = "intro";
+    private static final String NOTE = "note";
+    private static final String PREVIOUS_VALUE_KEY = "gui.ascendia_core.cycle_button.previous_value";
 
     private final Component name;
     private final Property<List<T>> values;
@@ -44,11 +49,35 @@ public final class CycleButton<T> extends Container {
     }
 
     public void setHint(TooltipStyle style, String captionKey, Function<T, String> valueKey) {
-        button.setTooltip(style, () -> ValueHint.of(style, captionKey, hintValues(valueKey)));
+        setHint(style, captionKey, valueKey, hint -> {
+        });
     }
 
-    private List<HintValue> hintValues(Function<T, String> valueKey) {
-        return values.get().stream().map(value -> new HintValue(valueName.apply(value), valueKey.apply(value))).toList();
+    public void setHint(TooltipStyle style, String captionKey, Function<T, String> valueKey, Consumer<Hint> otherKinds) {
+        String prefix = captionKey + HINT_PREFIX;
+        button.setTooltip(style, () -> {
+            Hint hint = Hint.of(style)
+                    .intro(optional(prefix + INTRO))
+                    .values(hintValues(prefix, valueKey))
+                    .note(optional(prefix + NOTE))
+                    .keyHint(keyHint());
+            otherKinds.accept(hint);
+            return hint.build();
+        });
+    }
+
+    private List<HintValue> hintValues(String prefix, Function<T, String> valueKey) {
+        T current = chosen.get();
+        return values.get().stream().map(value -> new HintValue(valueName.apply(value),
+                Component.translatable(prefix + valueKey.apply(value)), value.equals(current))).toList();
+    }
+
+    private Component keyHint() {
+        return values.get().size() > 1 ? Component.translatable(PREVIOUS_VALUE_KEY) : Component.empty();
+    }
+
+    private static Component optional(String key) {
+        return Language.getInstance().has(key) ? Component.translatable(key) : Component.empty();
     }
 
     public void showValueOnly() {

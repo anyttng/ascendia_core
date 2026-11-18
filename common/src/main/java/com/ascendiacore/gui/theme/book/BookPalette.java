@@ -15,6 +15,12 @@ final class BookPalette {
     static final int SAND = 0xFFB9A78C;
     static final int RED = 0xFFFF5555;
     static final int DARK_RED = 0xFFAA0000;
+    static final int ORANGE = 0xFFE8A24A;
+    static final int CORAL = 0xFFFF6B5E;
+    static final int PERIWINKLE = 0xFFB4B8E8;
+    static final int SAGE = 0xFFA8CF7C;
+    static final int MIST = 0xFF9CC7D6;
+    static final int UMBER = 0xFF6A5F52;
 
     private BookPalette() {
     }
