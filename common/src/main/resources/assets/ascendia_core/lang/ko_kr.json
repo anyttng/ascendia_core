@@ -2,5 +2,7 @@
   "key.category.ascendia_core.main": "Ascendia",
 
   "gui.ascendia_core.number_field.too_small": "너무 작습니다. 최소 %s.",
-  "gui.ascendia_core.number_field.too_large": "너무 큽니다. 최대 %s."
+  "gui.ascendia_core.number_field.too_large": "너무 큽니다. 최대 %s.",
+
+  "gui.ascendia_core.cycle_button.previous_value": "Shift + 클릭: 이전 값"
 }

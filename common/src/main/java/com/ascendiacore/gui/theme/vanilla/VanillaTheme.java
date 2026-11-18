@@ -1,5 +1,7 @@
 package com.ascendiacore.gui.theme.vanilla;
 
+import com.ascendiacore.gui.base.component.model.AlertColors;
+import com.ascendiacore.gui.base.component.model.LevelColors;
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.theme.Theme;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
@@ -89,7 +91,10 @@ public final class VanillaTheme {
     }
 
     private static TooltipStyle tooltip() {
-        return new TooltipStyle(null, VanillaPalette.WHITE, VanillaPalette.YELLOW, VanillaPalette.SILVER);
+        return new TooltipStyle(null, VanillaPalette.WHITE, VanillaPalette.YELLOW, VanillaPalette.SILVER,
+                new AlertColors(VanillaPalette.ORANGE, VanillaPalette.RED, VanillaPalette.PALE_BLUE),
+                new LevelColors(VanillaPalette.GREEN, VanillaPalette.YELLOW, VanillaPalette.RED),
+                VanillaPalette.GREEN, VanillaPalette.RULE_GRAY);
     }
 
     private static TextFieldStyle textField() {

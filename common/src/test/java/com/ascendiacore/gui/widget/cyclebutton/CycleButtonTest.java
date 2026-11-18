@@ -9,9 +9,11 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
+import com.ascendiacore.gui.base.component.model.AlertColors;
+import com.ascendiacore.gui.base.component.model.LevelColors;
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.draw.RecordingCanvas;
-import com.ascendiacore.gui.base.hint.ValueHint;
+import com.ascendiacore.gui.base.hint.Hint;
 import com.ascendiacore.gui.base.hint.model.HintValue;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
@@ -36,8 +38,12 @@ class CycleButtonTest {
     private static final ButtonStyle STYLE = new ButtonStyle("test:normal", "test:hover", "test:disabled",
             "test:selected", "test:selected_hover", 0xFF111111, 0xFF222222, 0xFF333333, false);
     private static final Component NAME = Component.literal("Shape");
-    private static final TooltipStyle TOOLTIP = new TooltipStyle(null, 0xFFFFFFFF, 0xFFFFFF55, 0xFFAAAAAA);
+    private static final TooltipStyle TOOLTIP = new TooltipStyle(null, 0xFFFFFFFF, 0xFFFFFF55, 0xFFAAAAAA,
+            new AlertColors(0xFFFFAA00, 0xFFFF5555, 0xFFA0A0FF), new LevelColors(0xFF55FF55, 0xFFFFFF55, 0xFFFF5555),
+            0xFF55FF55, 0xFF5A5A5A);
     private static final String CAPTION_KEY = "gui.example.shape";
+    private static final String PREVIOUS_VALUE_KEY = "gui.ascendia_core.cycle_button.previous_value";
+    private static final String WARNING = "Most structures do not fit.";
     private static final Modifiers SHIFT = new Modifiers(true, false, false);
     private static final int LEFT = 10;
     private static final int TOP = 20;
@@ -138,7 +144,7 @@ class CycleButtonTest {
     void hintListsEveryValueUnderTheNameTheButtonShows() {
         CycleButton<Shape> cycle = cycle(Value.of(Shape.NORMAL));
         cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey);
-        assertEquals(ValueHint.of(TOOLTIP, CAPTION_KEY, hintValues(Shape.values())), button(cycle).tooltip());
+        assertEquals(hint(Shape.NORMAL, Shape.values()).build(), button(cycle).tooltip());
         assertEquals(TOOLTIP, button(cycle).tooltipStyle());
     }
 
@@ -148,12 +154,39 @@ class CycleButtonTest {
         CycleButton<Shape> cycle = cycle(Value.of(Shape.NORMAL), values);
         cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey);
         values.set(List.of(Shape.NORMAL, Shape.CYLINDER));
-        assertEquals(ValueHint.of(TOOLTIP, CAPTION_KEY, hintValues(Shape.NORMAL, Shape.CYLINDER)),
-                button(cycle).tooltip());
+        assertEquals(hint(Shape.NORMAL, Shape.NORMAL, Shape.CYLINDER).build(), button(cycle).tooltip());
     }
 
-    private static List<HintValue> hintValues(Shape... shapes) {
-        return Arrays.stream(shapes).map(shape -> new HintValue(valueName(shape), valueKey(shape))).toList();
+    @Test
+    void hintMarksTheChosenValueAsCurrent() {
+        Value<Shape> chosen = Value.of(Shape.NORMAL);
+        CycleButton<Shape> cycle = cycle(chosen);
+        cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey);
+        chosen.set(Shape.TOROIDAL);
+        assertEquals(hint(Shape.TOROIDAL, Shape.values()).build(), button(cycle).tooltip());
+    }
+
+    @Test
+    void hintOfASingleValueNamesNoKey() {
+        CycleButton<Shape> cycle = cycle(Value.of(Shape.NORMAL), Property.of(List.of(Shape.NORMAL)));
+        cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey);
+        assertEquals(Hint.of(TOOLTIP).values(hintValues(Shape.NORMAL, Shape.NORMAL)).build(), button(cycle).tooltip());
+    }
+
+    @Test
+    void hintTakesTheOtherKindsItsAuthorAdds() {
+        CycleButton<Shape> cycle = cycle(Value.of(Shape.NORMAL));
+        cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey, hint -> hint.warning(Component.literal(WARNING)));
+        assertEquals(hint(Shape.NORMAL, Shape.values()).warning(Component.literal(WARNING)).build(), button(cycle).tooltip());
+    }
+
+    private static Hint hint(Shape current, Shape... shapes) {
+        return Hint.of(TOOLTIP).values(hintValues(current, shapes)).keyHint(Component.translatable(PREVIOUS_VALUE_KEY));
+    }
+
+    private static List<HintValue> hintValues(Shape current, Shape... shapes) {
+        return Arrays.stream(shapes).map(shape -> new HintValue(valueName(shape),
+                Component.translatable(CAPTION_KEY + ".hint." + valueKey(shape)), shape == current)).toList();
     }
 
     private static String valueKey(Shape shape) {

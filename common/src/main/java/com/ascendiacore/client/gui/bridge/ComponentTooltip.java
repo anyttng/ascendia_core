@@ -7,6 +7,7 @@ import org.jspecify.annotations.Nullable;
 import com.ascendiacore.gui.base.component.GuiComponent;
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
@@ -33,7 +34,8 @@ final class ComponentTooltip {
             widget.setTooltip(null);
             return;
         }
-        Component colored = Component.empty().withColor(style.textColor()).append(next);
+        Component colored = TooltipRule.stretched(Minecraft.getInstance(),
+                Component.empty().withColor(style.textColor()).append(next));
         @Nullable Identifier sprites = style.sprites() == null ? null : Identifier.parse(style.sprites());
         widget.setTooltip(Tooltip.create(colored, Optional.empty(), sprites));
     }
