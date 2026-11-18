@@ -19,7 +19,8 @@
     ]
   },
   "mixins": [
-    "ascendia_core.mixins.json"
+    "ascendia_core.mixins.json",
+    "ascendia_core.createworld.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.20.1",
