@@ -1,5 +1,7 @@
 package com.ascendiacore.gui.theme.book;
 
+import com.ascendiacore.gui.base.component.model.AlertColors;
+import com.ascendiacore.gui.base.component.model.LevelColors;
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.theme.Theme;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
@@ -91,7 +93,10 @@ public final class BookTheme {
     }
 
     private static TooltipStyle tooltip() {
-        return new TooltipStyle(TOOLTIP_SPRITES, BookPalette.PARCHMENT, BookPalette.GOLD, BookPalette.FADED);
+        return new TooltipStyle(TOOLTIP_SPRITES, BookPalette.PARCHMENT, BookPalette.GOLD, BookPalette.FADED,
+                new AlertColors(BookPalette.ORANGE, BookPalette.CORAL, BookPalette.PERIWINKLE),
+                new LevelColors(BookPalette.SAGE, BookPalette.GOLD, BookPalette.CORAL),
+                BookPalette.MIST, BookPalette.UMBER);
     }
 
     private static TextFieldStyle textField() {

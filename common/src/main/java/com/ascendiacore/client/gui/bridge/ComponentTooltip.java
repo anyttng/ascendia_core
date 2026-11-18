@@ -3,6 +3,7 @@ package com.ascendiacore.client.gui.bridge;
 import com.ascendiacore.gui.base.component.GuiComponent;
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
@@ -28,6 +29,8 @@ final class ComponentTooltip {
             widget.setTooltip(null);
             return;
         }
-        widget.setTooltip(Tooltip.create(Component.empty().withColor(style.textColor()).append(next)));
+        Component colored = TooltipRule.stretched(Minecraft.getInstance(),
+                Component.empty().withColor(style.textColor()).append(next));
+        widget.setTooltip(Tooltip.create(colored));
     }
 }

@@ -2,5 +2,7 @@
   "key.category.ascendia_core.main": "Ascendia",
 
   "gui.ascendia_core.number_field.too_small": "Trop petit. Au moins %s.",
-  "gui.ascendia_core.number_field.too_large": "Trop grand. Au plus %s."
+  "gui.ascendia_core.number_field.too_large": "Trop grand. Au plus %s.",
+
+  "gui.ascendia_core.cycle_button.previous_value": "Maj. + clic : valeur précédente"
 }
