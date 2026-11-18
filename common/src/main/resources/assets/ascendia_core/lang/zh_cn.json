@@ -2,5 +2,7 @@
   "key.category.ascendia_core.main": "Ascendia",
 
   "gui.ascendia_core.number_field.too_small": "太小。至少 %s。",
-  "gui.ascendia_core.number_field.too_large": "太大。至多 %s。"
+  "gui.ascendia_core.number_field.too_large": "太大。至多 %s。",
+
+  "gui.ascendia_core.cycle_button.previous_value": "Shift + 点击：上一个值"
 }
