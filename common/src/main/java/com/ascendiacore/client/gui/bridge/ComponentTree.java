@@ -72,6 +72,10 @@ public final class ComponentTree implements LayoutElement {
         mounted.forEach(mount -> widgetVisitor.accept(mount.widget()));
     }
 
+    public static AbstractWidget widgetOf(GuiComponent component) {
+        return mount(component).widget();
+    }
+
     private static Mount mount(GuiComponent component) {
         if (component instanceof TextField field) {
             TextFieldWidget widget = new TextFieldWidget(field);
