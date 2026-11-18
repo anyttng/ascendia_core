@@ -26,3 +26,6 @@ Shared framework for the Ascendia mods: GUI toolkit and extension points for van
 
 [[mixins]]
 config="ascendia_core.mixins.json"
+
+[[mixins]]
+config="ascendia_core.createworld.mixins.json"
