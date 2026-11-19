@@ -5,6 +5,8 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 logoFile="logo.png"
+iconFile="logo.png"
+iconBlur=true
 authors="Anyttng"
 description='''
 Shared framework for the Ascendia mods: GUI toolkit and extension points for vanilla screens. Adds no content on its own.
