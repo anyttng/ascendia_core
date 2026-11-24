@@ -57,8 +57,8 @@ public final class ModPresence {
     private final Supplier<@Nullable Side> side;
 
     private @Nullable MixinConfig mixinConfig;
-    private boolean probed;
-    private boolean admitted;
+    private boolean isProbed;
+    private boolean isAdmitted;
 
     public static Builder gate(Logger logger, String gateLabel) {
         return new Builder(logger, gateLabel);
@@ -68,15 +68,15 @@ public final class ModPresence {
         runningSide = side;
     }
 
-    public static boolean probe(String resource) {
-        return probe(ModPresence.class.getClassLoader(), resource);
+    public static boolean hasResource(String resource) {
+        return hasResource(ModPresence.class.getClassLoader(), resource);
     }
 
-    static boolean probe(ClassLoader classLoader, String resource) {
+    static boolean hasResource(ClassLoader classLoader, String resource) {
         return classLoader.getResource(resource) != null;
     }
 
-    public static boolean probeMethod(String owner, String name, String descriptor) {
+    public static boolean hasMethod(String owner, String name, String descriptor) {
         ClassModel model = new ClassFiles(ModPresence.class.getClassLoader()).load(owner).model();
         return model != null && model.methods().stream().anyMatch(method -> method.methodName().equalsString(name)
                 && method.methodType().equalsString(descriptor));
@@ -97,47 +97,47 @@ public final class ModPresence {
         this.side = side;
     }
 
-    public boolean covers(String mixinClassName) {
+    public boolean isCovering(String mixinClassName) {
         if (this.config == null) {
             return false;
         }
 
-        String prefix = mixinPackage() + ".";
+        String prefix = getMixinPackage() + ".";
         return mixinClassName.startsWith(prefix) && this.covering.test(mixinClassName.substring(prefix.length()));
     }
 
-    public boolean admits(String mixinClassName) {
-        return admitted() && !withheld(mixinClassName.substring(mixinPackage().length() + 1));
+    public boolean isAdmitting(String mixinClassName) {
+        return isAdmitted() && !isWithheld(mixinClassName.substring(getMixinPackage().length() + 1));
     }
 
-    private boolean withheld(String mixin) {
+    private boolean isWithheld(String mixin) {
         BooleanSupplier condition = this.withheld.get(mixin);
         return condition != null && condition.getAsBoolean();
     }
 
-    public synchronized boolean admitted() {
-        if (!this.probed) {
-            this.admitted = resolve();
-            this.probed = true;
+    public synchronized boolean isAdmitted() {
+        if (!this.isProbed) {
+            this.isAdmitted = areRequirementsMet();
+            this.isProbed = true;
         }
 
-        return this.admitted;
+        return this.isAdmitted;
     }
 
-    private boolean resolve() {
+    private boolean areRequirementsMet() {
         for (String resource : this.resources) {
-            if (!probe(this.classLoader, resource)) {
+            if (!hasResource(this.classLoader, resource)) {
                 this.logger.info("{}=false", this.gateLabel);
                 return false;
             }
         }
 
-        return admits(coveredMixins());
+        return isAdmitting(getCoveredMixins());
     }
 
-    private boolean admits(List<String> covered) {
+    private boolean isAdmitting(List<String> covered) {
         Map<String, String> bodySourcesByClass = new HashMap<>();
-        this.bodySources.forEach((mixin, owner) -> bodySourcesByClass.put(mixinPackage() + "." + mixin, owner));
+        this.bodySources.forEach((mixin, owner) -> bodySourcesByClass.put(getMixinPackage() + "." + mixin, owner));
         ClassFiles classFiles = new ClassFiles(this.classLoader);
         MixinTargetCheck check = new MixinTargetCheck(classFiles, bodySourcesByClass);
 
@@ -146,7 +146,7 @@ public final class ModPresence {
             refusals.addAll(check.check(mixin));
         }
 
-        List<String> scanned = scannedClasses(classFiles, refusals);
+        List<String> scanned = scanClasses(classFiles, refusals);
         ReferenceCheck references = new ReferenceCheck(classFiles, this.modPackages);
         for (String scannedClass : scanned) {
             refusals.addAll(references.check(scannedClass));
@@ -165,47 +165,47 @@ public final class ModPresence {
         return refusals.isEmpty();
     }
 
-    List<String> ownedClasses() {
-        return ownedClasses(new ClassFiles(this.classLoader), new ArrayList<>()).stream()
-                .map(ModPresence::className)
+    List<String> scanOwnedClasses() {
+        return scanOwnedClasses(new ClassFiles(this.classLoader), new ArrayList<>()).stream()
+                .map(ModPresence::toClassName)
                 .toList();
     }
 
-    List<String> scannedClasses() {
-        return scannedClasses(new ClassFiles(this.classLoader), new ArrayList<>());
+    List<String> scanClasses() {
+        return scanClasses(new ClassFiles(this.classLoader), new ArrayList<>());
     }
 
-    private List<String> scannedClasses(ClassFiles classFiles, List<Refusal> refusals) {
-        String root = this.modPackages.isEmpty() ? "" : packageOf(pluginOf(this.config));
-        Set<String> unapplied = unappliedMixins();
-        return ownedClasses(classFiles, refusals).stream()
+    private List<String> scanClasses(ClassFiles classFiles, List<Refusal> refusals) {
+        String root = this.modPackages.isEmpty() ? "" : toPackagePath(getPlugin(this.config));
+        Set<String> unapplied = getUnappliedMixins();
+        return scanOwnedClasses(classFiles, refusals).stream()
                 .filter(owned -> !this.optional.contains(owned.substring(root.length())))
-                .filter(owned -> !withheldMixin(className(outerOf(owned))))
-                .filter(owned -> !unapplied.contains(className(outerOf(owned))))
-                .map(ModPresence::className)
+                .filter(owned -> !isWithheldMixin(toClassName(toOuterClass(owned))))
+                .filter(owned -> !unapplied.contains(toClassName(toOuterClass(owned))))
+                .map(ModPresence::toClassName)
                 .toList();
     }
 
-    private Set<String> unappliedMixins() {
+    private Set<String> getUnappliedMixins() {
         if (this.config == null) {
             return Set.of();
         }
 
-        List<String> applied = appliedKeys();
+        List<String> applied = getAppliedKeys();
         List<String> skipped = MIXIN_LIST_KEYS.stream().filter(key -> !applied.contains(key)).toList();
         Set<String> unapplied = new HashSet<>();
-        for (String mixin : mixinConfig().mixins(skipped)) {
-            unapplied.add(mixinPackage() + "." + mixin);
+        for (String mixin : loadMixinConfig().getMixins(skipped)) {
+            unapplied.add(getMixinPackage() + "." + mixin);
         }
 
-        for (String mixin : mixinConfig().mixins(applied)) {
-            unapplied.remove(mixinPackage() + "." + mixin);
+        for (String mixin : loadMixinConfig().getMixins(applied)) {
+            unapplied.remove(getMixinPackage() + "." + mixin);
         }
 
         return unapplied;
     }
 
-    private List<String> appliedKeys() {
+    private List<String> getAppliedKeys() {
         Side current = this.side.get();
         if (current == null) {
             return MIXIN_LIST_KEYS;
@@ -218,45 +218,45 @@ public final class ModPresence {
         };
     }
 
-    private boolean withheldMixin(String outerClass) {
-        String prefix = mixinPackage() + ".";
-        return outerClass.startsWith(prefix) && withheld(outerClass.substring(prefix.length()));
+    private boolean isWithheldMixin(String outerClass) {
+        String prefix = getMixinPackage() + ".";
+        return outerClass.startsWith(prefix) && isWithheld(outerClass.substring(prefix.length()));
     }
 
-    private boolean claims(String root, String listed) {
+    private boolean isClaiming(String root, String listed) {
         Predicate<String> scanned = this.scanning;
         if (scanned == null) {
             return true;
         }
 
-        String outerClass = className(outerOf(listed));
-        if (outerClass.startsWith(mixinPackage() + ".")) {
-            return covers(outerClass);
+        String outerClass = toClassName(toOuterClass(listed));
+        if (outerClass.startsWith(getMixinPackage() + ".")) {
+            return isCovering(outerClass);
         }
 
         return scanned.test(outerClass.substring(root.length()));
     }
 
-    private static String outerOf(String internalName) {
+    private static String toOuterClass(String internalName) {
         int nested = internalName.indexOf('$', internalName.lastIndexOf(PACKAGE_SEPARATOR) + 1);
         return nested < 0 ? internalName : internalName.substring(0, nested);
     }
 
-    private static String className(String internalName) {
+    private static String toClassName(String internalName) {
         return internalName.replace(PACKAGE_SEPARATOR, '.');
     }
 
-    private String pluginOf(@Nullable String config) {
+    private String getPlugin(@Nullable String config) {
         String checked = Objects.requireNonNull(config, "a gate checking the mod's packages reads its config");
-        return Objects.requireNonNull(mixinConfig().plugin(), checked + " names no plugin");
+        return Objects.requireNonNull(loadMixinConfig().plugin(), checked + " names no plugin");
     }
 
-    private List<String> ownedClasses(ClassFiles classFiles, List<Refusal> refusals) {
+    private List<String> scanOwnedClasses(ClassFiles classFiles, List<Refusal> refusals) {
         if (this.modPackages.isEmpty()) {
             return List.of();
         }
 
-        String root = packageOf(pluginOf(this.config));
+        String root = toPackagePath(getPlugin(this.config));
         List<String> index = readIndex();
         if (index == null) {
             refusals.add(new Refusal(Objects.requireNonNull(this.config), CLASS_INDEX, Reason.MISSING_INDEX));
@@ -265,8 +265,8 @@ public final class ModPresence {
 
         List<String> nestedRoots = new ArrayList<>();
         for (String listed : index) {
-            String listedPackage = packageOf(listed);
-            if (listedPackage.startsWith(root) && !listedPackage.equals(root) && gatePlugin(classFiles, listed)) {
+            String listedPackage = toPackagePath(listed);
+            if (listedPackage.startsWith(root) && !listedPackage.equals(root) && isGatePlugin(classFiles, listed)) {
                 nestedRoots.add(listedPackage);
             }
         }
@@ -274,7 +274,7 @@ public final class ModPresence {
         List<String> owned = new ArrayList<>();
         for (String listed : index) {
             if (listed.startsWith(root) && nestedRoots.stream().noneMatch(listed::startsWith)
-                    && claims(root, listed)) {
+                    && isClaiming(root, listed)) {
                 owned.add(listed);
             }
         }
@@ -282,13 +282,13 @@ public final class ModPresence {
         return owned;
     }
 
-    private static boolean gatePlugin(ClassFiles classFiles, String internalName) {
+    private static boolean isGatePlugin(ClassFiles classFiles, String internalName) {
         ClassFiles.Loaded loaded = classFiles.load(internalName);
         return loaded.model() != null && loaded.model().superclass()
                 .filter(type -> type.asInternalName().equals(GATE_PLUGIN)).isPresent();
     }
 
-    private static String packageOf(String className) {
+    private static String toPackagePath(String className) {
         String internalName = className.replace('.', PACKAGE_SEPARATOR);
         return internalName.substring(0, internalName.lastIndexOf(PACKAGE_SEPARATOR) + 1);
     }
@@ -308,26 +308,26 @@ public final class ModPresence {
         }
     }
 
-    private List<String> coveredMixins() {
+    private List<String> getCoveredMixins() {
         if (this.config == null) {
             return List.of();
         }
 
         List<String> covered = new ArrayList<>();
-        for (String mixin : mixinConfig().mixins(appliedKeys())) {
-            if (this.covering.test(mixin) && !withheld(mixin)) {
-                covered.add(mixinPackage() + "." + mixin);
+        for (String mixin : loadMixinConfig().getMixins(getAppliedKeys())) {
+            if (this.covering.test(mixin) && !isWithheld(mixin)) {
+                covered.add(getMixinPackage() + "." + mixin);
             }
         }
 
         return covered;
     }
 
-    private String mixinPackage() {
-        return mixinConfig().mixinPackage();
+    private String getMixinPackage() {
+        return loadMixinConfig().mixinPackage();
     }
 
-    private synchronized MixinConfig mixinConfig() {
+    private synchronized MixinConfig loadMixinConfig() {
         MixinConfig read = this.mixinConfig;
         if (read == null) {
             read = readConfig(Objects.requireNonNull(this.config, "a gate without a mixin config covers no mixin"));
@@ -345,7 +345,7 @@ public final class ModPresence {
 
             try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
                 JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-                Map<String, List<String>> blocks = mixinLists(json);
+                Map<String, List<String>> blocks = toMixinLists(json);
                 String plugin = json.has(PLUGIN_KEY) ? json.get(PLUGIN_KEY).getAsString() : null;
                 return new MixinConfig(json.get(PACKAGE_KEY).getAsString(), plugin, blocks);
             }
@@ -354,7 +354,7 @@ public final class ModPresence {
         }
     }
 
-    private static Map<String, List<String>> mixinLists(JsonObject json) {
+    private static Map<String, List<String>> toMixinLists(JsonObject json) {
         Map<String, List<String>> blocks = new HashMap<>();
         for (String key : MIXIN_LIST_KEYS) {
             List<String> mixins = new ArrayList<>();
@@ -371,7 +371,7 @@ public final class ModPresence {
     }
 
     private record MixinConfig(String mixinPackage, @Nullable String plugin, Map<String, List<String>> blocks) {
-        List<String> mixins(List<String> keys) {
+        List<String> getMixins(List<String> keys) {
             List<String> mixins = new ArrayList<>();
             for (String key : keys) {
                 mixins.addAll(this.blocks.get(key));

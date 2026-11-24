@@ -76,9 +76,9 @@ public final class MixinTargetCheck {
     }
 
     public List<Refusal> check(String mixinClassName) {
-        Loaded own = load(internalName(mixinClassName));
-        if (!own.present()) {
-            return List.of(new Refusal(mixinClassName, internalName(mixinClassName), Reason.MISSING_MIXIN));
+        Loaded own = load(toInternalName(mixinClassName));
+        if (!own.isPresent()) {
+            return List.of(new Refusal(mixinClassName, toInternalName(mixinClassName), Reason.MISSING_MIXIN));
         }
 
         if (own.model() == null) {
@@ -91,14 +91,14 @@ public final class MixinTargetCheck {
             return List.of();
         }
 
-        boolean pseudo = MixinAnnotations.find(classAnnotations, PSEUDO).isPresent();
-        List<String> targets = targetsOf(mixin.get());
+        boolean isPseudo = MixinAnnotations.find(classAnnotations, PSEUDO).isPresent();
+        List<String> targets = getTargets(mixin.get());
         List<String> present = new ArrayList<>();
         List<Refusal> refusals = new ArrayList<>();
         for (String target : targets) {
-            if (isGame(target) || load(target).present()) {
+            if (isGame(target) || load(target).isPresent()) {
                 present.add(target);
-            } else if (!pseudo) {
+            } else if (!isPseudo) {
                 refusals.add(new Refusal(mixinClassName, target, Reason.MISSING_CLASS));
             }
         }
@@ -140,7 +140,7 @@ public final class MixinTargetCheck {
                     }
                 }
                 default -> {
-                    if (MixinAnnotations.element(annotation, METHOD_KEY).isPresent()) {
+                    if (MixinAnnotations.getElement(annotation, METHOD_KEY).isPresent()) {
                         checkInjector(mixinClassName, annotation, annotations, descriptor, target, refusals);
                     }
                 }
@@ -192,7 +192,7 @@ public final class MixinTargetCheck {
             checkCallback(mixinClassName, handlerDescriptor, selections, refusals);
         }
 
-        List<Annotation> points = points(injector);
+        List<Annotation> points = getPoints(injector);
         for (Selection selection : selections) {
             for (Annotation at : points) {
                 Refusal refusal = InjectionPoints.check(mixinClassName, selection, at);
@@ -206,7 +206,7 @@ public final class MixinTargetCheck {
     private @Nullable List<Selection> selections(String mixinClassName, Annotation injector,
             List<Annotation> siblings, String target, List<Refusal> refusals) {
         List<Selection> selections = new ArrayList<>();
-        for (String selector : MixinAnnotations.strings(injector, METHOD_KEY)) {
+        for (String selector : MixinAnnotations.getStrings(injector, METHOD_KEY)) {
             Selection selection;
             if (selector.equals(HANDLER_SELECTOR)) {
                 Optional<Annotation> handler = MixinAnnotations.find(siblings, TARGET_HANDLER);
@@ -230,10 +230,10 @@ public final class MixinTargetCheck {
     }
 
     private @Nullable Selection handlerSelection(String mixinClassName, Annotation handler, List<Refusal> refusals) {
-        String bodyOwner = internalName(MixinAnnotations.string(handler, HANDLER_MIXIN_KEY));
-        String handlerName = MixinAnnotations.string(handler, HANDLER_NAME_KEY);
+        String bodyOwner = toInternalName(MixinAnnotations.getString(handler, HANDLER_MIXIN_KEY));
+        String handlerName = MixinAnnotations.getString(handler, HANDLER_NAME_KEY);
         Loaded owner = load(bodyOwner);
-        if (!owner.present()) {
+        if (!owner.isPresent()) {
             refusals.add(new Refusal(mixinClassName, bodyOwner, Reason.MISSING_CLASS));
             return null;
         }
@@ -242,21 +242,21 @@ public final class MixinTargetCheck {
             return null;
         }
 
-        List<MethodModel> found = methods(owner.model(), handlerName::equals, any -> true);
+        List<MethodModel> found = getMethods(owner.model(), handlerName::equals, any -> true);
         if (found.isEmpty()) {
             refusals.add(new Refusal(mixinClassName, bodyOwner + "#" + handlerName, Reason.MISSING_METHOD));
             return null;
         }
 
         List<String> selfTargets = MixinAnnotations.find(MixinAnnotations.of(owner.model()), MIXIN)
-                .map(MixinTargetCheck::targetsOf)
+                .map(MixinTargetCheck::getTargets)
                 .orElse(List.of());
         return new Selection(bodyOwner, found, selfTargets);
     }
 
     private @Nullable Selection plainSelection(String mixinClassName, String selector, String target,
             List<Refusal> refusals) {
-        String bodyOwner = bodyOwnerOf(mixinClassName, target);
+        String bodyOwner = findBodyOwner(mixinClassName, target);
         if (isGame(bodyOwner)) {
             return null;
         }
@@ -267,7 +267,7 @@ public final class MixinTargetCheck {
         }
 
         MemberRef selected = MemberRef.parse(selector);
-        List<MethodModel> found = methods(owner,
+        List<MethodModel> found = getMethods(owner,
                 name -> selected.name().isEmpty() || selected.name().equals(name),
                 candidate -> selected.descriptor() == null || selected.descriptor().equals(candidate));
         if (found.isEmpty()) {
@@ -278,11 +278,11 @@ public final class MixinTargetCheck {
         return new Selection(bodyOwner, found, List.of());
     }
 
-    private static List<Annotation> points(Annotation injector) {
-        List<Annotation> points = new ArrayList<>(MixinAnnotations.nested(injector, AT_KEY));
-        for (Annotation slice : MixinAnnotations.nested(injector, SLICE_KEY)) {
-            points.addAll(MixinAnnotations.nested(slice, SLICE_FROM_KEY));
-            points.addAll(MixinAnnotations.nested(slice, SLICE_TO_KEY));
+    private static List<Annotation> getPoints(Annotation injector) {
+        List<Annotation> points = new ArrayList<>(MixinAnnotations.getNested(injector, AT_KEY));
+        for (Annotation slice : MixinAnnotations.getNested(injector, SLICE_KEY)) {
+            points.addAll(MixinAnnotations.getNested(slice, SLICE_FROM_KEY));
+            points.addAll(MixinAnnotations.getNested(slice, SLICE_TO_KEY));
         }
 
         return points;
@@ -293,9 +293,9 @@ public final class MixinTargetCheck {
         String parameters = MemberRef.parametersOf(handlerDescriptor);
         for (Selection selection : selections) {
             for (MethodModel body : selection.bodies()) {
-                boolean returns = !body.methodTypeSymbol().returnType().descriptorString()
+                boolean isReturning = !body.methodTypeSymbol().returnType().descriptorString()
                         .equals(MemberRef.VOID_RETURN);
-                if (!parameters.contains(returns ? CALLBACK_INFO_RETURNABLE : CALLBACK_INFO)) {
+                if (!parameters.contains(isReturning ? CALLBACK_INFO_RETURNABLE : CALLBACK_INFO)) {
                     String member = selection.owner() + "#" + body.methodName().stringValue()
                             + body.methodType().stringValue();
                     refusals.add(new Refusal(mixinClassName, member, Reason.WRONG_CALLBACK));
@@ -305,12 +305,12 @@ public final class MixinTargetCheck {
         }
     }
 
-    private String bodyOwnerOf(String mixinClassName, String target) {
+    private String findBodyOwner(String mixinClassName, String target) {
         String substitute = this.bodySources.get(mixinClassName);
-        return substitute != null && load(substitute).present() ? substitute : target;
+        return substitute != null && load(substitute).isPresent() ? substitute : target;
     }
 
-    private static List<MethodModel> methods(ClassModel owner, Predicate<String> name, Predicate<String> descriptor) {
+    private static List<MethodModel> getMethods(ClassModel owner, Predicate<String> name, Predicate<String> descriptor) {
         List<MethodModel> found = new ArrayList<>();
         for (MethodModel method : owner.methods()) {
             if (name.test(method.methodName().stringValue()) && descriptor.test(method.methodType().stringValue())) {
@@ -322,7 +322,7 @@ public final class MixinTargetCheck {
     }
 
     private static boolean hasMethod(ClassModel owner, List<String> names, Predicate<String> descriptor) {
-        return !methods(owner, names::contains, descriptor).isEmpty();
+        return !getMethods(owner, names::contains, descriptor).isEmpty();
     }
 
     private static boolean hasField(ClassModel owner, List<String> names, @Nullable String descriptor) {
@@ -336,17 +336,17 @@ public final class MixinTargetCheck {
         return false;
     }
 
-    private static List<String> shadowNames(Annotation shadow, String name, boolean method) {
+    private static List<String> shadowNames(Annotation shadow, String name, boolean isMethod) {
         List<String> names = new ArrayList<>();
-        String prefix = MixinAnnotations.element(shadow, PREFIX_KEY).map(MixinAnnotations::asString)
+        String prefix = MixinAnnotations.getElement(shadow, PREFIX_KEY).map(MixinAnnotations::asString)
                 .orElse(DEFAULT_SHADOW_PREFIX);
-        names.add(method && name.startsWith(prefix) ? name.substring(prefix.length()) : name);
-        names.addAll(MixinAnnotations.strings(shadow, ALIASES_KEY));
+        names.add(isMethod && name.startsWith(prefix) ? name.substring(prefix.length()) : name);
+        names.addAll(MixinAnnotations.getStrings(shadow, ALIASES_KEY));
         return names;
     }
 
     private static String generatedName(Annotation annotation, String methodName, List<String> prefixes) {
-        String explicit = MixinAnnotations.element(annotation, MixinAnnotations.VALUE_KEY).map(MixinAnnotations::asString).orElse("");
+        String explicit = MixinAnnotations.getElement(annotation, MixinAnnotations.VALUE_KEY).map(MixinAnnotations::asString).orElse("");
         if (!explicit.isEmpty()) {
             return explicit;
         }
@@ -378,20 +378,20 @@ public final class MixinTargetCheck {
         return false;
     }
 
-    private static String internalName(String className) {
+    private static String toInternalName(String className) {
         return className.replace('.', '/');
     }
 
-    private static List<String> targetsOf(Annotation mixin) {
+    private static List<String> getTargets(Annotation mixin) {
         List<String> targets = new ArrayList<>();
-        for (AnnotationValue value : MixinAnnotations.values(mixin, MixinAnnotations.VALUE_KEY)) {
+        for (AnnotationValue value : MixinAnnotations.getValues(mixin, MixinAnnotations.VALUE_KEY)) {
             if (value instanceof AnnotationValue.OfClass type) {
                 targets.add(MemberRef.unwrapDescriptor(type.classSymbol().descriptorString()));
             }
         }
 
-        for (String target : MixinAnnotations.strings(mixin, TARGETS_KEY)) {
-            targets.add(internalName(target));
+        for (String target : MixinAnnotations.getStrings(mixin, TARGETS_KEY)) {
+            targets.add(toInternalName(target));
         }
 
         return targets;

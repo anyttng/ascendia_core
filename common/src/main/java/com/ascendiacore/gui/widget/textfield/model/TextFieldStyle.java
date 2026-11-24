@@ -7,5 +7,5 @@ public record TextFieldStyle(
         int textColor,
         int disabledTextColor,
         int placeholderColor,
-        boolean textShadow) {
+        boolean hasTextShadow) {
 }

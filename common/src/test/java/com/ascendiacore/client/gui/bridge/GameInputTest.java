@@ -44,7 +44,7 @@ class GameInputTest {
 
     @Test
     void pointerKeepsThePosition() {
-        PointerInput input = GameInput.pointer(press(InputConstants.MOUSE_BUTTON_LEFT, NO_MODIFIERS));
+        PointerInput input = GameInput.toPointerInput(press(InputConstants.MOUSE_BUTTON_LEFT, NO_MODIFIERS));
         assertEquals(new PointerInput(X, Y, PointerButton.LEFT, Modifiers.NONE), input);
     }
 
@@ -68,21 +68,21 @@ class GameInputTest {
         assertEquals(new Modifiers(false, true, false), key(InputConstants.KEY_TAB, InputConstants.MOD_CONTROL).modifiers());
         assertEquals(new Modifiers(false, false, true), key(InputConstants.KEY_TAB, InputConstants.MOD_ALT).modifiers());
         assertEquals(new Modifiers(true, false, true),
-                GameInput.pointer(press(InputConstants.MOUSE_BUTTON_LEFT, InputConstants.MOD_SHIFT | InputConstants.MOD_ALT))
+                GameInput.toPointerInput(press(InputConstants.MOUSE_BUTTON_LEFT, InputConstants.MOD_SHIFT | InputConstants.MOD_ALT))
                         .modifiers());
     }
 
     @Test
     void textKeepsACodepointOutsideTheBasicPlane() {
-        assertEquals(new TextInput(CODEPOINT), GameInput.text(new CharacterEvent(CODEPOINT)));
+        assertEquals(new TextInput(CODEPOINT), GameInput.toTextInput(new CharacterEvent(CODEPOINT)));
     }
 
     private static PointerButton button(int gameButton) {
-        return GameInput.pointer(press(gameButton, NO_MODIFIERS)).button();
+        return GameInput.toPointerInput(press(gameButton, NO_MODIFIERS)).button();
     }
 
     private static KeyInput key(int gameKey, int modifiers) {
-        return GameInput.key(new KeyEvent(gameKey, UNUSED_KEYCODE, modifiers));
+        return GameInput.toKeyInput(new KeyEvent(gameKey, UNUSED_KEYCODE, modifiers));
     }
 
     private static MouseButtonEvent press(int button, int modifiers) {

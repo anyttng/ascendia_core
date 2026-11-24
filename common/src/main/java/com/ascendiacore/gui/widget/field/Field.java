@@ -11,7 +11,7 @@ import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import net.minecraft.network.chat.Component;
 
 public final class Field extends Container {
-    private static final int GAP = 2;
+    private static final int GAP_PIXELS = 2;
 
     private final GuiComponent control;
     private final Label caption;
@@ -23,7 +23,7 @@ public final class Field extends Container {
         super(Axis.VERTICAL);
         this.control = control;
         this.caption = captionLabel(fill, caption);
-        setGap(GAP);
+        setGapPixels(GAP_PIXELS);
         add(this.caption);
         add(control);
         add(lineLabel(fill));
@@ -47,30 +47,30 @@ public final class Field extends Container {
 
     private Label captionLabel(FillStyle fill, Component text) {
         Label label = new Label(fill, LabelRole.NORMAL, text);
-        label.setRole(() -> control.enabled() ? LabelRole.NORMAL : LabelRole.MUTED);
+        label.setRole(() -> control.isEnabled() ? LabelRole.NORMAL : LabelRole.MUTED);
         return label;
     }
 
     private Label lineLabel(FillStyle fill) {
         Label label = new Label(fill, LabelRole.MUTED, Component.empty());
-        label.setText(this::line);
-        label.setRole(() -> showsError() ? LabelRole.ERROR : LabelRole.MUTED);
+        label.setText(this::getLine);
+        label.setRole(() -> isShowingError() ? LabelRole.ERROR : LabelRole.MUTED);
         return label;
     }
 
-    private Component line() {
-        if (showsError()) {
+    private Component getLine() {
+        if (isShowingError()) {
             return error.get();
         }
         Component value = valueLine.get();
-        return present(value) ? value : hint.get();
+        return isPresent(value) ? value : hint.get();
     }
 
-    private boolean showsError() {
-        return control.enabled() && present(error.get());
+    private boolean isShowingError() {
+        return control.isEnabled() && isPresent(error.get());
     }
 
-    private static boolean present(Component text) {
+    private static boolean isPresent(Component text) {
         return !text.getString().isEmpty();
     }
 }

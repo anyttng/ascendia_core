@@ -15,16 +15,16 @@ public final class Panel extends OpenContainer {
     public Panel(PanelStyle style, FillKind fill) {
         super(Axis.VERTICAL);
         this.frame = style.frame();
-        this.fill = style.fills().of(fill);
-        setPadding(frame.border());
+        this.fill = style.fills().getFill(fill);
+        setPaddingPixels(frame.borderPixels());
     }
 
-    public FillStyle fill() {
+    public FillStyle getFill() {
         return fill;
     }
 
     @Override
-    public boolean mountsItself() {
+    public boolean isMountingItself() {
         return true;
     }
 

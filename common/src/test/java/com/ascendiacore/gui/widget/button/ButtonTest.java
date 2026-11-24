@@ -30,15 +30,15 @@ class ButtonTest {
     private static final Component OTHER_LABEL = Component.literal("Done");
     private static final int LEFT = 100;
     private static final int TOP = 50;
-    private static final int WIDTH = 120;
-    private static final int HEIGHT = 20;
-    private static final int TEXT_WIDTH = 30;
-    private static final int NARROW_WIDTH = 24;
-    private static final int LABEL_MARGIN = 5;
+    private static final int WIDTH_PIXELS = 120;
+    private static final int HEIGHT_PIXELS = 20;
+    private static final int TEXT_WIDTH_PIXELS = 30;
+    private static final int NARROW_WIDTH_PIXELS = 24;
+    private static final int LABEL_MARGIN_PIXELS = 5;
     private static final long SCROLLED_TO_THE_END_MILLIS = 2400;
-    private static final int LINE_HEIGHT = 9;
-    private static final int ICON_GAP = 4;
-    private static final int SIDE_PADDING = 8;
+    private static final int LINE_HEIGHT_PIXELS = 9;
+    private static final int ICON_GAP_PIXELS = 4;
+    private static final int SIDE_PADDING_PIXELS = 8;
     private static final int INSIDE_X = LEFT + 5;
     private static final int INSIDE_Y = TOP + 5;
     private static final int OUTSIDE_X = LEFT - 5;
@@ -54,7 +54,7 @@ class ButtonTest {
     @Test
     void leftPressRunsTheActionAndAsksForTheClick() {
         Button button = textButton();
-        assertTrue(button.pointerPressed(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
+        assertTrue(button.tryPressPointer(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
         assertEquals(1, runs);
         assertEquals(1, recorder.clicks);
     }
@@ -62,9 +62,9 @@ class ButtonTest {
     @Test
     void enterNumpadEnterAndSpaceRunTheAction() {
         Button button = textButton();
-        assertTrue(button.keyPressed(new KeyInput(Key.ENTER, Modifiers.NONE)));
-        assertTrue(button.keyPressed(new KeyInput(Key.NUMPAD_ENTER, Modifiers.NONE)));
-        assertTrue(button.keyPressed(new KeyInput(Key.SPACE, Modifiers.NONE)));
+        assertTrue(button.tryPressKey(new KeyInput(Key.ENTER, Modifiers.NONE)));
+        assertTrue(button.tryPressKey(new KeyInput(Key.NUMPAD_ENTER, Modifiers.NONE)));
+        assertTrue(button.tryPressKey(new KeyInput(Key.SPACE, Modifiers.NONE)));
         assertEquals(3, runs);
         assertEquals(3, recorder.clicks);
     }
@@ -72,8 +72,8 @@ class ButtonTest {
     @Test
     void otherKeysAreLeft() {
         Button button = textButton();
-        assertFalse(button.keyPressed(new KeyInput(Key.TAB, Modifiers.NONE)));
-        assertFalse(button.keyPressed(new KeyInput(Key.OTHER, Modifiers.NONE)));
+        assertFalse(button.tryPressKey(new KeyInput(Key.TAB, Modifiers.NONE)));
+        assertFalse(button.tryPressKey(new KeyInput(Key.OTHER, Modifiers.NONE)));
         assertEquals(0, runs);
         assertEquals(0, recorder.clicks);
     }
@@ -82,8 +82,8 @@ class ButtonTest {
     void disabledButtonNeitherRunsNorClicks() {
         Button button = textButton();
         button.setEnabled(false);
-        assertFalse(button.pointerPressed(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
-        assertFalse(button.keyPressed(new KeyInput(Key.ENTER, Modifiers.NONE)));
+        assertFalse(button.tryPressPointer(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
+        assertFalse(button.tryPressKey(new KeyInput(Key.ENTER, Modifiers.NONE)));
         assertEquals(0, runs);
         assertEquals(0, recorder.clicks);
     }
@@ -147,8 +147,8 @@ class ButtonTest {
     void selectedButtonStillRunsItsAction() {
         Button button = textButton();
         button.setSelected(true);
-        assertTrue(button.pointerPressed(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
-        assertTrue(button.keyPressed(new KeyInput(Key.ENTER, Modifiers.NONE)));
+        assertTrue(button.tryPressPointer(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
+        assertTrue(button.tryPressKey(new KeyInput(Key.ENTER, Modifiers.NONE)));
         assertEquals(2, runs);
         assertEquals(2, recorder.clicks);
     }
@@ -156,13 +156,13 @@ class ButtonTest {
     @Test
     void spriteCoversTheWholeButton() {
         textButton().draw(recorder, OUTSIDE_X, INSIDE_Y);
-        assertEquals(List.of(new Rect(LEFT, TOP, WIDTH, HEIGHT)), recorder.spriteRects);
+        assertEquals(List.of(new Rect(LEFT, TOP, WIDTH_PIXELS, HEIGHT_PIXELS)), recorder.spriteRects);
     }
 
     @Test
     void textIsCenteredAndWhite() {
         textButton().draw(recorder, OUTSIDE_X, INSIDE_Y);
-        assertEquals(List.of(new Text(LEFT + (WIDTH - TEXT_WIDTH) / 2, textTop(), ENABLED_TEXT, false)), recorder.texts);
+        assertEquals(List.of(new Text(LEFT + (WIDTH_PIXELS - TEXT_WIDTH_PIXELS) / 2, getTextTop(), ENABLED_TEXT, false)), recorder.texts);
     }
 
     @Test
@@ -177,32 +177,32 @@ class ButtonTest {
     void iconAloneIsCenteredAndItsNameIsNotDrawn() {
         Button button = place(Button.icon(STYLE, Icon.sprite(ICON_SPRITE), LABEL, () -> runs++));
         button.draw(recorder, OUTSIDE_X, INSIDE_Y);
-        assertEquals(new Rect(LEFT + (WIDTH - Icon.SIZE) / 2, iconTop(), Icon.SIZE, Icon.SIZE), recorder.spriteRects.getLast());
+        assertEquals(new Rect(LEFT + (WIDTH_PIXELS - Icon.SIZE_PIXELS) / 2, iconTop(), Icon.SIZE_PIXELS, Icon.SIZE_PIXELS), recorder.spriteRects.getLast());
         assertTrue(recorder.texts.isEmpty());
-        assertEquals(LABEL, button.narration());
+        assertEquals(LABEL, button.getNarration());
     }
 
     @Test
     void iconSitsLeftOfTheTextAndThePairIsCentered() {
         Button button = place(Button.iconAndText(STYLE, Icon.sprite(ICON_SPRITE), LABEL, () -> runs++));
         button.draw(recorder, OUTSIDE_X, INSIDE_Y);
-        int contentLeft = LEFT + (WIDTH - Icon.SIZE - ICON_GAP - TEXT_WIDTH) / 2;
-        assertEquals(new Rect(contentLeft, iconTop(), Icon.SIZE, Icon.SIZE), recorder.spriteRects.getLast());
-        assertEquals(List.of(new Text(contentLeft + Icon.SIZE + ICON_GAP, textTop(), ENABLED_TEXT, false)), recorder.texts);
+        int contentLeft = LEFT + (WIDTH_PIXELS - Icon.SIZE_PIXELS - ICON_GAP_PIXELS - TEXT_WIDTH_PIXELS) / 2;
+        assertEquals(new Rect(contentLeft, iconTop(), Icon.SIZE_PIXELS, Icon.SIZE_PIXELS), recorder.spriteRects.getLast());
+        assertEquals(List.of(new Text(contentLeft + Icon.SIZE_PIXELS + ICON_GAP_PIXELS, getTextTop(), ENABLED_TEXT, false)), recorder.texts);
     }
 
     @Test
     void labelWiderThanTheButtonIsClippedToItsRoomAndScrolledByTheClock() {
         Button button = textButton();
-        button.setSize(NARROW_WIDTH, HEIGHT);
-        int room = NARROW_WIDTH - 2 * LABEL_MARGIN;
+        button.setSize(NARROW_WIDTH_PIXELS, HEIGHT_PIXELS);
+        int roomPixels = NARROW_WIDTH_PIXELS - 2 * LABEL_MARGIN_PIXELS;
         button.draw(recorder, OUTSIDE_X, INSIDE_Y);
         recorder.timeMillis = SCROLLED_TO_THE_END_MILLIS;
         button.draw(recorder, OUTSIDE_X, INSIDE_Y);
-        Rect clip = new Rect(LEFT + LABEL_MARGIN, TOP, room, HEIGHT);
+        Rect clip = new Rect(LEFT + LABEL_MARGIN_PIXELS, TOP, roomPixels, HEIGHT_PIXELS);
         assertEquals(List.of(clip, clip), recorder.clips);
-        assertEquals(LEFT + LABEL_MARGIN, recorder.texts.get(0).x());
-        assertEquals(LEFT + LABEL_MARGIN - (TEXT_WIDTH - room), recorder.texts.get(1).x());
+        assertEquals(LEFT + LABEL_MARGIN_PIXELS, recorder.texts.get(0).x());
+        assertEquals(LEFT + LABEL_MARGIN_PIXELS - (TEXT_WIDTH_PIXELS - roomPixels), recorder.texts.get(1).x());
         assertEquals(0, recorder.openClips);
     }
 
@@ -215,10 +215,10 @@ class ButtonTest {
     @Test
     void naturalSizeIsTheContentBetweenTheSidePaddings() {
         Icon icon = Icon.sprite(ICON_SPRITE);
-        assertEquals(new Size(TEXT_WIDTH + 2 * SIDE_PADDING, HEIGHT), textButton().naturalSize(recorder));
-        assertEquals(new Size(HEIGHT, HEIGHT),
+        assertEquals(new Size(TEXT_WIDTH_PIXELS + 2 * SIDE_PADDING_PIXELS, HEIGHT_PIXELS), textButton().naturalSize(recorder));
+        assertEquals(new Size(HEIGHT_PIXELS, HEIGHT_PIXELS),
                 Button.icon(STYLE, icon, LABEL, () -> runs++).naturalSize(recorder));
-        assertEquals(new Size(Icon.SIZE + ICON_GAP + TEXT_WIDTH + 2 * SIDE_PADDING, HEIGHT),
+        assertEquals(new Size(Icon.SIZE_PIXELS + ICON_GAP_PIXELS + TEXT_WIDTH_PIXELS + 2 * SIDE_PADDING_PIXELS, HEIGHT_PIXELS),
                 Button.iconAndText(STYLE, icon, LABEL, () -> runs++).naturalSize(recorder));
     }
 
@@ -228,7 +228,7 @@ class ButtonTest {
         Value<Component> label = Value.of(LABEL);
         button.setLabel(label);
         label.set(OTHER_LABEL);
-        assertEquals(OTHER_LABEL, button.narration());
+        assertEquals(OTHER_LABEL, button.getNarration());
     }
 
     @Test
@@ -236,9 +236,9 @@ class ButtonTest {
         Button button = textButton();
         Value<Boolean> ready = Value.of(false);
         button.setEnabled(ready);
-        assertFalse(button.pointerPressed(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
+        assertFalse(button.tryPressPointer(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
         ready.set(true);
-        assertTrue(button.pointerPressed(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
+        assertTrue(button.tryPressPointer(new PointerInput(INSIDE_X, INSIDE_Y, PointerButton.LEFT, Modifiers.NONE)));
         assertEquals(1, runs);
     }
 
@@ -248,23 +248,23 @@ class ButtonTest {
 
     private Button place(Button button) {
         button.setPosition(LEFT, TOP);
-        button.setSize(WIDTH, HEIGHT);
+        button.setSize(WIDTH_PIXELS, HEIGHT_PIXELS);
         button.attach(recorder);
         return button;
     }
 
-    private static int textTop() {
-        return TOP + (HEIGHT - LINE_HEIGHT) / 2 + 1;
+    private static int getTextTop() {
+        return TOP + (HEIGHT_PIXELS - LINE_HEIGHT_PIXELS) / 2 + 1;
     }
 
     private static int iconTop() {
-        return TOP + (HEIGHT - Icon.SIZE) / 2;
+        return TOP + (HEIGHT_PIXELS - Icon.SIZE_PIXELS) / 2;
     }
 
-    private record Rect(int x, int y, int width, int height) {
+    private record Rect(int x, int y, int widthPixels, int heightPixels) {
     }
 
-    private record Text(int x, int y, int color, boolean shadow) {
+    private record Text(int x, int y, int color, boolean hasShadow) {
     }
 
     private static final class Recorder implements Canvas, ComponentHost {
@@ -277,30 +277,30 @@ class ButtonTest {
         private int clicks;
 
         @Override
-        public void sprite(String sprite, int x, int y, int width, int height) {
+        public void sprite(String sprite, int x, int y, int widthPixels, int heightPixels) {
             if (!sprite.equals(ICON_SPRITE)) {
                 sprites.add(sprite);
             }
-            spriteRects.add(new Rect(x, y, width, height));
+            spriteRects.add(new Rect(x, y, widthPixels, heightPixels));
         }
 
         @Override
-        public void sprite(String sprite, int x, int y, int width, int height, int tint) {
-            sprite(sprite, x, y, width, height);
+        public void sprite(String sprite, int x, int y, int widthPixels, int heightPixels, int tint) {
+            sprite(sprite, x, y, widthPixels, heightPixels);
         }
 
         @Override
-        public void fill(int x, int y, int width, int height, int color) {
+        public void fill(int x, int y, int widthPixels, int heightPixels, int color) {
         }
 
         @Override
-        public void text(Component text, int x, int y, int color, boolean shadow) {
-            texts.add(new Text(x, y, color, shadow));
+        public void text(Component text, int x, int y, int color, boolean hasShadow) {
+            texts.add(new Text(x, y, color, hasShadow));
         }
 
         @Override
-        public int textWidth(Component text) {
-            return TEXT_WIDTH;
+        public int textWidthPixels(Component text) {
+            return TEXT_WIDTH_PIXELS;
         }
 
         @Override
@@ -308,8 +308,8 @@ class ButtonTest {
         }
 
         @Override
-        public void pushClip(int x, int y, int width, int height) {
-            clips.add(new Rect(x, y, width, height));
+        public void pushClip(int x, int y, int widthPixels, int heightPixels) {
+            clips.add(new Rect(x, y, widthPixels, heightPixels));
             openClips++;
         }
 
@@ -319,7 +319,7 @@ class ButtonTest {
         }
 
         @Override
-        public long frameTimeMillis() {
+        public long getFrameTimeMillis() {
             return timeMillis;
         }
 

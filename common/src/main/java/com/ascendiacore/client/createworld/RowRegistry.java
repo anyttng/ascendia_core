@@ -10,7 +10,7 @@ final class RowRegistry {
         rows.add(row);
     }
 
-    List<WorldTabRow> rows() {
+    List<WorldTabRow> getRows() {
         return List.copyOf(rows);
     }
 }

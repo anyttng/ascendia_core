@@ -23,8 +23,8 @@ class PanelTest {
     private static final TextMetrics NO_TEXT = text -> 0;
     private static final int LEFT = 10;
     private static final int TOP = 20;
-    private static final int WIDTH = 120;
-    private static final int HEIGHT = 80;
+    private static final int WIDTH_PIXELS = 120;
+    private static final int HEIGHT_PIXELS = 80;
     private static final int OUTSIDE = -1;
 
     private final RecordingCanvas canvas = new RecordingCanvas();
@@ -36,8 +36,8 @@ class PanelTest {
         place(panel);
         panel.draw(canvas, OUTSIDE, OUTSIDE);
         FillStyle page = style.fills().page();
-        assertEquals(List.of(new RecordingCanvas.Fill(LEFT + 1, TOP + 1, WIDTH - 2, HEIGHT - 2, page.color())), canvas.fills());
-        assertEquals(List.of(new RecordingCanvas.Sprite(style.frame().sprite(), LEFT, TOP, WIDTH, HEIGHT)), canvas.sprites());
+        assertEquals(List.of(new RecordingCanvas.Fill(LEFT + 1, TOP + 1, WIDTH_PIXELS - 2, HEIGHT_PIXELS - 2, page.color())), canvas.fills());
+        assertEquals(List.of(new RecordingCanvas.Sprite(style.frame().sprite(), LEFT, TOP, WIDTH_PIXELS, HEIGHT_PIXELS)), canvas.sprites());
     }
 
     @Test
@@ -57,11 +57,11 @@ class PanelTest {
         Row content = new Row();
         panel.add(content, Length.fill());
         panel.layout(NO_TEXT);
-        int border = style.frame().border();
-        assertEquals(LEFT + border, content.x());
-        assertEquals(TOP + border, content.y());
-        assertEquals(WIDTH - 2 * border, content.width());
-        assertEquals(HEIGHT - 2 * border, content.height());
+        int borderPixels = style.frame().borderPixels();
+        assertEquals(LEFT + borderPixels, content.getX());
+        assertEquals(TOP + borderPixels, content.getY());
+        assertEquals(WIDTH_PIXELS - 2 * borderPixels, content.getWidthPixels());
+        assertEquals(HEIGHT_PIXELS - 2 * borderPixels, content.getHeightPixels());
     }
 
     @Test
@@ -72,19 +72,19 @@ class PanelTest {
         inset.draw(canvas, OUTSIDE, OUTSIDE);
         assertEquals(style.dark().sprite(), canvas.sprites().getFirst().sprite());
         assertEquals(style.fills().dark().color(), canvas.fills().getFirst().color());
-        assertEquals(style.fills().dark(), inset.fill());
+        assertEquals(style.fills().dark(), inset.getFill());
     }
 
     @Test
     void eachInsetFrameKindNamesItsOwnFrame() {
         InsetStyle style = Themes.BOOK.inset();
-        assertEquals(style.light(), style.frame(InsetFrame.LIGHT));
-        assertEquals(style.dark(), style.frame(InsetFrame.DARK));
-        assertEquals(style.rim(), style.frame(InsetFrame.RIM));
+        assertEquals(style.light(), style.getFrame(InsetFrame.LIGHT));
+        assertEquals(style.dark(), style.getFrame(InsetFrame.DARK));
+        assertEquals(style.rim(), style.getFrame(InsetFrame.RIM));
     }
 
     private static void place(GuiComponent component) {
         component.setPosition(LEFT, TOP);
-        component.setSize(WIDTH, HEIGHT);
+        component.setSize(WIDTH_PIXELS, HEIGHT_PIXELS);
     }
 }

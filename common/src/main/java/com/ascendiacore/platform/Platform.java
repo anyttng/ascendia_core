@@ -3,9 +3,9 @@ package com.ascendiacore.platform;
 public interface Platform {
     boolean isClient();
 
-    String modVersion();
+    String getModVersion();
 
-    String loaderName();
+    String getLoaderName();
 
-    String loaderVersion();
+    String getLoaderVersion();
 }

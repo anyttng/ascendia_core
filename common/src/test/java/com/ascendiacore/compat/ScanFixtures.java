@@ -76,19 +76,19 @@ final class ScanFixtures {
     private static final class FixtureModLoader extends ClassLoader {
         private final Map<String, String> swapped;
         private final Set<String> hidden;
-        private final boolean indexed;
+        private final boolean isIndexed;
 
-        private FixtureModLoader(Map<String, String> swapped, Set<String> hidden, boolean indexed) {
+        private FixtureModLoader(Map<String, String> swapped, Set<String> hidden, boolean isIndexed) {
             super(ScanFixtures.class.getClassLoader());
             this.swapped = swapped;
             this.hidden = hidden;
-            this.indexed = indexed;
+            this.isIndexed = isIndexed;
         }
 
         @Override
         public @Nullable InputStream getResourceAsStream(String name) {
             if (name.equals(ModPresence.CLASS_INDEX)) {
-                return this.indexed ? new ByteArrayInputStream(LISTED.stream().map(ScanFixtures::internalName)
+                return this.isIndexed ? new ByteArrayInputStream(LISTED.stream().map(ScanFixtures::internalName)
                         .collect(Collectors.joining("\n")).getBytes(StandardCharsets.UTF_8)) : null;
             }
 
