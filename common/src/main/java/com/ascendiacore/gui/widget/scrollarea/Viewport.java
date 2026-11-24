@@ -20,51 +20,51 @@ final class Viewport extends Container {
     }
 
     @Override
-    public boolean mountsItself() {
+    public boolean isMountingItself() {
         return true;
     }
 
     @Override
-    public boolean interactive() {
+    public boolean isInteractive() {
         return true;
     }
 
     @Override
-    public boolean tabStop() {
+    public boolean isTabStop() {
         return false;
     }
 
     @Override
     public void layout(TextMetrics metrics) {
-        content.setPosition(x(), y() - scroll.offset());
-        content.setSize(width(), scroll.content());
+        content.setPosition(getX(), getY() - scroll.getOffsetPixels());
+        content.setSize(getWidthPixels(), scroll.getContentPixels());
         content.layout(metrics);
     }
 
     @Override
-    protected Rect windowOfChildren() {
-        Rect own = new Rect(x(), y(), width(), height());
-        Rect outer = window();
-        return outer == null ? own : own.intersect(outer);
+    protected Rect getWindowOfChildren() {
+        Rect own = new Rect(getX(), getY(), getWidthPixels(), getHeightPixels());
+        Rect outer = getWindow();
+        return outer == null ? own : own.intersection(outer);
     }
 
     @Override
-    protected boolean onWheel(WheelInput input) {
-        if (!scroll.scrollable()) {
+    protected boolean tryHandleWheel(WheelInput input) {
+        if (!scroll.isScrollable()) {
             return false;
         }
-        scroll.wheel(input.amount());
+        scroll.wheel(input.notches());
         return true;
     }
 
     @Override
     protected void reveal(GuiComponent descendant) {
-        int above = y() - descendant.y();
-        int below = descendant.y() + descendant.height() - (y() + height());
-        if (above > 0) {
-            scroll.scrollBy(-above - ScrollArea.WHEEL_STEP);
-        } else if (below > 0) {
-            scroll.scrollBy(below + ScrollArea.WHEEL_STEP);
+        int abovePixels = getY() - descendant.getY();
+        int belowPixels = descendant.getY() + descendant.getHeightPixels() - (getY() + getHeightPixels());
+        if (abovePixels > 0) {
+            scroll.scrollBy(-abovePixels - ScrollArea.WHEEL_STEP_PIXELS);
+        } else if (belowPixels > 0) {
+            scroll.scrollBy(belowPixels + ScrollArea.WHEEL_STEP_PIXELS);
         }
     }
 }

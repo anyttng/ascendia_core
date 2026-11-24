@@ -24,12 +24,12 @@ final class ComponentTooltip {
     }
 
     void follow(int mouseX, int mouseY) {
-        Component next = component.tooltipAt(mouseX, mouseY);
+        Component next = component.getTooltipAt(mouseX, mouseY);
         if (next.equals(text)) {
             return;
         }
         text = next;
-        TooltipStyle style = component.tooltipStyle();
+        TooltipStyle style = component.getTooltipStyle();
         if (style == null || next.getString().isEmpty()) {
             widget.setTooltip(null);
             return;

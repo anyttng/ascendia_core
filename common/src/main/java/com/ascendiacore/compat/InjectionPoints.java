@@ -34,11 +34,11 @@ final class InjectionPoints {
     }
 
     static @Nullable Refusal check(String mixinClassName, Selection selection, Annotation at) {
-        String target = MixinAnnotations.element(at, TARGET_KEY).map(MixinAnnotations::asString).orElse("");
-        int needed = Math.max(MixinAnnotations.integer(at, ORDINAL_KEY, ANY_ORDINAL), 0) + 1;
+        String target = MixinAnnotations.getElement(at, TARGET_KEY).map(MixinAnnotations::asString).orElse("");
+        int needed = Math.max(MixinAnnotations.getInteger(at, ORDINAL_KEY, ANY_ORDINAL), 0) + 1;
         Reason reason;
         ToIntFunction<MethodModel> counter;
-        switch (MixinAnnotations.string(at, MixinAnnotations.VALUE_KEY)) {
+        switch (MixinAnnotations.getString(at, MixinAnnotations.VALUE_KEY)) {
             case AT_INVOKE -> {
                 reason = Reason.MISSING_INVOKE;
                 MemberRef wanted = MemberRef.parse(target);
@@ -47,7 +47,7 @@ final class InjectionPoints {
             case AT_FIELD -> {
                 reason = Reason.MISSING_FIELD_ACCESS;
                 MemberRef wanted = MemberRef.parse(target);
-                int opcode = MixinAnnotations.integer(at, OPCODE_KEY, ANY_OPCODE);
+                int opcode = MixinAnnotations.getInteger(at, OPCODE_KEY, ANY_OPCODE);
                 counter = body -> countFieldAccesses(body, wanted, opcode, selection);
             }
             case AT_NEW -> {
@@ -78,57 +78,57 @@ final class InjectionPoints {
     }
 
     private static int countInvokes(MethodModel body, MemberRef wanted, Selection selection) {
-        int count = 0;
-        for (CodeElement element : codeOf(body)) {
+        int invokeCount = 0;
+        for (CodeElement element : getCode(body)) {
             if (element instanceof InvokeInstruction invoke
-                    && wanted.matches(merged(invoke.owner().asInternalName(), selection, wanted),
+                    && wanted.isMatching(merged(invoke.owner().asInternalName(), selection, wanted),
                             invoke.name().stringValue(),
                             invoke.type().stringValue())) {
-                count++;
+                invokeCount++;
             }
         }
 
-        return count;
+        return invokeCount;
     }
 
     private static int countFieldAccesses(MethodModel body, MemberRef wanted, int opcode, Selection selection) {
-        int count = 0;
-        for (CodeElement element : codeOf(body)) {
+        int accessCount = 0;
+        for (CodeElement element : getCode(body)) {
             if (element instanceof FieldInstruction access
                     && (opcode == ANY_OPCODE || access.opcode().bytecode() == opcode)
-                    && wanted.matches(merged(access.owner().asInternalName(), selection, wanted),
+                    && wanted.isMatching(merged(access.owner().asInternalName(), selection, wanted),
                             access.name().stringValue(),
                             access.type().stringValue())) {
-                count++;
+                accessCount++;
             }
         }
 
-        return count;
+        return accessCount;
     }
 
     private static int countNews(MethodModel body, String target) {
-        boolean byConstructor = target.startsWith("(");
-        String created = byConstructor ? MemberRef.unwrapDescriptor(target.substring(target.indexOf(')') + 1))
+        boolean isByConstructor = target.startsWith("(");
+        String created = isByConstructor ? MemberRef.unwrapDescriptor(target.substring(target.indexOf(')') + 1))
                 : MemberRef.unwrapDescriptor(target);
-        String constructor = byConstructor ? MemberRef.parametersOf(target) + MemberRef.VOID_RETURN : null;
-        int count = 0;
-        for (CodeElement element : codeOf(body)) {
-            if (byConstructor && element instanceof InvokeInstruction invoke
+        String constructor = isByConstructor ? MemberRef.parametersOf(target) + MemberRef.VOID_RETURN : null;
+        int creationCount = 0;
+        for (CodeElement element : getCode(body)) {
+            if (isByConstructor && element instanceof InvokeInstruction invoke
                     && invoke.opcode() == Opcode.INVOKESPECIAL
                     && invoke.owner().asInternalName().equals(created)
                     && invoke.name().equalsString(MemberRef.CONSTRUCTOR)
                     && invoke.type().equalsString(constructor)) {
-                count++;
-            } else if (!byConstructor && element instanceof NewObjectInstruction creation
+                creationCount++;
+            } else if (!isByConstructor && element instanceof NewObjectInstruction creation
                     && creation.className().asInternalName().equals(created)) {
-                count++;
+                creationCount++;
             }
         }
 
-        return count;
+        return creationCount;
     }
 
-    private static Iterable<CodeElement> codeOf(MethodModel method) {
+    private static Iterable<CodeElement> getCode(MethodModel method) {
         return method.code().<Iterable<CodeElement>>map(code -> code).orElse(List.of());
     }
 }

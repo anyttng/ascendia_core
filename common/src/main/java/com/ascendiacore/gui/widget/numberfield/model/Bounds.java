@@ -7,15 +7,15 @@ public record Bounds(int min, int max) {
         }
     }
 
-    public boolean below(int value) {
+    public boolean isBelow(int value) {
         return value < min;
     }
 
-    public boolean above(int value) {
+    public boolean isAbove(int value) {
         return value > max;
     }
 
-    public boolean contains(int value) {
-        return !below(value) && !above(value);
+    public boolean isContaining(int value) {
+        return !isBelow(value) && !isAbove(value);
     }
 }

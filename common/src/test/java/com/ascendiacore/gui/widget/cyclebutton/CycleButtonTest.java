@@ -47,9 +47,9 @@ class CycleButtonTest {
     private static final Modifiers SHIFT = new Modifiers(true, false, false);
     private static final int LEFT = 10;
     private static final int TOP = 20;
-    private static final int WIDTH = 150;
-    private static final int HEIGHT = 20;
-    private static final int CHAR_WIDTH = 6;
+    private static final int WIDTH_PIXELS = 150;
+    private static final int HEIGHT_PIXELS = 20;
+    private static final int CHAR_WIDTH_PIXELS = 6;
 
     private final List<Shape> reported = new ArrayList<>();
 
@@ -76,9 +76,9 @@ class CycleButtonTest {
     void enterStepsForwardAndShiftEnterBack() {
         Value<Shape> chosen = Value.of(Shape.TOROIDAL);
         CycleButton<Shape> cycle = cycle(chosen);
-        button(cycle).keyPressed(new KeyInput(Key.ENTER, Modifiers.NONE));
+        button(cycle).tryPressKey(new KeyInput(Key.ENTER, Modifiers.NONE));
         assertEquals(Shape.CYLINDER, chosen.get());
-        button(cycle).keyPressed(new KeyInput(Key.ENTER, SHIFT));
+        button(cycle).tryPressKey(new KeyInput(Key.ENTER, SHIFT));
         assertEquals(Shape.TOROIDAL, chosen.get());
     }
 
@@ -122,14 +122,14 @@ class CycleButtonTest {
     @Test
     void labelNamesTheOptionAndTheValue() {
         CycleButton<Shape> cycle = cycle(Value.of(Shape.TOROIDAL));
-        assertEquals(CommonComponents.optionNameValue(NAME, valueName(Shape.TOROIDAL)), button(cycle).narration());
+        assertEquals(CommonComponents.optionNameValue(NAME, valueName(Shape.TOROIDAL)), button(cycle).getNarration());
     }
 
     @Test
     void valueOnlyLabelShowsTheValueAlone() {
         CycleButton<Shape> cycle = cycle(Value.of(Shape.TOROIDAL));
         cycle.showValueOnly();
-        assertEquals(valueName(Shape.TOROIDAL), button(cycle).narration());
+        assertEquals(valueName(Shape.TOROIDAL), button(cycle).getNarration());
     }
 
     @Test
@@ -137,15 +137,15 @@ class CycleButtonTest {
         Value<Shape> chosen = Value.of(Shape.NORMAL);
         CycleButton<Shape> cycle = cycle(chosen);
         chosen.set(Shape.CYLINDER);
-        assertEquals(CommonComponents.optionNameValue(NAME, valueName(Shape.CYLINDER)), button(cycle).narration());
+        assertEquals(CommonComponents.optionNameValue(NAME, valueName(Shape.CYLINDER)), button(cycle).getNarration());
     }
 
     @Test
     void hintListsEveryValueUnderTheNameTheButtonShows() {
         CycleButton<Shape> cycle = cycle(Value.of(Shape.NORMAL));
         cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey);
-        assertEquals(hint(Shape.NORMAL, Shape.values()).build(), button(cycle).tooltip());
-        assertEquals(TOOLTIP, button(cycle).tooltipStyle());
+        assertEquals(hint(Shape.NORMAL, Shape.values()).build(), button(cycle).getTooltip());
+        assertEquals(TOOLTIP, button(cycle).getTooltipStyle());
     }
 
     @Test
@@ -154,7 +154,7 @@ class CycleButtonTest {
         CycleButton<Shape> cycle = cycle(Value.of(Shape.NORMAL), values);
         cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey);
         values.set(List.of(Shape.NORMAL, Shape.CYLINDER));
-        assertEquals(hint(Shape.NORMAL, Shape.NORMAL, Shape.CYLINDER).build(), button(cycle).tooltip());
+        assertEquals(hint(Shape.NORMAL, Shape.NORMAL, Shape.CYLINDER).build(), button(cycle).getTooltip());
     }
 
     @Test
@@ -163,21 +163,21 @@ class CycleButtonTest {
         CycleButton<Shape> cycle = cycle(chosen);
         cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey);
         chosen.set(Shape.TOROIDAL);
-        assertEquals(hint(Shape.TOROIDAL, Shape.values()).build(), button(cycle).tooltip());
+        assertEquals(hint(Shape.TOROIDAL, Shape.values()).build(), button(cycle).getTooltip());
     }
 
     @Test
     void hintOfASingleValueNamesNoKey() {
         CycleButton<Shape> cycle = cycle(Value.of(Shape.NORMAL), Property.of(List.of(Shape.NORMAL)));
         cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey);
-        assertEquals(Hint.of(TOOLTIP).values(hintValues(Shape.NORMAL, Shape.NORMAL)).build(), button(cycle).tooltip());
+        assertEquals(Hint.of(TOOLTIP).values(hintValues(Shape.NORMAL, Shape.NORMAL)).build(), button(cycle).getTooltip());
     }
 
     @Test
     void hintTakesTheOtherKindsItsAuthorAdds() {
         CycleButton<Shape> cycle = cycle(Value.of(Shape.NORMAL));
         cycle.setHint(TOOLTIP, CAPTION_KEY, CycleButtonTest::valueKey, hint -> hint.warning(Component.literal(WARNING)));
-        assertEquals(hint(Shape.NORMAL, Shape.values()).warning(Component.literal(WARNING)).build(), button(cycle).tooltip());
+        assertEquals(hint(Shape.NORMAL, Shape.values()).warning(Component.literal(WARNING)).build(), button(cycle).getTooltip());
     }
 
     @Test
@@ -187,7 +187,7 @@ class CycleButtonTest {
         List<HintValue> values = Arrays.stream(Shape.values()).map(shape -> new HintValue(valueName(shape),
                 Component.literal(shape.name()), shape == Shape.NORMAL)).toList();
         assertEquals(Hint.of(TOOLTIP).values(values).keyHint(Component.translatable(PREVIOUS_VALUE_KEY)).build(),
-                button(cycle).tooltip());
+                button(cycle).getTooltip());
     }
 
     private static Hint hint(Shape current, Shape... shapes) {
@@ -211,19 +211,19 @@ class CycleButtonTest {
         CycleButton<Shape> cycle = new CycleButton<>(STYLE, NAME, values, chosen, CycleButtonTest::valueName);
         cycle.setOnChange(reported::add);
         RecordingCanvas canvas = new RecordingCanvas();
-        canvas.setCharWidth(CHAR_WIDTH);
+        canvas.setCharWidthPixels(CHAR_WIDTH_PIXELS);
         cycle.setPosition(LEFT, TOP);
-        cycle.setSize(WIDTH, HEIGHT);
+        cycle.setSize(WIDTH_PIXELS, HEIGHT_PIXELS);
         cycle.layout(canvas);
         return cycle;
     }
 
     private static void click(CycleButton<Shape> cycle, Modifiers modifiers) {
-        button(cycle).pointerPressed(new PointerInput(LEFT + 1, TOP + 1, PointerButton.LEFT, modifiers));
+        button(cycle).tryPressPointer(new PointerInput(LEFT + 1, TOP + 1, PointerButton.LEFT, modifiers));
     }
 
     private static Button button(CycleButton<Shape> cycle) {
-        return (Button) cycle.mountedComponents().getFirst();
+        return (Button) cycle.getMountedComponents().getFirst();
     }
 
     private static Component valueName(Shape shape) {

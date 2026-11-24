@@ -232,8 +232,8 @@ class HintTest {
         assertEquals(INTRO + "\n\n" + NOTE, Hint.of(STYLE).intro(text(INTRO)).note(text(NOTE)).build().getString());
     }
 
-    private static HintValue value(String name, String text, boolean current) {
-        return new HintValue(text(name), text(text), current);
+    private static HintValue value(String name, String text, boolean isCurrent) {
+        return new HintValue(text(name), text(text), isCurrent);
     }
 
     private static Component text(String text) {

@@ -32,19 +32,19 @@ public final class NumberField extends Container {
         this.bounds = bounds;
         this.text = new TextField(style, edited -> onChange.run());
         this.text.setAccepted(Character::isDigit);
-        this.text.setValid(() -> value() != null);
+        this.text.setValid(() -> getValue() != null);
         this.field = new Field(fill, caption, text);
-        this.field.setError(this::boundsLine);
-        this.field.setValueLine(this::shownValueLine);
+        this.field.setError(this::getBoundsLine);
+        this.field.setValueLine(this::getShownValueLine);
         add(field);
     }
 
-    public void setSigned(boolean signed) {
-        text.setAccepted(signed ? NumberField::digitOrMinus : Character::isDigit);
+    public void setSigned(boolean isSigned) {
+        text.setAccepted(isSigned ? NumberField::isDigitOrMinus : Character::isDigit);
     }
 
-    public void setMaxLength(int maxLength) {
-        text.setMaxLength(maxLength);
+    public void setMaxCharacterCount(int maxCharacterCount) {
+        text.setMaxCharacterCount(maxCharacterCount);
     }
 
     public void setValueLine(IntFunction<Component> valueLine) {
@@ -63,39 +63,39 @@ public final class NumberField extends Container {
         text.setValue(shown);
     }
 
-    public @Nullable Integer value() {
-        Integer number = parsed();
+    public @Nullable Integer getValue() {
+        Integer number = parseText();
         Optional<Bounds> known = bounds.get();
-        return number != null && known.isPresent() && known.get().contains(number) ? number : null;
+        return number != null && known.isPresent() && known.get().isContaining(number) ? number : null;
     }
 
-    private Component boundsLine() {
-        Integer number = parsed();
+    private Component getBoundsLine() {
+        Integer number = parseText();
         Optional<Bounds> known = bounds.get();
         if (number == null || known.isEmpty()) {
             return Component.empty();
         }
         Bounds range = known.get();
-        if (range.below(number)) {
+        if (range.isBelow(number)) {
             return Component.translatable(TOO_SMALL_KEY, range.min());
         }
-        return range.above(number) ? Component.translatable(TOO_LARGE_KEY, range.max()) : Component.empty();
+        return range.isAbove(number) ? Component.translatable(TOO_LARGE_KEY, range.max()) : Component.empty();
     }
 
-    private Component shownValueLine() {
-        Integer number = value();
+    private Component getShownValueLine() {
+        Integer number = getValue();
         return number == null ? Component.empty() : valueLine.apply(number);
     }
 
-    private @Nullable Integer parsed() {
+    private @Nullable Integer parseText() {
         try {
-            return Integer.parseInt(text.value());
+            return Integer.parseInt(text.getValue());
         } catch (NumberFormatException notANumber) {
             return null;
         }
     }
 
-    private static boolean digitOrMinus(int character) {
+    private static boolean isDigitOrMinus(int character) {
         return Character.isDigit(character) || character == MINUS;
     }
 }

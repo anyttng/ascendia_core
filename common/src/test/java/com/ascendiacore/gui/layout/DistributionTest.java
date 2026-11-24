@@ -9,23 +9,23 @@ import org.junit.jupiter.api.Test;
 import com.ascendiacore.gui.layout.model.Length;
 
 class DistributionTest {
-    private static final int GAP = 8;
+    private static final int GAP_PIXELS = 8;
     private static final Distribution.Item LIST = new Distribution.Item(Length.flexible(100, 150), 0);
     private static final Distribution.Item PANEL = new Distribution.Item(Length.flexible(200, 310), 0);
 
     @Test
     void everythingKeepsItsPreferredSizeWhenItFits() {
-        assertArrayEquals(new int[] {150, 310}, Distribution.sizes(468, GAP, List.of(LIST, PANEL)));
+        assertArrayEquals(new int[] {150, 310}, Distribution.sizes(468, GAP_PIXELS, List.of(LIST, PANEL)));
     }
 
     @Test
     void flexibleItemsShrinkInProportionToTheirRoom() {
-        assertArrayEquals(new int[] {139, 283}, Distribution.sizes(430, GAP, List.of(LIST, PANEL)));
+        assertArrayEquals(new int[] {139, 283}, Distribution.sizes(430, GAP_PIXELS, List.of(LIST, PANEL)));
     }
 
     @Test
     void flexibleItemsStopAtTheirMinimum() {
-        assertArrayEquals(new int[] {100, 200}, Distribution.sizes(300, GAP, List.of(LIST, PANEL)));
+        assertArrayEquals(new int[] {100, 200}, Distribution.sizes(300, GAP_PIXELS, List.of(LIST, PANEL)));
     }
 
     @Test
@@ -54,6 +54,6 @@ class DistributionTest {
 
     @Test
     void nothingToPlaceGivesNoSizes() {
-        assertArrayEquals(new int[0], Distribution.sizes(100, GAP, List.of()));
+        assertArrayEquals(new int[0], Distribution.sizes(100, GAP_PIXELS, List.of()));
     }
 }

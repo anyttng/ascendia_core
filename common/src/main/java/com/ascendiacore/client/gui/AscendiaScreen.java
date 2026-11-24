@@ -14,34 +14,34 @@ import net.minecraft.network.chat.Component;
 
 public abstract class AscendiaScreen extends Screen {
     private final Theme theme;
-    private final int panelWidth;
-    private final int panelHeight;
+    private final int panelWidthPixels;
+    private final int panelHeightPixels;
 
-    protected AscendiaScreen(Component title, Theme theme, int panelWidth, int panelHeight) {
+    protected AscendiaScreen(Component title, Theme theme, int panelWidthPixels, int panelHeightPixels) {
         super(title);
         this.theme = theme;
-        this.panelWidth = panelWidth;
-        this.panelHeight = panelHeight;
+        this.panelWidthPixels = panelWidthPixels;
+        this.panelHeightPixels = panelHeightPixels;
     }
 
-    protected Theme theme() {
+    protected Theme getTheme() {
         return theme;
     }
 
-    protected int panelWidth() {
-        return panelWidth;
+    protected int getPanelWidthPixels() {
+        return panelWidthPixels;
     }
 
-    protected int panelHeight() {
-        return panelHeight;
+    protected int getPanelHeightPixels() {
+        return panelHeightPixels;
     }
 
-    protected int panelLeft() {
-        return (this.width - panelWidth) / 2;
+    protected int getPanelLeft() {
+        return (this.width - panelWidthPixels) / 2;
     }
 
-    protected int panelTop() {
-        return (this.height - panelHeight) / 2;
+    protected int getPanelTop() {
+        return (this.height - panelHeightPixels) / 2;
     }
 
     @Override
@@ -49,8 +49,8 @@ public abstract class AscendiaScreen extends Screen {
         Panel panel = new Panel(theme.panel(), FillKind.PARCHMENT);
         fillPanel(panel);
         ComponentTree tree = new ComponentTree(panel);
-        tree.setSize(panelWidth, panelHeight);
-        tree.setPosition(panelLeft(), panelTop());
+        tree.setSize(panelWidthPixels, panelHeightPixels);
+        tree.setPosition(getPanelLeft(), getPanelTop());
         tree.visitWidgets(this::addRenderableWidget);
     }
 

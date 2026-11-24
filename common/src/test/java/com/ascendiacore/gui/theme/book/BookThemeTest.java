@@ -40,12 +40,12 @@ class BookThemeTest {
 
     @Test
     void rowTextIsLeatherAndTurnsParchmentOnTheSelectedFramedRowAndGoldOnTheSelectedButtonRow() {
-        assertEquals(BookPalette.DARK_LEATHER, THEME.list().text(RowStyle.FRAMED, false).ink());
-        assertEquals(BookPalette.PARCHMENT, THEME.list().text(RowStyle.FRAMED, true).ink());
-        assertEquals(BookPalette.DARK_LEATHER, THEME.list().text(RowStyle.BUTTON, false).ink());
-        assertEquals(BookPalette.GOLD, THEME.list().text(RowStyle.BUTTON, true).ink());
-        assertEquals(BookPalette.TAN, THEME.list().text(RowStyle.FRAMED, true).mutedInk());
-        assertFalse(THEME.list().text(RowStyle.FRAMED, true).inkShadow());
+        assertEquals(BookPalette.DARK_LEATHER, THEME.list().getText(RowStyle.FRAMED, false).ink());
+        assertEquals(BookPalette.PARCHMENT, THEME.list().getText(RowStyle.FRAMED, true).ink());
+        assertEquals(BookPalette.DARK_LEATHER, THEME.list().getText(RowStyle.BUTTON, false).ink());
+        assertEquals(BookPalette.GOLD, THEME.list().getText(RowStyle.BUTTON, true).ink());
+        assertEquals(BookPalette.TAN, THEME.list().getText(RowStyle.FRAMED, true).mutedInk());
+        assertFalse(THEME.list().getText(RowStyle.FRAMED, true).hasInkShadow());
     }
 
     @Test
@@ -53,7 +53,7 @@ class BookThemeTest {
         assertEquals(BookPalette.DARK_LEATHER, THEME.button().labelColor());
         assertEquals(BookPalette.FADED, THEME.button().disabledLabelColor());
         assertEquals(BookPalette.GOLD, THEME.button().selectedLabelColor());
-        assertFalse(THEME.button().labelShadow());
+        assertFalse(THEME.button().hasLabelShadow());
     }
 
     @Test
@@ -61,27 +61,27 @@ class BookThemeTest {
         assertEquals(BookPalette.CHARCOAL, THEME.textField().textColor());
         assertEquals(BookPalette.FADED, THEME.textField().disabledTextColor());
         assertEquals(BookPalette.SAND, THEME.textField().placeholderColor());
-        assertFalse(THEME.textField().textShadow());
+        assertFalse(THEME.textField().hasTextShadow());
     }
 
     @Test
     void eachFillCarriesTheInkThatReadsOnIt() {
-        assertEquals(BookPalette.DARK_LEATHER, THEME.panel().fills().of(FillKind.PARCHMENT).ink());
-        assertEquals(BookPalette.SLATE, THEME.panel().fills().of(FillKind.PAGE).ink());
-        assertEquals(BookPalette.PARCHMENT, THEME.panel().fills().of(FillKind.DARK).ink());
+        assertEquals(BookPalette.DARK_LEATHER, THEME.panel().fills().getFill(FillKind.PARCHMENT).ink());
+        assertEquals(BookPalette.SLATE, THEME.panel().fills().getFill(FillKind.PAGE).ink());
+        assertEquals(BookPalette.PARCHMENT, THEME.panel().fills().getFill(FillKind.DARK).ink());
         assertEquals(THEME.panel().fills(), THEME.inset().fills());
     }
 
     @Test
     void errorInkIsDarkRedOnTheLightFillsAndRedOnSlate() {
-        assertEquals(BookPalette.DARK_RED, THEME.panel().fills().of(FillKind.PARCHMENT).errorInk());
-        assertEquals(BookPalette.DARK_RED, THEME.panel().fills().of(FillKind.PAGE).errorInk());
-        assertEquals(BookPalette.RED, THEME.panel().fills().of(FillKind.DARK).errorInk());
+        assertEquals(BookPalette.DARK_RED, THEME.panel().fills().getFill(FillKind.PARCHMENT).errorInk());
+        assertEquals(BookPalette.DARK_RED, THEME.panel().fills().getFill(FillKind.PAGE).errorInk());
+        assertEquals(BookPalette.RED, THEME.panel().fills().getFill(FillKind.DARK).errorInk());
     }
 
     @Test
     void linkIsLeatherOnLightAndGoldOnDark() {
-        assertEquals(BookPalette.LEATHER, THEME.link().on(FillKind.PAGE).normal());
-        assertEquals(BookPalette.GOLD, THEME.link().on(FillKind.DARK).normal());
+        assertEquals(BookPalette.LEATHER, THEME.link().getColors(FillKind.PAGE).normal());
+        assertEquals(BookPalette.GOLD, THEME.link().getColors(FillKind.DARK).normal());
     }
 }

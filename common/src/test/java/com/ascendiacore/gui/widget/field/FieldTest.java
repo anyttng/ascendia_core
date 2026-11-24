@@ -17,14 +17,14 @@ import net.minecraft.network.chat.Component;
 
 class FieldTest {
     private static final FillStyle FILL = new FillStyle(0xFF000000, 0xFF111111, 0xFF222222, 0xFF333333, true);
-    private static final int CHAR_WIDTH = 6;
-    private static final int LINE_HEIGHT = 9;
-    private static final int CONTROL_HEIGHT = 20;
-    private static final int GAP = 2;
-    private static final int FIELD_HEIGHT = LINE_HEIGHT + GAP + CONTROL_HEIGHT + GAP + LINE_HEIGHT;
+    private static final int CHAR_WIDTH_PIXELS = 6;
+    private static final int LINE_HEIGHT_PIXELS = 9;
+    private static final int CONTROL_HEIGHT_PIXELS = 20;
+    private static final int GAP_PIXELS = 2;
+    private static final int FIELD_HEIGHT_PIXELS = LINE_HEIGHT_PIXELS + GAP_PIXELS + CONTROL_HEIGHT_PIXELS + GAP_PIXELS + LINE_HEIGHT_PIXELS;
     private static final int LEFT = 10;
     private static final int TOP = 20;
-    private static final int WIDTH = 120;
+    private static final int WIDTH_PIXELS = 120;
     private static final String CAPTION = "Size along X";
     private static final String ERROR = "Too large";
     private static final String VALUE = "2048 blocks";
@@ -57,8 +57,8 @@ class FieldTest {
         Field empty = field(new Control());
         Field filled = field(new Control());
         filled.setHint(() -> Component.literal(HINT));
-        assertEquals(FIELD_HEIGHT, empty.naturalSize(canvas).height());
-        assertEquals(FIELD_HEIGHT, filled.naturalSize(canvas).height());
+        assertEquals(FIELD_HEIGHT_PIXELS, empty.naturalSize(canvas).heightPixels());
+        assertEquals(FIELD_HEIGHT_PIXELS, filled.naturalSize(canvas).heightPixels());
         assertEquals(NONE, drawnLine(empty).text().getString());
     }
 
@@ -66,10 +66,10 @@ class FieldTest {
     void captionAboveTheControlAcrossTheWidthAndTheLineUnderIt() {
         Control control = new Control();
         Field field = laidOut(field(control));
-        List<GuiComponent> parts = field.mountedComponents();
-        assertBounds(parts.get(0), TOP, LINE_HEIGHT);
-        assertBounds(control, TOP + LINE_HEIGHT + GAP, CONTROL_HEIGHT);
-        assertBounds(parts.get(2), TOP + LINE_HEIGHT + GAP + CONTROL_HEIGHT + GAP, LINE_HEIGHT);
+        List<GuiComponent> parts = field.getMountedComponents();
+        assertBounds(parts.get(0), TOP, LINE_HEIGHT_PIXELS);
+        assertBounds(control, TOP + LINE_HEIGHT_PIXELS + GAP_PIXELS, CONTROL_HEIGHT_PIXELS);
+        assertBounds(parts.get(2), TOP + LINE_HEIGHT_PIXELS + GAP_PIXELS + CONTROL_HEIGHT_PIXELS + GAP_PIXELS, LINE_HEIGHT_PIXELS);
         assertEquals(control, parts.get(1));
     }
 
@@ -86,16 +86,16 @@ class FieldTest {
     void twoFieldsInARowTakeHalfEach() {
         Row row = new Row();
         row.setPosition(LEFT, TOP);
-        row.setSize(2 * WIDTH + GAP, FIELD_HEIGHT);
-        row.setGap(GAP);
+        row.setSize(2 * WIDTH_PIXELS + GAP_PIXELS, FIELD_HEIGHT_PIXELS);
+        row.setGapPixels(GAP_PIXELS);
         Field first = field(new Control());
         Field second = field(new Control());
         row.add(first, Length.fill());
         row.add(second, Length.fill());
         row.layout(canvas);
-        assertEquals(WIDTH, first.width());
-        assertEquals(WIDTH, second.width());
-        assertEquals(LEFT + WIDTH + GAP, second.x());
+        assertEquals(WIDTH_PIXELS, first.getWidthPixels());
+        assertEquals(WIDTH_PIXELS, second.getWidthPixels());
+        assertEquals(LEFT + WIDTH_PIXELS + GAP_PIXELS, second.getX());
     }
 
     @Test
@@ -127,21 +127,21 @@ class FieldTest {
     }
 
     private RecordingCanvas.Text drawnCaption(Field field) {
-        return drawn(field, 0);
+        return isDrawn(field, 0);
     }
 
     private RecordingCanvas.Text drawnLine(Field field) {
-        return drawn(field, 2);
+        return isDrawn(field, 2);
     }
 
-    private RecordingCanvas.Text drawn(Field field, int part) {
-        laidOut(field).mountedComponents().get(part).draw(canvas, 0, 0);
+    private RecordingCanvas.Text isDrawn(Field field, int part) {
+        laidOut(field).getMountedComponents().get(part).draw(canvas, 0, 0);
         return canvas.texts().getLast();
     }
 
     private Field laidOut(Field field) {
         field.setPosition(LEFT, TOP);
-        field.setSize(WIDTH, FIELD_HEIGHT);
+        field.setSize(WIDTH_PIXELS, FIELD_HEIGHT_PIXELS);
         field.layout(canvas);
         return field;
     }
@@ -155,22 +155,22 @@ class FieldTest {
         assertEquals(color, drawn.color());
     }
 
-    private static void assertBounds(GuiComponent part, int top, int height) {
-        assertEquals(LEFT, part.x());
-        assertEquals(top, part.y());
-        assertEquals(WIDTH, part.width());
-        assertEquals(height, part.height());
+    private static void assertBounds(GuiComponent part, int top, int heightPixels) {
+        assertEquals(LEFT, part.getX());
+        assertEquals(top, part.getY());
+        assertEquals(WIDTH_PIXELS, part.getWidthPixels());
+        assertEquals(heightPixels, part.getHeightPixels());
     }
 
     private static RecordingCanvas canvas() {
         RecordingCanvas canvas = new RecordingCanvas();
-        canvas.setCharWidth(CHAR_WIDTH);
+        canvas.setCharWidthPixels(CHAR_WIDTH_PIXELS);
         return canvas;
     }
 
     private static final class Control extends GuiComponent {
         Control() {
-            setSize(0, CONTROL_HEIGHT);
+            setSize(0, CONTROL_HEIGHT_PIXELS);
         }
 
         @Override

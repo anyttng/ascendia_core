@@ -9,8 +9,8 @@ public final class WorldTabRows {
         REGISTRY.add(row);
     }
 
-    static List<WorldTabRow> rows() {
-        return REGISTRY.rows();
+    static List<WorldTabRow> getRows() {
+        return REGISTRY.getRows();
     }
 
     private WorldTabRows() {

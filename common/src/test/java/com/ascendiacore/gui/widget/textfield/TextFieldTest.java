@@ -17,10 +17,10 @@ import net.minecraft.network.chat.Component;
 class TextFieldTest {
     private static final int LEFT = 100;
     private static final int TOP = 50;
-    private static final int WIDTH = 120;
-    private static final int HEIGHT = 20;
-    private static final int TEXT_PADDING = 4;
-    private static final int TEXT_HEIGHT = 8;
+    private static final int WIDTH_PIXELS = 120;
+    private static final int HEIGHT_PIXELS = 20;
+    private static final int TEXT_PADDING_PIXELS = 4;
+    private static final int TEXT_HEIGHT_PIXELS = 8;
     private static final int OUTSIDE = Integer.MIN_VALUE;
     private static final int TEXT = 0xFF112233;
     private static final int DISABLED_TEXT = 0xFF445566;
@@ -45,7 +45,7 @@ class TextFieldTest {
     void placeholderIsDrawnInItsColorInsideThePaddingWhileEmpty() {
         TextField field = field();
         RecordingCanvas canvas = draw(field);
-        assertEquals(List.of(new RecordingCanvas.Text(HINT, LEFT + TEXT_PADDING, TOP + (HEIGHT - TEXT_HEIGHT) / 2,
+        assertEquals(List.of(new RecordingCanvas.Text(HINT, LEFT + TEXT_PADDING_PIXELS, TOP + (HEIGHT_PIXELS - TEXT_HEIGHT_PIXELS) / 2,
                 PLACEHOLDER, false)), canvas.texts());
     }
 
@@ -72,7 +72,7 @@ class TextFieldTest {
         field.edited("a");
         field.edited("ab");
         assertEquals(List.of("a", "ab"), reported);
-        assertEquals("ab", field.value());
+        assertEquals("ab", field.getValue());
     }
 
     @Test
@@ -86,41 +86,41 @@ class TextFieldTest {
     @Test
     void acceptedKeepsOnlyTheCharactersTheRuleLets() {
         TextField field = field();
-        assertEquals("a1-", field.accepted("a1-"));
+        assertEquals("a1-", field.filterAccepted("a1-"));
         field.setAccepted(Character::isDigit);
-        assertEquals("12", field.accepted("1a2"));
-        assertEquals("", field.accepted("ab"));
+        assertEquals("12", field.filterAccepted("1a2"));
+        assertEquals("", field.filterAccepted("ab"));
     }
 
     @Test
     void maxLengthCutsTheValue() {
         TextField field = field();
         field.setValue("abcdef");
-        field.setMaxLength(3);
-        assertEquals("abc", field.value());
+        field.setMaxCharacterCount(3);
+        assertEquals("abc", field.getValue());
         field.setValue("wxyz");
-        assertEquals("wxy", field.value());
+        assertEquals("wxy", field.getValue());
     }
 
     @Test
     void textAreaSitsInsideThePaddingAndCentersTheLine() {
         TextField field = field();
-        assertEquals(LEFT + TEXT_PADDING, field.textLeft());
-        assertEquals(TOP + (HEIGHT - TEXT_HEIGHT) / 2, field.textTop());
-        assertEquals(WIDTH - 2 * TEXT_PADDING, field.textRoom());
+        assertEquals(LEFT + TEXT_PADDING_PIXELS, field.getTextLeft());
+        assertEquals(TOP + (HEIGHT_PIXELS - TEXT_HEIGHT_PIXELS) / 2, field.getTextTop());
+        assertEquals(WIDTH_PIXELS - 2 * TEXT_PADDING_PIXELS, field.getTextRoomPixels());
     }
 
     @Test
     void naturalHeightIsTheGamesFieldHeight() {
         TextField field = new TextField(STYLE, reported::add);
-        assertEquals(new Size(0, HEIGHT), field.naturalSize(text -> 0));
+        assertEquals(new Size(0, HEIGHT_PIXELS), field.naturalSize(text -> 0));
     }
 
     private TextField field() {
         TextField field = new TextField(STYLE, reported::add);
         field.setPlaceholder(HINT);
         field.setPosition(LEFT, TOP);
-        field.setSize(WIDTH, HEIGHT);
+        field.setSize(WIDTH_PIXELS, HEIGHT_PIXELS);
         return field;
     }
 

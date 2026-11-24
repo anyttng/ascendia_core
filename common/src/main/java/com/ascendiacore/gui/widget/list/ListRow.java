@@ -16,7 +16,7 @@ import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import net.minecraft.network.chat.Component;
 
 public final class ListRow extends OpenContainer {
-    static final int PADDING = 4;
+    static final int PADDING_PIXELS = 4;
 
     private final ListStyle style;
     private final ButtonStyle button;
@@ -33,31 +33,31 @@ public final class ListRow extends OpenContainer {
         this.name = name;
         this.selected = selected;
         this.select = select;
-        setPadding(PADDING);
+        setPaddingPixels(PADDING_PIXELS);
     }
 
-    public Property<FillStyle> fill() {
-        return () -> style.text(rowStyle, selected.getAsBoolean());
+    public Property<FillStyle> getFill() {
+        return () -> style.getText(rowStyle, selected.getAsBoolean());
     }
 
     @Override
-    public boolean mountsItself() {
+    public boolean isMountingItself() {
         return true;
     }
 
     @Override
-    public boolean interactive() {
+    public boolean isInteractive() {
         return true;
     }
 
     @Override
-    public Component narration() {
+    public Component getNarration() {
         return name;
     }
 
     @Override
     protected void drawContent(Canvas canvas) {
-        canvas.sprite(sprite(), x(), y(), width(), height());
+        canvas.sprite(getSprite(), getX(), getY(), getWidthPixels(), getHeightPixels());
     }
 
     @Override
@@ -66,7 +66,7 @@ public final class ListRow extends OpenContainer {
     }
 
     @Override
-    protected boolean onKey(KeyInput input) {
+    protected boolean tryHandleKey(KeyInput input) {
         if (!input.isSelection()) {
             return false;
         }
@@ -79,14 +79,14 @@ public final class ListRow extends OpenContainer {
         select.run();
     }
 
-    private String sprite() {
-        boolean chosen = selected.getAsBoolean();
-        boolean highlighted = hovered() || focused();
+    private String getSprite() {
+        boolean isChosen = selected.getAsBoolean();
+        boolean isHighlighted = isHovered() || isFocused();
         return switch (rowStyle) {
-            case FRAMED -> chosen ? style.rowSelected() : highlighted ? style.rowHover() : style.row();
-            case BUTTON -> chosen
-                    ? (highlighted ? button.selectedHover() : button.selected())
-                    : (highlighted ? button.hover() : button.normal());
+            case FRAMED -> isChosen ? style.rowSelected() : isHighlighted ? style.rowHover() : style.row();
+            case BUTTON -> isChosen
+                    ? (isHighlighted ? button.selectedHover() : button.selected())
+                    : (isHighlighted ? button.hover() : button.normal());
         };
     }
 }
