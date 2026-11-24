@@ -55,10 +55,20 @@ public final class CycleButton<T> extends Container {
 
     public void setHint(TooltipStyle style, String captionKey, Function<T, String> valueKey, Consumer<Hint> otherKinds) {
         String prefix = captionKey + HINT_PREFIX;
+        setHintOf(style, prefix, value -> Component.translatable(prefix + valueKey.apply(value)), otherKinds);
+    }
+
+    public void setValueHints(TooltipStyle style, String captionKey, Function<T, Component> valueHint) {
+        setHintOf(style, captionKey + HINT_PREFIX, valueHint, hint -> {
+        });
+    }
+
+    private void setHintOf(TooltipStyle style, String prefix, Function<T, Component> valueHint,
+            Consumer<Hint> otherKinds) {
         button.setTooltip(style, () -> {
             Hint hint = Hint.of(style)
                     .intro(optional(prefix + INTRO))
-                    .values(hintValues(prefix, valueKey))
+                    .values(hintValues(valueHint))
                     .note(optional(prefix + NOTE))
                     .keyHint(keyHint());
             otherKinds.accept(hint);
@@ -66,10 +76,10 @@ public final class CycleButton<T> extends Container {
         });
     }
 
-    private List<HintValue> hintValues(String prefix, Function<T, String> valueKey) {
+    private List<HintValue> hintValues(Function<T, Component> valueHint) {
         T current = chosen.get();
-        return values.get().stream().map(value -> new HintValue(valueName.apply(value),
-                Component.translatable(prefix + valueKey.apply(value)), value.equals(current))).toList();
+        return values.get().stream().map(value -> new HintValue(valueName.apply(value), valueHint.apply(value),
+                value.equals(current))).toList();
     }
 
     private Component keyHint() {

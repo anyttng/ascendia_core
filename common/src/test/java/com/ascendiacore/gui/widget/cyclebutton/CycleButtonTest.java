@@ -180,6 +180,16 @@ class CycleButtonTest {
         assertEquals(hint(Shape.NORMAL, Shape.values()).warning(Component.literal(WARNING)).build(), button(cycle).tooltip());
     }
 
+    @Test
+    void hintTakesAValuesOwnText() {
+        CycleButton<Shape> cycle = cycle(Value.of(Shape.NORMAL));
+        cycle.setValueHints(TOOLTIP, CAPTION_KEY, shape -> Component.literal(shape.name()));
+        List<HintValue> values = Arrays.stream(Shape.values()).map(shape -> new HintValue(valueName(shape),
+                Component.literal(shape.name()), shape == Shape.NORMAL)).toList();
+        assertEquals(Hint.of(TOOLTIP).values(values).keyHint(Component.translatable(PREVIOUS_VALUE_KEY)).build(),
+                button(cycle).tooltip());
+    }
+
     private static Hint hint(Shape current, Shape... shapes) {
         return Hint.of(TOOLTIP).values(hintValues(current, shapes)).keyHint(Component.translatable(PREVIOUS_VALUE_KEY));
     }
