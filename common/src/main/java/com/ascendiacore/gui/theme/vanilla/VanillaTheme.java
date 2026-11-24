@@ -15,6 +15,7 @@ import com.ascendiacore.gui.widget.panel.model.InsetStyle;
 import com.ascendiacore.gui.widget.panel.model.PanelStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
 import com.ascendiacore.gui.widget.textfield.model.TextFieldStyle;
+import com.ascendiacore.gui.widget.toggleswitch.model.ToggleSwitchStyle;
 
 public final class VanillaTheme {
     private static final String NAME = "vanilla";
@@ -35,14 +36,25 @@ public final class VanillaTheme {
     private static final String ROW = SPRITES + "row";
     private static final String ROW_HOVER = SPRITES + "row_hover";
     private static final String ROW_SELECTED = SPRITES + "row_selected";
+    private static final String SWITCH_OFF = SPRITES + "switch_off";
+    private static final String SWITCH_ON = SPRITES + "switch_on";
+    private static final String SWITCH_OFF_HOVER = SPRITES + "switch_off_hover";
+    private static final String SWITCH_ON_HOVER = SPRITES + "switch_on_hover";
+    private static final String SWITCH_OFF_DISABLED = SPRITES + "switch_off_disabled";
+    private static final String SWITCH_ON_DISABLED = SPRITES + "switch_on_disabled";
     private static final int GAME_POPUP_BORDER_PIXELS = 6;
     private static final int LIGHT_INSET_BORDER_PIXELS = 3;
     private static final int HEAVY_INSET_BORDER_PIXELS = 4;
 
     public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar(), tooltip(),
-            textField());
+            textField(), toggleSwitch());
 
     private VanillaTheme() {
+    }
+
+    private static ToggleSwitchStyle toggleSwitch() {
+        return new ToggleSwitchStyle(SWITCH_OFF, SWITCH_ON, SWITCH_OFF_HOVER, SWITCH_ON_HOVER, SWITCH_OFF_DISABLED,
+                SWITCH_ON_DISABLED);
     }
 
     private static ButtonStyle button() {

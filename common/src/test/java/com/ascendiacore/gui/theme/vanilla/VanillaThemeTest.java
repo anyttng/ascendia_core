@@ -45,6 +45,16 @@ class VanillaThemeTest {
     }
 
     @Test
+    void toggleSwitchSpritesAreOurOwnSinceTheGameHasNone() {
+        List<String> sprites = List.of(
+                THEME.toggleSwitch().off(), THEME.toggleSwitch().on(),
+                THEME.toggleSwitch().offHover(), THEME.toggleSwitch().onHover(),
+                THEME.toggleSwitch().offDisabled(), THEME.toggleSwitch().onDisabled());
+        assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
+        assertEquals(sprites.size(), Set.copyOf(sprites).size());
+    }
+
+    @Test
     void textFieldDrawsWithTheGamesSpritesAndKeepsItsFrameWhenDisabled() {
         assertEquals("minecraft:widget/text_field", THEME.textField().normal());
         assertEquals("minecraft:widget/text_field_highlighted", THEME.textField().focused());
