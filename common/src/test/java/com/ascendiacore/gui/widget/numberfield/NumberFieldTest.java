@@ -29,60 +29,60 @@ class NumberFieldTest {
     private static final String TOO_LARGE_KEY = "gui.ascendia_core.number_field.too_large";
     private static final Component CAPTION = Component.literal("Size along X in chunks");
     private static final Component HINT = Component.literal("Plain torus");
-    private static final Bounds SIZE = new Bounds(8, 4096);
-    private static final int CHAR_WIDTH = 6;
-    private static final int WIDTH = 300;
-    private static final int HEIGHT = 42;
+    private static final Bounds SIZE_PIXELS = new Bounds(8, 4096);
+    private static final int CHAR_WIDTH_PIXELS = 6;
+    private static final int WIDTH_PIXELS = 300;
+    private static final int HEIGHT_PIXELS = 42;
     private static final int TEXT_FIELD = 1;
-    private static final int LINE = 2;
+    private static final int LINE_INDEX = 2;
 
     private final RecordingCanvas canvas = canvas();
     private int changes;
 
     @Test
     void takesDigitsOnly() {
-        assertEquals("123", textField(field()).accepted("1-2a3"));
+        assertEquals("123", textField(field()).filterAccepted("1-2a3"));
     }
 
     @Test
     void signedTakesTheMinusToo() {
         NumberField field = field();
         field.setSigned(true);
-        assertEquals("-1-23", textField(field).accepted("-1-2a3"));
+        assertEquals("-1-23", textField(field).filterAccepted("-1-2a3"));
     }
 
     @Test
     void numberInsideTheBoundsIsTheValue() {
         NumberField field = field();
         field.setText("64");
-        assertEquals(64, field.value());
-        assertTrue(textField(field).valid());
+        assertEquals(64, field.getValue());
+        assertTrue(textField(field).isValid());
     }
 
     @Test
     void bothEndsAreInside() {
         NumberField field = field();
-        field.setValue(SIZE.min());
-        assertEquals(SIZE.min(), field.value());
-        field.setValue(SIZE.max());
-        assertEquals(SIZE.max(), field.value());
+        field.setValue(SIZE_PIXELS.min());
+        assertEquals(SIZE_PIXELS.min(), field.getValue());
+        field.setValue(SIZE_PIXELS.max());
+        assertEquals(SIZE_PIXELS.max(), field.getValue());
     }
 
     @Test
     void numberBelowTheBoundsNamesTheMinimumAsAnError() {
         NumberField field = field();
         field.setText("7");
-        assertNull(field.value());
-        assertFalse(textField(field).valid());
-        assertLine(Component.translatable(TOO_SMALL_KEY, SIZE.min()), FILL.errorInk(), field);
+        assertNull(field.getValue());
+        assertFalse(textField(field).isValid());
+        assertLine(Component.translatable(TOO_SMALL_KEY, SIZE_PIXELS.min()), FILL.errorInk(), field);
     }
 
     @Test
     void numberAboveTheBoundsNamesTheMaximumAsAnError() {
         NumberField field = field();
         field.setText("4097");
-        assertNull(field.value());
-        assertLine(Component.translatable(TOO_LARGE_KEY, SIZE.max()), FILL.errorInk(), field);
+        assertNull(field.getValue());
+        assertLine(Component.translatable(TOO_LARGE_KEY, SIZE_PIXELS.max()), FILL.errorInk(), field);
     }
 
     @Test
@@ -92,7 +92,7 @@ class NumberFieldTest {
         field.setHint(Property.of(HINT));
         for (String text : new String[] {"", "-", "1-2"}) {
             field.setText(text);
-            assertNull(field.value());
+            assertNull(field.getValue());
             assertLine(HINT, FILL.mutedInk(), field);
         }
     }
@@ -102,18 +102,18 @@ class NumberFieldTest {
         NumberField field = new NumberField(FILL, STYLE, CAPTION, Optional::empty, () -> changes++);
         field.setHint(Property.of(HINT));
         field.setText("64");
-        assertNull(field.value());
+        assertNull(field.getValue());
         assertLine(HINT, FILL.mutedInk(), field);
     }
 
     @Test
     void boundsFollowTheirRule() {
-        Value<Optional<Bounds>> bounds = Value.of(Optional.of(SIZE));
+        Value<Optional<Bounds>> bounds = Value.of(Optional.of(SIZE_PIXELS));
         NumberField field = new NumberField(FILL, STYLE, CAPTION, bounds, () -> changes++);
         field.setText("10");
-        assertEquals(10, field.value());
+        assertEquals(10, field.getValue());
         bounds.set(Optional.of(new Bounds(0, 9)));
-        assertNull(field.value());
+        assertNull(field.getValue());
         assertLine(Component.translatable(TOO_LARGE_KEY, 9), FILL.errorInk(), field);
     }
 
@@ -125,7 +125,7 @@ class NumberFieldTest {
         field.setText("64");
         assertEquals("64 chunks", drawnLine(field).text().getString());
         field.setText("7");
-        assertLine(Component.translatable(TOO_SMALL_KEY, SIZE.min()), FILL.errorInk(), field);
+        assertLine(Component.translatable(TOO_SMALL_KEY, SIZE_PIXELS.min()), FILL.errorInk(), field);
     }
 
     @Test
@@ -143,9 +143,9 @@ class NumberFieldTest {
         Column form = new Column();
         form.add(field);
         field.setText("7");
-        assertFalse(form.fieldsValid());
+        assertFalse(form.areFieldsValid());
         field.setText("64");
-        assertTrue(form.fieldsValid());
+        assertTrue(form.areFieldsValid());
     }
 
     @Test
@@ -155,7 +155,7 @@ class NumberFieldTest {
         form.add(field);
         field.setText("7");
         field.setEnabled(false);
-        assertTrue(form.fieldsValid());
+        assertTrue(form.areFieldsValid());
     }
 
     @Test
@@ -164,7 +164,7 @@ class NumberFieldTest {
     }
 
     private NumberField field() {
-        return new NumberField(FILL, STYLE, CAPTION, Property.of(Optional.of(SIZE)), () -> changes++);
+        return new NumberField(FILL, STYLE, CAPTION, Property.of(Optional.of(SIZE_PIXELS)), () -> changes++);
     }
 
     private void assertLine(Component text, int color, NumberField field) {
@@ -175,19 +175,19 @@ class NumberFieldTest {
 
     private RecordingCanvas.Text drawnLine(NumberField field) {
         field.setPosition(0, 0);
-        field.setSize(WIDTH, HEIGHT);
+        field.setSize(WIDTH_PIXELS, HEIGHT_PIXELS);
         field.layout(canvas);
-        field.mountedComponents().get(LINE).draw(canvas, 0, 0);
+        field.getMountedComponents().get(LINE_INDEX).draw(canvas, 0, 0);
         return canvas.texts().getLast();
     }
 
     private static TextField textField(NumberField field) {
-        return (TextField) field.mountedComponents().get(TEXT_FIELD);
+        return (TextField) field.getMountedComponents().get(TEXT_FIELD);
     }
 
     private static RecordingCanvas canvas() {
         RecordingCanvas canvas = new RecordingCanvas();
-        canvas.setCharWidth(CHAR_WIDTH);
+        canvas.setCharWidthPixels(CHAR_WIDTH_PIXELS);
         return canvas;
     }
 }

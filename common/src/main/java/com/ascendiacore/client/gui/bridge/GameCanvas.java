@@ -25,27 +25,27 @@ public final class GameCanvas implements Canvas {
     }
 
     @Override
-    public void sprite(String sprite, int x, int y, int width, int height) {
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, spriteId(sprite), x, y, width, height);
+    public void sprite(String sprite, int x, int y, int widthPixels, int heightPixels) {
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, toSpriteId(sprite), x, y, widthPixels, heightPixels);
     }
 
     @Override
-    public void sprite(String sprite, int x, int y, int width, int height, int tint) {
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, spriteId(sprite), x, y, width, height, tint);
+    public void sprite(String sprite, int x, int y, int widthPixels, int heightPixels, int tint) {
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, toSpriteId(sprite), x, y, widthPixels, heightPixels, tint);
     }
 
     @Override
-    public void fill(int x, int y, int width, int height, int color) {
-        graphics.fill(x, y, x + width, y + height, color);
+    public void fill(int x, int y, int widthPixels, int heightPixels, int color) {
+        graphics.fill(x, y, x + widthPixels, y + heightPixels, color);
     }
 
     @Override
-    public void text(Component text, int x, int y, int color, boolean shadow) {
-        graphics.text(font, text, x, y, color, shadow);
+    public void text(Component text, int x, int y, int color, boolean hasShadow) {
+        graphics.text(font, text, x, y, color, hasShadow);
     }
 
     @Override
-    public int textWidth(Component text) {
+    public int textWidthPixels(Component text) {
         return font.width(text);
     }
 
@@ -55,8 +55,8 @@ public final class GameCanvas implements Canvas {
     }
 
     @Override
-    public void pushClip(int x, int y, int width, int height) {
-        graphics.enableScissor(x, y, x + width, y + height);
+    public void pushClip(int x, int y, int widthPixels, int heightPixels) {
+        graphics.enableScissor(x, y, x + widthPixels, y + heightPixels);
     }
 
     @Override
@@ -65,11 +65,11 @@ public final class GameCanvas implements Canvas {
     }
 
     @Override
-    public long frameTimeMillis() {
+    public long getFrameTimeMillis() {
         return Util.getMillis();
     }
 
-    private static Identifier spriteId(String sprite) {
+    private static Identifier toSpriteId(String sprite) {
         return SPRITE_IDS.computeIfAbsent(sprite, Identifier::parse);
     }
 }

@@ -35,9 +35,9 @@ public final class VanillaTheme {
     private static final String ROW = SPRITES + "row";
     private static final String ROW_HOVER = SPRITES + "row_hover";
     private static final String ROW_SELECTED = SPRITES + "row_selected";
-    private static final int GAME_POPUP_BORDER = 6;
-    private static final int LIGHT_INSET_BORDER = 3;
-    private static final int HEAVY_INSET_BORDER = 4;
+    private static final int GAME_POPUP_BORDER_PIXELS = 6;
+    private static final int LIGHT_INSET_BORDER_PIXELS = 3;
+    private static final int HEAVY_INSET_BORDER_PIXELS = 4;
 
     public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar(), tooltip(),
             textField());
@@ -53,14 +53,14 @@ public final class VanillaTheme {
     private static PanelStyle panel() {
         FillStyle inTheSprite = new FillStyle(FillStyle.NO_FILL, VanillaPalette.WHITE, VanillaPalette.DISABLED_LABEL,
                 VanillaPalette.RED, true);
-        return new PanelStyle(new FrameStyle(GAME_POPUP, GAME_POPUP_BORDER), new Fills(inTheSprite, inTheSprite, inTheSprite));
+        return new PanelStyle(new FrameStyle(GAME_POPUP, GAME_POPUP_BORDER_PIXELS), new Fills(inTheSprite, inTheSprite, inTheSprite));
     }
 
     private static InsetStyle inset() {
         return new InsetStyle(
-                new FrameStyle(INSET_LIGHT, LIGHT_INSET_BORDER),
-                new FrameStyle(INSET_DARK, HEAVY_INSET_BORDER),
-                new FrameStyle(INSET_RIM, HEAVY_INSET_BORDER),
+                new FrameStyle(INSET_LIGHT, LIGHT_INSET_BORDER_PIXELS),
+                new FrameStyle(INSET_DARK, HEAVY_INSET_BORDER_PIXELS),
+                new FrameStyle(INSET_RIM, HEAVY_INSET_BORDER_PIXELS),
                 new Fills(
                         new FillStyle(VanillaPalette.LIGHT_GRAY, VanillaPalette.CHARCOAL, VanillaPalette.DISABLED_LINK,
                                 VanillaPalette.DARK_RED, false),

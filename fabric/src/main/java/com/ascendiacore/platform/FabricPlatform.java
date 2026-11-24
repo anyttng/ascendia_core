@@ -14,21 +14,21 @@ public final class FabricPlatform implements Platform {
     }
 
     @Override
-    public String modVersion() {
-        return versionOf(AscendiaCore.MODID);
+    public String getModVersion() {
+        return getVersion(AscendiaCore.MODID);
     }
 
     @Override
-    public String loaderName() {
+    public String getLoaderName() {
         return "fabric";
     }
 
     @Override
-    public String loaderVersion() {
-        return versionOf(LOADER_MOD_ID);
+    public String getLoaderVersion() {
+        return getVersion(LOADER_MOD_ID);
     }
 
-    private static String versionOf(String modId) {
+    private static String getVersion(String modId) {
         return FabricLoader.getInstance().getModContainer(modId).orElseThrow()
                 .getMetadata().getVersion().getFriendlyString();
     }

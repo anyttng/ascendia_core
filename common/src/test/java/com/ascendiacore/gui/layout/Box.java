@@ -5,21 +5,21 @@ import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.form.Validated;
 
 final class Box extends GuiComponent implements Validated {
-    private boolean valid = true;
+    private boolean isValid = true;
 
-    Box(int width, int height) {
-        setSize(width, height);
+    Box(int widthPixels, int heightPixels) {
+        setSize(widthPixels, heightPixels);
     }
 
     static Box invalid() {
         Box box = new Box(0, 0);
-        box.valid = false;
+        box.isValid = false;
         return box;
     }
 
     @Override
-    public boolean valid() {
-        return valid;
+    public boolean isValid() {
+        return isValid;
     }
 
     @Override

@@ -27,7 +27,7 @@ public final class Distribution {
         return switch (item.length()) {
             case Length.Fixed fixed -> fixed.pixels();
             case Length.Natural natural -> item.natural();
-            case Length.Flexible flexible -> flexible.preferred();
+            case Length.Flexible flexible -> flexible.preferredPixels();
             case Length.Fill fill -> 0;
         };
     }
@@ -44,7 +44,7 @@ public final class Distribution {
         int[] room = new int[sizes.length];
         for (int index = 0; index < sizes.length; index++) {
             if (items.get(index).length() instanceof Length.Flexible flexible) {
-                room[index] = flexible.preferred() - flexible.min();
+                room[index] = flexible.preferredPixels() - flexible.minPixels();
             }
         }
         int[] cuts = share(Math.min(deficit, sum(room)), room);

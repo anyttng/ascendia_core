@@ -19,23 +19,23 @@ public final class GameInput {
     private GameInput() {
     }
 
-    public static PointerInput pointer(MouseButtonEvent event) {
-        return new PointerInput(event.x(), event.y(), button(event.button()), modifiers(event));
+    public static PointerInput toPointerInput(MouseButtonEvent event) {
+        return new PointerInput(event.x(), event.y(), toPointerButton(event.button()), toModifiers(event));
     }
 
-    public static KeyInput key(KeyEvent event) {
-        return new KeyInput(keyOf(event.key()), modifiers(event));
+    public static KeyInput toKeyInput(KeyEvent event) {
+        return new KeyInput(toKey(event.key()), toModifiers(event));
     }
 
-    public static TextInput text(CharacterEvent event) {
+    public static TextInput toTextInput(CharacterEvent event) {
         return new TextInput(event.codepoint());
     }
 
-    public static WheelInput wheel(double x, double y, double scrollY) {
+    public static WheelInput toWheelInput(double x, double y, double scrollY) {
         return new WheelInput(x, y, scrollY);
     }
 
-    private static PointerButton button(int button) {
+    private static PointerButton toPointerButton(int button) {
         return switch (button) {
             case InputConstants.MOUSE_BUTTON_LEFT -> PointerButton.LEFT;
             case InputConstants.MOUSE_BUTTON_RIGHT -> PointerButton.RIGHT;
@@ -44,7 +44,7 @@ public final class GameInput {
         };
     }
 
-    private static Key keyOf(int key) {
+    private static Key toKey(int key) {
         return switch (key) {
             case InputConstants.KEY_RETURN -> Key.ENTER;
             case InputConstants.KEY_NUMPADENTER -> Key.NUMPAD_ENTER;
@@ -63,7 +63,7 @@ public final class GameInput {
         };
     }
 
-    private static Modifiers modifiers(InputWithModifiers input) {
+    private static Modifiers toModifiers(InputWithModifiers input) {
         return new Modifiers(input.hasShiftDown(), input.hasControlDown(), input.hasAltDown());
     }
 }

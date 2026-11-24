@@ -17,40 +17,40 @@ public final class TextFieldWidget extends EditBox {
     private final Font font;
     private final ComponentTooltip tooltip;
     private @Nullable Tooltip shownTooltip;
-    private int maxLength;
-    private boolean editable = true;
+    private int maxCharacterCount;
+    private boolean isEditable = true;
 
     public TextFieldWidget(TextField field) {
         this(field, Minecraft.getInstance().font);
     }
 
     private TextFieldWidget(TextField field, Font font) {
-        super(font, field.textLeft(), field.textTop(), field.textRoom(), field.textHeight(), field.narration());
+        super(font, field.getTextLeft(), field.getTextTop(), field.getTextRoomPixels(), field.getTextHeightPixels(), field.getNarration());
         this.field = field;
         this.font = font;
         this.tooltip = new ComponentTooltip(this, field);
-        TextFieldStyle style = field.style();
+        TextFieldStyle style = field.getStyle();
         setBordered(false);
         setTextColor(style.textColor());
         setTextColorUneditable(style.disabledTextColor());
-        setTextShadow(style.textShadow());
+        setTextShadow(style.hasTextShadow());
         followField();
         setResponder(field::edited);
     }
 
     @Override
     public boolean isActive() {
-        return field.interactive() && field.visible() && field.enabled();
+        return field.isInteractive() && field.isVisible() && field.isEnabled();
     }
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return field.takesPointerAt(mouseX, mouseY);
+        return field.isTakingPointerAt(mouseX, mouseY);
     }
 
     @Override
     public boolean isHovered() {
-        return field.hovered();
+        return field.isHovered();
     }
 
     @Override
@@ -61,12 +61,12 @@ public final class TextFieldWidget extends EditBox {
 
     @Override
     public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-        return field.wheelScrolled(GameInput.wheel(x, y, scrollY));
+        return field.tryScrollWheel(GameInput.toWheelInput(x, y, scrollY));
     }
 
     @Override
     public void insertText(String input) {
-        String kept = field.accepted(input);
+        String kept = field.filterAccepted(input);
         if (!kept.isEmpty() || input.isEmpty()) {
             super.insertText(kept);
         }
@@ -75,13 +75,13 @@ public final class TextFieldWidget extends EditBox {
     @Override
     public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         followField();
-        if (!field.visible()) {
+        if (!field.isVisible()) {
             super.setTooltip(null);
             return;
         }
-        boolean pointerShown = graphics.containsPointInScissor(mouseX, mouseY);
+        boolean isPointerShown = graphics.containsPointInScissor(mouseX, mouseY);
         field.draw(new GameCanvas(graphics, font),
-                pointerShown ? mouseX : ComponentWidget.OUTSIDE, pointerShown ? mouseY : ComponentWidget.OUTSIDE);
+                isPointerShown ? mouseX : ComponentWidget.OUTSIDE, isPointerShown ? mouseY : ComponentWidget.OUTSIDE);
         extractTextInWindow(graphics, mouseX, mouseY, partialTick);
         if (isHovered() || isFocused()) {
             tooltip.follow(mouseX, mouseY);
@@ -90,12 +90,12 @@ public final class TextFieldWidget extends EditBox {
     }
 
     private void extractTextInWindow(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        Rect window = field.window();
+        Rect window = field.getWindow();
         if (window == null) {
             super.extractWidgetRenderState(graphics, mouseX, mouseY, partialTick);
             return;
         }
-        graphics.enableScissor(window.x(), window.y(), window.right(), window.bottom());
+        graphics.enableScissor(window.x(), window.y(), window.getRight(), window.getBottom());
         super.extractWidgetRenderState(graphics, mouseX, mouseY, partialTick);
         graphics.disableScissor();
     }
@@ -107,9 +107,9 @@ public final class TextFieldWidget extends EditBox {
     }
 
     void followComponent() {
-        int room = getWidth();
-        setRectangle(field.textRoom(), field.textHeight(), field.textLeft(), field.textTop());
-        if (getWidth() != room) {
+        int widthBeforePixels = getWidth();
+        setRectangle(field.getTextRoomPixels(), field.getTextHeightPixels(), field.getTextLeft(), field.getTextTop());
+        if (getWidth() != widthBeforePixels) {
             scrollToCursor();
         }
     }
@@ -120,17 +120,17 @@ public final class TextFieldWidget extends EditBox {
 
     private void followField() {
         followComponent();
-        if (maxLength != field.maxLength()) {
-            maxLength = field.maxLength();
-            setMaxLength(maxLength);
+        if (maxCharacterCount != field.getMaxCharacterCount()) {
+            maxCharacterCount = field.getMaxCharacterCount();
+            setMaxLength(maxCharacterCount);
         }
-        if (!getValue().equals(field.value())) {
-            setValue(field.value());
+        if (!getValue().equals(field.getValue())) {
+            setValue(field.getValue());
         }
-        boolean enabled = field.enabled();
-        if (editable != enabled) {
-            editable = enabled;
-            setEditable(enabled);
+        boolean isEnabled = field.isEnabled();
+        if (isEditable != isEnabled) {
+            isEditable = isEnabled;
+            setEditable(isEnabled);
         }
     }
 }

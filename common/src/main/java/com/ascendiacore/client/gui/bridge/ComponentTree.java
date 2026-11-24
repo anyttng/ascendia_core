@@ -29,11 +29,11 @@ public final class ComponentTree implements LayoutElement {
 
     public ComponentTree(Container root) {
         this.root = root;
-        this.mounted = root.mountedComponents().stream().map(ComponentTree::mount).toList();
+        this.mounted = root.getMountedComponents().stream().map(ComponentTree::mount).toList();
     }
 
-    public void setSize(int width, int height) {
-        this.size = new Size(width, height);
+    public void setSize(int widthPixels, int heightPixels) {
+        this.size = new Size(widthPixels, heightPixels);
     }
 
     @Override
@@ -58,12 +58,12 @@ public final class ComponentTree implements LayoutElement {
 
     @Override
     public int getWidth() {
-        return size().width();
+        return getSize().widthPixels();
     }
 
     @Override
     public int getHeight() {
-        return size().height();
+        return getSize().heightPixels();
     }
 
     @Override
@@ -72,7 +72,7 @@ public final class ComponentTree implements LayoutElement {
         mounted.forEach(mount -> widgetVisitor.accept(mount.widget()));
     }
 
-    public static AbstractWidget widgetOf(GuiComponent component) {
+    public static AbstractWidget toWidget(GuiComponent component) {
         return mount(component).widget();
     }
 
@@ -86,18 +86,18 @@ public final class ComponentTree implements LayoutElement {
     }
 
     private void arrange() {
-        Size bounds = size();
+        Size bounds = getSize();
         root.setPosition(x, y);
-        root.setSize(bounds.width(), bounds.height());
-        root.layout(metrics());
+        root.setSize(bounds.widthPixels(), bounds.heightPixels());
+        root.layout(getMetrics());
         mounted.forEach(mount -> mount.follow().run());
     }
 
-    private Size size() {
-        return size != null ? size : root.naturalSize(metrics());
+    private Size getSize() {
+        return size != null ? size : root.naturalSize(getMetrics());
     }
 
-    private static TextMetrics metrics() {
+    private static TextMetrics getMetrics() {
         return Minecraft.getInstance().font::width;
     }
 

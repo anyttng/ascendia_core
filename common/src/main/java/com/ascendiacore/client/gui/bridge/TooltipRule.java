@@ -20,10 +20,10 @@ final class TooltipRule {
             return text;
         }
         Font font = minecraft.font;
-        int width = Tooltip.splitTooltip(minecraft, text).stream().mapToInt(font::width).max().orElse(0);
+        int widthPixels = Tooltip.splitTooltip(minecraft, text).stream().mapToInt(font::width).max().orElse(0);
         MutableComponent stretched = Component.empty();
         text.visit((style, segment) -> {
-            String shown = isRule(style, segment) ? rule(font, style, width) : segment;
+            String shown = isRule(style, segment) ? rule(font, style, widthPixels) : segment;
             stretched.append(Component.literal(shown).withStyle(style));
             return Optional.empty();
         }, Style.EMPTY);
@@ -39,8 +39,8 @@ final class TooltipRule {
         return style.isStrikethrough() && segment.equals(Hint.RULE);
     }
 
-    private static String rule(Font font, Style style, int width) {
-        int step = font.width(Component.literal(Hint.RULE).withStyle(style));
-        return step <= 0 ? Hint.RULE : Hint.RULE.repeat(Math.max(1, Math.ceilDiv(width, step)));
+    private static String rule(Font font, Style style, int widthPixels) {
+        int stepPixels = font.width(Component.literal(Hint.RULE).withStyle(style));
+        return stepPixels <= 0 ? Hint.RULE : Hint.RULE.repeat(Math.max(1, Math.ceilDiv(widthPixels, stepPixels)));
     }
 }

@@ -16,7 +16,7 @@ class ContainerLayoutTest {
     private static final TextMetrics NO_TEXT = text -> 0;
     private static final int LEFT = 10;
     private static final int TOP = 20;
-    private static final int GAP = 5;
+    private static final int GAP_PIXELS = 5;
 
     @Test
     void rowPlacesChildrenLeftToRightAndStretchesThemAcross() {
@@ -27,7 +27,7 @@ class ContainerLayoutTest {
         row.add(second, Length.fill());
         row.layout(NO_TEXT);
         assertEquals(new Bounds(LEFT, TOP, 20, 30), Bounds.of(first));
-        assertEquals(new Bounds(LEFT + 20 + GAP, TOP, 75, 30), Bounds.of(second));
+        assertEquals(new Bounds(LEFT + 20 + GAP_PIXELS, TOP, 75, 30), Bounds.of(second));
     }
 
     @Test
@@ -35,14 +35,14 @@ class ContainerLayoutTest {
         Column column = new Column();
         column.setPosition(LEFT, TOP);
         column.setSize(60, 100);
-        column.setGap(GAP);
+        column.setGapPixels(GAP_PIXELS);
         Box first = new Box(20, 10);
         Box second = new Box(0, 0);
         column.add(first);
         column.add(second, Length.fill());
         column.layout(NO_TEXT);
         assertEquals(new Bounds(LEFT, TOP, 60, 10), Bounds.of(first));
-        assertEquals(new Bounds(LEFT, TOP + 10 + GAP, 60, 85), Bounds.of(second));
+        assertEquals(new Bounds(LEFT, TOP + 10 + GAP_PIXELS, 60, 85), Bounds.of(second));
     }
 
     @Test
@@ -63,7 +63,7 @@ class ContainerLayoutTest {
         row.add(hidden);
         row.add(last);
         row.layout(NO_TEXT);
-        assertEquals(LEFT + 20 + GAP, last.x());
+        assertEquals(LEFT + 20 + GAP_PIXELS, last.getX());
     }
 
     @Test
@@ -91,13 +91,13 @@ class ContainerLayoutTest {
         column.add(first);
         column.add(inner);
         column.add(third);
-        assertEquals(List.of(first, second, third), column.mountedComponents());
+        assertEquals(List.of(first, second, third), column.getMountedComponents());
     }
 
     @Test
     void paddingMovesChildrenInAndTakesItsRoomFromBothSides() {
         Row row = row(100, 30);
-        row.setPadding(5);
+        row.setPaddingPixels(5);
         Box box = new Box(0, 0);
         row.add(box, Length.fill());
         row.layout(NO_TEXT);
@@ -107,7 +107,7 @@ class ContainerLayoutTest {
     @Test
     void naturalSizeIncludesThePadding() {
         Row row = row(0, 0);
-        row.setPadding(5);
+        row.setPaddingPixels(5);
         row.add(new Box(20, 10));
         assertEquals(new Size(30, 20), row.naturalSize(NO_TEXT));
     }
@@ -117,7 +117,7 @@ class ContainerLayoutTest {
         Row row = row(0, 0);
         row.add(new Box(20, 10));
         row.add(new Box(30, 15));
-        assertEquals(new Size(20 + GAP + 30, 15), row.naturalSize(NO_TEXT));
+        assertEquals(new Size(20 + GAP_PIXELS + 30, 15), row.naturalSize(NO_TEXT));
     }
 
     private static Bounds aligned(Align align) {
@@ -129,17 +129,17 @@ class ContainerLayoutTest {
         return Bounds.of(box);
     }
 
-    private static Row row(int width, int height) {
+    private static Row row(int widthPixels, int heightPixels) {
         Row row = new Row();
         row.setPosition(LEFT, TOP);
-        row.setSize(width, height);
-        row.setGap(GAP);
+        row.setSize(widthPixels, heightPixels);
+        row.setGapPixels(GAP_PIXELS);
         return row;
     }
 
-    private record Bounds(int x, int y, int width, int height) {
+    private record Bounds(int x, int y, int widthPixels, int heightPixels) {
         static Bounds of(GuiComponent component) {
-            return new Bounds(component.x(), component.y(), component.width(), component.height());
+            return new Bounds(component.getX(), component.getY(), component.getWidthPixels(), component.getHeightPixels());
         }
     }
 }

@@ -10,10 +10,10 @@ public record ListStyle(
         FillStyle framedSelectedText,
         FillStyle buttonText,
         FillStyle buttonSelectedText) {
-    public FillStyle text(RowStyle rowStyle, boolean selected) {
+    public FillStyle getText(RowStyle rowStyle, boolean isSelected) {
         return switch (rowStyle) {
-            case FRAMED -> selected ? framedSelectedText : framedText;
-            case BUTTON -> selected ? buttonSelectedText : buttonText;
+            case FRAMED -> isSelected ? framedSelectedText : framedText;
+            case BUTTON -> isSelected ? buttonSelectedText : buttonText;
         };
     }
 }

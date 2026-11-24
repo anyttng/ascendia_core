@@ -20,8 +20,8 @@ public abstract class Container extends GuiComponent {
 
     private final Axis axis;
     private final List<Slot> slots = new ArrayList<>();
-    private int gap;
-    private int padding;
+    private int gapPixels;
+    private int paddingPixels;
     private Align align = Align.STRETCH;
 
     protected Container(Axis axis) {
@@ -37,40 +37,40 @@ public abstract class Container extends GuiComponent {
         slots.add(new Slot(child, length));
     }
 
-    public void setGap(int gap) {
-        this.gap = gap;
+    public void setGapPixels(int gapPixels) {
+        this.gapPixels = gapPixels;
     }
 
-    public void setPadding(int padding) {
-        this.padding = padding;
+    public void setPaddingPixels(int paddingPixels) {
+        this.paddingPixels = paddingPixels;
     }
 
     public void setAlign(Align align) {
         this.align = align;
     }
 
-    public boolean mountsItself() {
+    public boolean isMountingItself() {
         return false;
     }
 
     @Override
-    public boolean interactive() {
+    public boolean isInteractive() {
         return false;
     }
 
     @Override
-    public boolean takesPointerAt(double pointX, double pointY) {
-        return super.takesPointerAt(pointX, pointY) && !descendantTakesPointerAt(pointX, pointY);
+    public boolean isTakingPointerAt(double pointX, double pointY) {
+        return super.isTakingPointerAt(pointX, pointY) && !isDescendantTakingPointerAt(pointX, pointY);
     }
 
-    public List<GuiComponent> mountedComponents() {
+    public List<GuiComponent> getMountedComponents() {
         List<GuiComponent> mounted = new ArrayList<>();
-        if (mountsItself()) {
+        if (isMountingItself()) {
             mounted.add(this);
         }
         for (Slot slot : slots) {
             if (slot.component() instanceof Container container) {
-                mounted.addAll(container.mountedComponents());
+                mounted.addAll(container.getMountedComponents());
             } else {
                 mounted.add(slot.component());
             }
@@ -78,19 +78,19 @@ public abstract class Container extends GuiComponent {
         return mounted;
     }
 
-    public boolean fieldsValid() {
-        return fieldsValid(this);
+    public boolean areFieldsValid() {
+        return areFieldsValid(this);
     }
 
     public void layout(TextMetrics metrics) {
-        List<Slot> shown = shownSlots();
+        List<Slot> shown = getShownSlots();
         List<Size> naturals = shown.stream().map(slot -> slot.component().naturalSize(metrics)).toList();
-        int[] lengths = Distribution.sizes(axis.along(width(), height()) - 2 * padding, gap, items(shown, naturals));
-        int offset = padding;
+        int[] lengthsPixels = Distribution.sizes(axis.along(getWidthPixels(), getHeightPixels()) - 2 * paddingPixels, gapPixels, toItems(shown, naturals));
+        int offsetPixels = paddingPixels;
         for (int index = 0; index < shown.size(); index++) {
             GuiComponent child = shown.get(index).component();
-            place(child, offset, lengths[index], naturals.get(index));
-            offset += lengths[index] + gap;
+            place(child, offsetPixels, lengthsPixels[index], naturals.get(index));
+            offsetPixels += lengthsPixels[index] + gapPixels;
             if (child instanceof Container container) {
                 container.layout(metrics);
             }
@@ -99,95 +99,95 @@ public abstract class Container extends GuiComponent {
 
     @Override
     public Size naturalSize(TextMetrics metrics) {
-        List<Slot> shown = shownSlots();
-        int along = gap * Math.max(shown.size() - 1, 0) + 2 * padding;
-        int across = 0;
+        List<Slot> shown = getShownSlots();
+        int alongPixels = gapPixels * Math.max(shown.size() - 1, 0) + 2 * paddingPixels;
+        int acrossPixels = 0;
         for (Slot slot : shown) {
             Size natural = slot.component().naturalSize(metrics);
-            along += Distribution.preferredSize(item(slot, natural));
-            across = Math.max(across, axis.across(natural.width(), natural.height()));
+            alongPixels += Distribution.preferredSize(toItem(slot, natural));
+            acrossPixels = Math.max(acrossPixels, axis.across(natural.widthPixels(), natural.heightPixels()));
         }
-        across += 2 * padding;
-        return new Size(axis.horizontal(along, across), axis.vertical(along, across));
+        acrossPixels += 2 * paddingPixels;
+        return new Size(axis.horizontal(alongPixels, acrossPixels), axis.vertical(alongPixels, acrossPixels));
     }
 
     @Override
-    public Component tooltipAt(double pointX, double pointY) {
-        return childShowsTooltipAt(pointX, pointY) ? Component.empty() : tooltip();
+    public Component getTooltipAt(double pointX, double pointY) {
+        return isChildShowingTooltipAt(pointX, pointY) ? Component.empty() : getTooltip();
     }
 
     @Override
     protected void drawContent(Canvas canvas) {
     }
 
-    private boolean descendantTakesPointerAt(double pointX, double pointY) {
+    private boolean isDescendantTakingPointerAt(double pointX, double pointY) {
         for (Slot slot : slots) {
             GuiComponent child = slot.component();
-            if (child.takesPointerAt(pointX, pointY)
-                    || (child instanceof Container container && container.descendantTakesPointerAt(pointX, pointY))) {
+            if (child.isTakingPointerAt(pointX, pointY)
+                    || (child instanceof Container container && container.isDescendantTakingPointerAt(pointX, pointY))) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean childShowsTooltipAt(double pointX, double pointY) {
+    private boolean isChildShowingTooltipAt(double pointX, double pointY) {
         for (Slot slot : slots) {
             GuiComponent child = slot.component();
-            if (child.visible() && child.contains(pointX, pointY) && showsTooltipAt(child, pointX, pointY)) {
+            if (child.isVisible() && child.isContaining(pointX, pointY) && isShowingTooltipAt(child, pointX, pointY)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static boolean showsTooltipAt(GuiComponent component, double pointX, double pointY) {
+    private static boolean isShowingTooltipAt(GuiComponent component, double pointX, double pointY) {
         if (component instanceof Container container) {
-            return container.childShowsTooltipAt(pointX, pointY)
-                    || (container.mountsItself() && !container.tooltip().getString().isEmpty());
+            return container.isChildShowingTooltipAt(pointX, pointY)
+                    || (container.isMountingItself() && !container.getTooltip().getString().isEmpty());
         }
-        return !component.tooltipAt(pointX, pointY).getString().isEmpty();
+        return !component.getTooltipAt(pointX, pointY).getString().isEmpty();
     }
 
-    private void place(GuiComponent child, int offset, int length, Size natural) {
-        int room = axis.across(width(), height()) - 2 * padding;
-        int breadth = align == Align.STRETCH ? room : axis.across(natural.width(), natural.height());
-        int shift = padding + switch (align) {
+    private void place(GuiComponent child, int offsetPixels, int lengthPixels, Size natural) {
+        int roomPixels = axis.across(getWidthPixels(), getHeightPixels()) - 2 * paddingPixels;
+        int breadthPixels = align == Align.STRETCH ? roomPixels : axis.across(natural.widthPixels(), natural.heightPixels());
+        int shiftPixels = paddingPixels + switch (align) {
             case START, STRETCH -> 0;
-            case CENTER -> (room - breadth) / 2;
-            case END -> room - breadth;
+            case CENTER -> (roomPixels - breadthPixels) / 2;
+            case END -> roomPixels - breadthPixels;
         };
-        child.setPosition(x() + axis.horizontal(offset, shift), y() + axis.vertical(offset, shift));
-        child.setSize(axis.horizontal(length, breadth), axis.vertical(length, breadth));
+        child.setPosition(getX() + axis.horizontal(offsetPixels, shiftPixels), getY() + axis.vertical(offsetPixels, shiftPixels));
+        child.setSize(axis.horizontal(lengthPixels, breadthPixels), axis.vertical(lengthPixels, breadthPixels));
     }
 
-    private List<Slot> shownSlots() {
-        return slots.stream().filter(slot -> slot.component().visibleByOwnRule()).toList();
+    private List<Slot> getShownSlots() {
+        return slots.stream().filter(slot -> slot.component().isVisibleByOwnRule()).toList();
     }
 
-    private List<Distribution.Item> items(List<Slot> shown, List<Size> naturals) {
+    private List<Distribution.Item> toItems(List<Slot> shown, List<Size> naturals) {
         List<Distribution.Item> items = new ArrayList<>(shown.size());
         for (int index = 0; index < shown.size(); index++) {
-            items.add(item(shown.get(index), naturals.get(index)));
+            items.add(toItem(shown.get(index), naturals.get(index)));
         }
         return items;
     }
 
-    private Distribution.Item item(Slot slot, Size natural) {
-        return new Distribution.Item(slot.length(), axis.along(natural.width(), natural.height()));
+    private Distribution.Item toItem(Slot slot, Size natural) {
+        return new Distribution.Item(slot.length(), axis.along(natural.widthPixels(), natural.heightPixels()));
     }
 
-    private static boolean fieldsValid(GuiComponent component) {
+    private static boolean areFieldsValid(GuiComponent component) {
         if (component instanceof Container container) {
-            return !counted(container) || container.slots.stream().allMatch(slot -> fieldsValid(slot.component()));
+            return !isCounted(container) || container.slots.stream().allMatch(slot -> areFieldsValid(slot.component()));
         }
         if (component instanceof Validated field) {
-            return !counted(component) || field.valid();
+            return !isCounted(component) || field.isValid();
         }
         return true;
     }
 
-    private static boolean counted(GuiComponent component) {
-        return component.countedWhenInactive() || (component.visibleByOwnRule() && component.enabledByOwnRule());
+    private static boolean isCounted(GuiComponent component) {
+        return component.isCountedWhenInactive() || (component.isVisibleByOwnRule() && component.isEnabledByOwnRule());
     }
 }

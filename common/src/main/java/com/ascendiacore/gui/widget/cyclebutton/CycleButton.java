@@ -32,7 +32,7 @@ public final class CycleButton<T> extends Container {
     private final Value<T> chosen;
     private final Function<T, Component> valueName;
     private final Button button;
-    private boolean valueOnly;
+    private boolean isValueOnly;
     private Consumer<T> onChange = picked -> {
     };
 
@@ -44,7 +44,7 @@ public final class CycleButton<T> extends Container {
         this.chosen = chosen;
         this.valueName = valueName;
         this.button = Button.text(style, name, this::step);
-        this.button.setLabel(this::label);
+        this.button.setLabel(this::getLabel);
         add(button);
     }
 
@@ -67,10 +67,10 @@ public final class CycleButton<T> extends Container {
             Consumer<Hint> otherKinds) {
         button.setTooltip(style, () -> {
             Hint hint = Hint.of(style)
-                    .intro(optional(prefix + INTRO))
+                    .intro(translateOptional(prefix + INTRO))
                     .values(hintValues(valueHint))
-                    .note(optional(prefix + NOTE))
-                    .keyHint(keyHint());
+                    .note(translateOptional(prefix + NOTE))
+                    .keyHint(getKeyHint());
             otherKinds.accept(hint);
             return hint.build();
         });
@@ -82,25 +82,25 @@ public final class CycleButton<T> extends Container {
                 value.equals(current))).toList();
     }
 
-    private Component keyHint() {
+    private Component getKeyHint() {
         return values.get().size() > 1 ? Component.translatable(PREVIOUS_VALUE_KEY) : Component.empty();
     }
 
-    private static Component optional(String key) {
+    private static Component translateOptional(String key) {
         return Language.getInstance().has(key) ? Component.translatable(key) : Component.empty();
     }
 
     public void showValueOnly() {
-        valueOnly = true;
+        isValueOnly = true;
     }
 
     public void setOnChange(Consumer<T> onChange) {
         this.onChange = onChange;
     }
 
-    private Component label() {
+    private Component getLabel() {
         Component value = valueName.apply(chosen.get());
-        return valueOnly ? value : CommonComponents.optionNameValue(name, value);
+        return isValueOnly ? value : CommonComponents.optionNameValue(name, value);
     }
 
     private void step(Modifiers modifiers) {
@@ -108,16 +108,16 @@ public final class CycleButton<T> extends Container {
         if (list.isEmpty()) {
             return;
         }
-        int delta = modifiers.shift() ? BACK : FORWARD;
+        int delta = modifiers.isShiftDown() ? BACK : FORWARD;
         T picked = list.get(nextIndex(list.indexOf(chosen.get()), delta, list.size()));
         chosen.set(picked);
         onChange.accept(picked);
     }
 
-    private static int nextIndex(int index, int delta, int size) {
+    private static int nextIndex(int index, int delta, int valueCount) {
         if (index < 0) {
-            return delta == FORWARD ? 0 : size - 1;
+            return delta == FORWARD ? 0 : valueCount - 1;
         }
-        return Math.floorMod(index + delta, size);
+        return Math.floorMod(index + delta, valueCount);
     }
 }

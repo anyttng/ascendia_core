@@ -21,7 +21,7 @@ class FieldsValidTest {
         Column form = new Column();
         form.add(new Box(0, 0));
         form.add(new Box(0, 0));
-        assertTrue(form.fieldsValid());
+        assertTrue(form.areFieldsValid());
     }
 
     @Test
@@ -30,12 +30,12 @@ class FieldsValidTest {
         Value<Boolean> valid = Value.of(true);
         Button done = Button.text(Themes.VANILLA.button(), Component.literal("Done"), () -> {
         });
-        done.setEnabled(form::fieldsValid);
+        done.setEnabled(form::areFieldsValid);
         form.add(new RuleField(valid));
         form.add(done);
-        assertTrue(done.enabled());
+        assertTrue(done.isEnabled());
         valid.set(false);
-        assertFalse(done.enabled());
+        assertFalse(done.isEnabled());
     }
 
     @Test
@@ -45,7 +45,7 @@ class FieldsValidTest {
         inner.add(Box.invalid());
         form.add(new Box(0, 0));
         form.add(inner);
-        assertFalse(form.fieldsValid());
+        assertFalse(form.areFieldsValid());
     }
 
     @Test
@@ -54,7 +54,7 @@ class FieldsValidTest {
         Box field = Box.invalid();
         field.setVisible(false);
         form.add(field);
-        assertTrue(form.fieldsValid());
+        assertTrue(form.areFieldsValid());
     }
 
     @Test
@@ -63,7 +63,7 @@ class FieldsValidTest {
         Box field = Box.invalid();
         field.setEnabled(false);
         form.add(field);
-        assertTrue(form.fieldsValid());
+        assertTrue(form.areFieldsValid());
     }
 
     @Test
@@ -73,7 +73,7 @@ class FieldsValidTest {
         section.setVisible(false);
         section.add(Box.invalid());
         form.add(section);
-        assertTrue(form.fieldsValid());
+        assertTrue(form.areFieldsValid());
     }
 
     @Test
@@ -82,7 +82,7 @@ class FieldsValidTest {
         Column page = offScreenPage();
         page.add(Box.invalid());
         form.add(page);
-        assertFalse(form.fieldsValid());
+        assertFalse(form.areFieldsValid());
     }
 
     @Test
@@ -93,7 +93,7 @@ class FieldsValidTest {
         field.setVisible(false);
         page.add(field);
         form.add(page);
-        assertTrue(form.fieldsValid());
+        assertTrue(form.areFieldsValid());
     }
 
     private static final class RuleField extends GuiComponent implements Validated {
@@ -104,7 +104,7 @@ class FieldsValidTest {
         }
 
         @Override
-        public boolean valid() {
+        public boolean isValid() {
             return valid.get();
         }
 

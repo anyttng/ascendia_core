@@ -38,9 +38,9 @@ public final class BookTheme {
     private static final String TEXT_FIELD_FOCUSED = SPRITES + "text_field_focused";
     private static final String TEXT_FIELD_DISABLED = SPRITES + "text_field_disabled";
     private static final String TOOLTIP_SPRITES = "ascendia_core:book";
-    private static final int PANEL_BORDER = 8;
-    private static final int LIGHT_INSET_BORDER = 3;
-    private static final int HEAVY_INSET_BORDER = 4;
+    private static final int PANEL_BORDER_PIXELS = 8;
+    private static final int LIGHT_INSET_BORDER_PIXELS = 3;
+    private static final int HEAVY_INSET_BORDER_PIXELS = 4;
 
     public static final Theme THEME = new Theme(NAME, button(), panel(), inset(), link(), list(), scrollbar(), tooltip(),
             textField());
@@ -54,14 +54,14 @@ public final class BookTheme {
     }
 
     private static PanelStyle panel() {
-        return new PanelStyle(new FrameStyle(PANEL_COVER, PANEL_BORDER), fills());
+        return new PanelStyle(new FrameStyle(PANEL_COVER, PANEL_BORDER_PIXELS), fills());
     }
 
     private static InsetStyle inset() {
         return new InsetStyle(
-                new FrameStyle(INSET_LIGHT, LIGHT_INSET_BORDER),
-                new FrameStyle(INSET_DARK, HEAVY_INSET_BORDER),
-                new FrameStyle(INSET_RIM, HEAVY_INSET_BORDER),
+                new FrameStyle(INSET_LIGHT, LIGHT_INSET_BORDER_PIXELS),
+                new FrameStyle(INSET_DARK, HEAVY_INSET_BORDER_PIXELS),
+                new FrameStyle(INSET_RIM, HEAVY_INSET_BORDER_PIXELS),
                 fills());
     }
 

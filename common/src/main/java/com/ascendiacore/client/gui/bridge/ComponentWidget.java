@@ -30,7 +30,7 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     private @Nullable Tooltip shownTooltip;
 
     public ComponentWidget(GuiComponent component) {
-        super(component.x(), component.y(), component.width(), component.height(), component.narration());
+        super(component.getX(), component.getY(), component.getWidthPixels(), component.getHeightPixels(), component.getNarration());
         this.component = component;
         this.tooltip = new ComponentTooltip(this, component);
         component.attach(this);
@@ -44,22 +44,22 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
 
     @Override
     public boolean isActive() {
-        return component.interactive() && component.visible() && component.enabled();
+        return component.isInteractive() && component.isVisible() && component.isEnabled();
     }
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return component.takesPointerAt(mouseX, mouseY);
+        return component.isTakingPointerAt(mouseX, mouseY);
     }
 
     @Override
     public boolean isHovered() {
-        return component.hovered();
+        return component.isHovered();
     }
 
     @Override
     public @Nullable ComponentPath nextFocusPath(FocusNavigationEvent navigationEvent) {
-        return component.tabStop() ? super.nextFocusPath(navigationEvent) : null;
+        return component.isTabStop() ? super.nextFocusPath(navigationEvent) : null;
     }
 
     @Override
@@ -74,7 +74,7 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
 
     @Override
     public Component getMessage() {
-        return component.narration();
+        return component.getNarration();
     }
 
     @Override
@@ -86,69 +86,69 @@ public final class ComponentWidget extends AbstractWidget implements ComponentHo
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         placeComponent();
-        boolean taken = component.pointerPressed(GameInput.pointer(event));
-        if (taken && !shouldTakeFocusAfterInteraction()) {
+        boolean isTaken = component.tryPressPointer(GameInput.toPointerInput(event));
+        if (isTaken && !shouldTakeFocusAfterInteraction()) {
             dropScreenFocus();
         }
-        return taken;
+        return isTaken;
     }
 
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         placeComponent();
-        return component.pointerDragged(GameInput.pointer(event));
+        return component.tryDragPointer(GameInput.toPointerInput(event));
     }
 
     @Override
     public boolean mouseReleased(MouseButtonEvent event) {
         placeComponent();
-        boolean taken = component.pointerReleased(GameInput.pointer(event));
-        if (!component.takesFocusOnPress()) {
+        boolean isTaken = component.tryReleasePointer(GameInput.toPointerInput(event));
+        if (!component.isTakingFocusOnPress()) {
             dropScreenFocus();
         }
-        return taken;
+        return isTaken;
     }
 
     @Override
     public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
         placeComponent();
-        return component.wheelScrolled(GameInput.wheel(x, y, scrollY));
+        return component.tryScrollWheel(GameInput.toWheelInput(x, y, scrollY));
     }
 
     @Override
     public boolean shouldTakeFocusAfterInteraction() {
-        return component.takesFocusOnPress() || component.followsDrag();
+        return component.isTakingFocusOnPress() || component.isFollowingDrag();
     }
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        return component.keyPressed(GameInput.key(event));
+        return component.tryPressKey(GameInput.toKeyInput(event));
     }
 
     @Override
     public boolean charTyped(CharacterEvent event) {
-        return component.textTyped(GameInput.text(event));
+        return component.tryTypeText(GameInput.toTextInput(event));
     }
 
     @Override
     protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         placeComponent();
-        boolean pointerShown = graphics.containsPointInScissor(mouseX, mouseY);
+        boolean isPointerShown = graphics.containsPointInScissor(mouseX, mouseY);
         component.draw(new GameCanvas(graphics, Minecraft.getInstance().font),
-                pointerShown ? mouseX : OUTSIDE, pointerShown ? mouseY : OUTSIDE);
-        if (component.visible() && (isHovered() || isFocused())) {
+                isPointerShown ? mouseX : OUTSIDE, isPointerShown ? mouseY : OUTSIDE);
+        if (component.isVisible() && (isHovered() || isFocused())) {
             tooltip.follow(mouseX, mouseY);
         }
-        super.setTooltip(component.visible() ? shownTooltip : null);
+        super.setTooltip(component.isVisible() ? shownTooltip : null);
     }
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput output) {
-        output.add(NarratedElementType.TITLE, component.narration());
+        output.add(NarratedElementType.TITLE, component.getNarration());
     }
 
     void followComponent() {
-        setRectangle(component.width(), component.height(), component.x(), component.y());
+        setRectangle(component.getWidthPixels(), component.getHeightPixels(), component.getX(), component.getY());
     }
 
     private static void dropScreenFocus() {

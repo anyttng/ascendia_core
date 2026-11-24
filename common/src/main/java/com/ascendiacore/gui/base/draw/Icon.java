@@ -4,7 +4,7 @@ import net.minecraft.world.item.ItemStack;
 
 @FunctionalInterface
 public interface Icon {
-    int SIZE = 16;
+    int SIZE_PIXELS = 16;
 
     void draw(Canvas canvas, int x, int y);
 
@@ -13,6 +13,6 @@ public interface Icon {
     }
 
     static Icon sprite(String sprite) {
-        return (canvas, x, y) -> canvas.sprite(sprite, x, y, SIZE, SIZE);
+        return (canvas, x, y) -> canvas.sprite(sprite, x, y, SIZE_PIXELS, SIZE_PIXELS);
     }
 }

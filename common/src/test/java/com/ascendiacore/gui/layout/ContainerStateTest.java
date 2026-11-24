@@ -28,11 +28,11 @@ class ContainerStateTest {
         outer.add(inner);
         Value<Boolean> shown = Value.of(true);
         outer.setVisible(shown);
-        assertTrue(box.visible());
+        assertTrue(box.isVisible());
         shown.set(false);
-        assertFalse(inner.visible());
-        assertFalse(box.visible());
-        assertTrue(box.visibleByOwnRule());
+        assertFalse(inner.isVisible());
+        assertFalse(box.isVisible());
+        assertTrue(box.isVisibleByOwnRule());
     }
 
     @Test
@@ -41,9 +41,9 @@ class ContainerStateTest {
         Box box = new Box(10, 10);
         outer.add(box);
         outer.setEnabled(false);
-        assertFalse(box.enabled());
-        assertTrue(box.enabledByOwnRule());
-        assertFalse(box.pointerPressed(PRESS_INSIDE));
+        assertFalse(box.isEnabled());
+        assertTrue(box.isEnabledByOwnRule());
+        assertFalse(box.tryPressPointer(PRESS_INSIDE));
     }
 
     @Test
@@ -52,8 +52,8 @@ class ContainerStateTest {
         column.setSize(20, 20);
         Box box = new Box(10, 10);
         column.add(box);
-        assertFalse(column.pointerPressed(PRESS_INSIDE));
-        assertTrue(box.pointerPressed(PRESS_INSIDE));
+        assertFalse(column.tryPressPointer(PRESS_INSIDE));
+        assertTrue(box.tryPressPointer(PRESS_INSIDE));
     }
 
     @Test
@@ -67,7 +67,7 @@ class ContainerStateTest {
         panel.add(first);
         panel.add(row);
         root.add(panel);
-        assertEquals(List.of(panel, first, second), root.mountedComponents());
+        assertEquals(List.of(panel, first, second), root.getMountedComponents());
     }
 
     @Test
@@ -75,6 +75,6 @@ class ContainerStateTest {
         Panel panel = new Panel(Themes.BOOK.panel(), FillKind.PARCHMENT);
         Box box = new Box(0, 0);
         panel.add(box);
-        assertEquals(List.of(panel, box), panel.mountedComponents());
+        assertEquals(List.of(panel, box), panel.getMountedComponents());
     }
 }

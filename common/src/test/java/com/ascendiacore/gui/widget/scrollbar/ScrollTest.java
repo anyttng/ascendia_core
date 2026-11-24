@@ -7,60 +7,60 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class ScrollTest {
-    private static final int STEP = 22;
-    private static final int VIEW = 100;
-    private static final int LONG = 250;
-    private static final int SHORT = 60;
+    private static final int STEP_PIXELS = 22;
+    private static final int VIEW_PIXELS = 100;
+    private static final int LONG_PIXELS = 250;
+    private static final int SHORT_PIXELS = 60;
 
     @Test
     void contentLongerThanTheViewScrollsByTheDifference() {
-        Scroll scroll = scroll(LONG);
-        assertTrue(scroll.scrollable());
-        assertEquals(LONG - VIEW, scroll.maxOffset());
-        assertEquals(0, scroll.offset());
+        Scroll scroll = scroll(LONG_PIXELS);
+        assertTrue(scroll.isScrollable());
+        assertEquals(LONG_PIXELS - VIEW_PIXELS, scroll.getMaxOffsetPixels());
+        assertEquals(0, scroll.getOffsetPixels());
     }
 
     @Test
     void contentThatFitsDoesNotScroll() {
-        Scroll scroll = scroll(SHORT);
-        assertFalse(scroll.scrollable());
-        assertEquals(0, scroll.maxOffset());
-        scroll.scrollBy(STEP);
-        assertEquals(0, scroll.offset());
+        Scroll scroll = scroll(SHORT_PIXELS);
+        assertFalse(scroll.isScrollable());
+        assertEquals(0, scroll.getMaxOffsetPixels());
+        scroll.scrollBy(STEP_PIXELS);
+        assertEquals(0, scroll.getOffsetPixels());
     }
 
     @Test
     void offsetStaysWithinItsBounds() {
-        Scroll scroll = scroll(LONG);
+        Scroll scroll = scroll(LONG_PIXELS);
         scroll.scrollTo(-5);
-        assertEquals(0, scroll.offset());
-        scroll.scrollTo(LONG);
-        assertEquals(LONG - VIEW, scroll.offset());
+        assertEquals(0, scroll.getOffsetPixels());
+        scroll.scrollTo(LONG_PIXELS);
+        assertEquals(LONG_PIXELS - VIEW_PIXELS, scroll.getOffsetPixels());
     }
 
     @Test
     void aTallerViewPullsTheOffsetBackInsideItsBounds() {
-        Scroll scroll = scroll(LONG);
-        scroll.scrollTo(LONG - VIEW);
-        scroll.setView(LONG - 10);
-        assertEquals(10, scroll.offset());
+        Scroll scroll = scroll(LONG_PIXELS);
+        scroll.scrollTo(LONG_PIXELS - VIEW_PIXELS);
+        scroll.setViewPixels(LONG_PIXELS - 10);
+        assertEquals(10, scroll.getOffsetPixels());
     }
 
     @Test
     void wheelDownMovesOneStepFurtherAndWheelUpOneStepBack() {
-        Scroll scroll = scroll(LONG);
+        Scroll scroll = scroll(LONG_PIXELS);
         scroll.wheel(-1);
-        assertEquals(STEP, scroll.offset());
+        assertEquals(STEP_PIXELS, scroll.getOffsetPixels());
         scroll.wheel(-2);
-        assertEquals(3 * STEP, scroll.offset());
+        assertEquals(3 * STEP_PIXELS, scroll.getOffsetPixels());
         scroll.wheel(1);
-        assertEquals(2 * STEP, scroll.offset());
+        assertEquals(2 * STEP_PIXELS, scroll.getOffsetPixels());
     }
 
-    private static Scroll scroll(int content) {
-        Scroll scroll = new Scroll(STEP);
-        scroll.setView(VIEW);
-        scroll.setContent(content);
+    private static Scroll scroll(int contentPixels) {
+        Scroll scroll = new Scroll(STEP_PIXELS);
+        scroll.setViewPixels(VIEW_PIXELS);
+        scroll.setContentPixels(contentPixels);
         return scroll;
     }
 }

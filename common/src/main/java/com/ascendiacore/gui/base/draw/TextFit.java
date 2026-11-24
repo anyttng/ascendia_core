@@ -7,23 +7,23 @@ public final class TextFit {
     private TextFit() {
     }
 
-    public static Component fit(Component text, int room, TextMetrics metrics) {
-        if (metrics.textWidth(text) <= room) {
+    public static Component fit(Component text, int roomPixels, TextMetrics metrics) {
+        if (metrics.textWidthPixels(text) <= roomPixels) {
             return text;
         }
         String plain = text.getString();
-        int fitting = 0;
-        int above = plain.codePointCount(0, plain.length()) + 1;
-        while (above - fitting > 1) {
-            int middle = (fitting + above) >>> 1;
-            if (metrics.textWidth(cut(text, plain, middle)) <= room) {
-                fitting = middle;
+        int fittingCodePoints = 0;
+        int tooManyCodePoints = plain.codePointCount(0, plain.length()) + 1;
+        while (tooManyCodePoints - fittingCodePoints > 1) {
+            int middleCodePoints = (fittingCodePoints + tooManyCodePoints) >>> 1;
+            if (metrics.textWidthPixels(cut(text, plain, middleCodePoints)) <= roomPixels) {
+                fittingCodePoints = middleCodePoints;
             } else {
-                above = middle;
+                tooManyCodePoints = middleCodePoints;
             }
         }
-        Component shortest = cut(text, plain, fitting);
-        return metrics.textWidth(shortest) <= room ? shortest : Component.empty();
+        Component shortest = cut(text, plain, fittingCodePoints);
+        return metrics.textWidthPixels(shortest) <= roomPixels ? shortest : Component.empty();
     }
 
     private static Component cut(Component text, String plain, int codePoints) {

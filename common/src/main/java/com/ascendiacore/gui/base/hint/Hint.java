@@ -30,7 +30,7 @@ public final class Hint {
     private Component note = Component.empty();
     private Component disabledReason = Component.empty();
     private Component keyHint = Component.empty();
-    private boolean divided;
+    private boolean isDivided;
 
     private Hint(TooltipStyle style) {
         this.style = style;
@@ -91,12 +91,12 @@ public final class Hint {
     }
 
     public Hint divider() {
-        divided = true;
+        isDivided = true;
         return this;
     }
 
     public Hint level(Component caption, HintLevel level, Component levelName) {
-        this.level = CommonComponents.optionNameValue(caption, levelName.copy().withColor(levelColor(level)));
+        this.level = CommonComponents.optionNameValue(caption, levelName.copy().withColor(getLevelColor(level)));
         return this;
     }
 
@@ -117,13 +117,13 @@ public final class Hint {
 
     public Component build() {
         MutableComponent hint = Component.empty();
-        for (Component paragraph : body()) {
+        for (Component paragraph : getBody()) {
             append(hint, PARAGRAPH, paragraph);
         }
-        List<Component> footer = present(List.of(level, note, disabledReason, keyHint));
+        List<Component> footer = dropBlank(List.of(level, note, disabledReason, keyHint));
         String gap = PARAGRAPH;
-        if (divided && !footer.isEmpty()) {
-            append(hint, PARAGRAPH, rule());
+        if (isDivided && !footer.isEmpty()) {
+            append(hint, PARAGRAPH, getRule());
             gap = LINE;
         }
         for (Component paragraph : footer) {
@@ -133,24 +133,24 @@ public final class Hint {
         return hint;
     }
 
-    private List<Component> body() {
+    private List<Component> getBody() {
         List<Component> body = new ArrayList<>(List.of(derived, intro));
         for (HintValue value : values) {
-            body.add(valueLine(value));
+            body.add(toValueLine(value));
         }
         body.addAll(List.of(warning, danger, requirement, liveState));
-        return present(body);
+        return dropBlank(body);
     }
 
-    private Component valueLine(HintValue value) {
+    private Component toValueLine(HintValue value) {
         MutableComponent name = value.name().copy().withColor(style.valueColor());
-        if (value.current()) {
+        if (value.isCurrent()) {
             name.withStyle(ChatFormatting.UNDERLINE);
         }
         return CommonComponents.optionNameValue(name, value.text());
     }
 
-    private Component rule() {
+    private Component getRule() {
         int color = isBlank(level) ? style.noteColor() : style.dividerColor();
         return Component.literal(RULE).withStyle(ChatFormatting.STRIKETHROUGH).withColor(color);
     }
@@ -159,7 +159,7 @@ public final class Hint {
         return isBlank(text) ? text : text.copy().withStyle(ChatFormatting.ITALIC).withColor(style.noteColor());
     }
 
-    private int levelColor(HintLevel level) {
+    private int getLevelColor(HintLevel level) {
         LevelColors colors = style.levels();
         return switch (level) {
             case LOW -> colors.low();
@@ -176,7 +176,7 @@ public final class Hint {
         return isBlank(text) ? text : CommonComponents.optionNameValue(word.copy().withColor(color), text);
     }
 
-    private static List<Component> present(List<Component> paragraphs) {
+    private static List<Component> dropBlank(List<Component> paragraphs) {
         return paragraphs.stream().filter(paragraph -> !isBlank(paragraph)).toList();
     }
 
