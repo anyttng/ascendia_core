@@ -33,7 +33,10 @@ class BookThemeTest {
                 THEME.inset().light().sprite(), THEME.inset().dark().sprite(), THEME.inset().rim().sprite(),
                 THEME.list().row(), THEME.list().rowHover(), THEME.list().rowSelected(),
                 THEME.scrollbar().track(), THEME.scrollbar().thumb(), THEME.scrollbar().thumbHover(),
-                THEME.textField().normal(), THEME.textField().focused(), THEME.textField().disabled());
+                THEME.textField().normal(), THEME.textField().focused(), THEME.textField().disabled(),
+                THEME.toggleSwitch().off(), THEME.toggleSwitch().on(),
+                THEME.toggleSwitch().offHover(), THEME.toggleSwitch().onHover(),
+                THEME.toggleSwitch().offDisabled(), THEME.toggleSwitch().onDisabled());
         assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
         assertEquals(sprites.size(), Set.copyOf(sprites).size());
     }
