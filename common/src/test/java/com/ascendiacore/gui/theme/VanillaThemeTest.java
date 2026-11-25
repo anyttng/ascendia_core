@@ -15,6 +15,7 @@ import com.ascendiacore.gui.widget.panel.model.FillKind;
 class VanillaThemeTest {
     private static final int WHITE = 0xFFFFFFFF;
     private static final int YELLOW = 0xFFFFFF55;
+    private static final int PALE_YELLOW = 0xFFFFFFA0;
     private static final int PALE_GRAY = 0xFFE0E0E0;
     private static final int LIGHT_GRAY = 0xFFC6C6C6;
     private static final int GRAY = 0xFFA0A0A0;
@@ -73,6 +74,18 @@ class VanillaThemeTest {
         assertEquals("minecraft:widget/slider_handle", THEME.slider().handle());
         assertEquals("minecraft:widget/slider_handle_highlighted", THEME.slider().handleHover());
         assertEquals(OWN_SPRITES + "slider/handle_disabled", THEME.slider().handleDisabled());
+    }
+
+    @Test
+    void tabRowDrawsOurOwnStoneSpritesSinceTheGamesSelectedTabIsAnEmptyFrame() {
+        assertEquals(OWN_SPRITES + "tab_row/normal", THEME.tabRow().normal());
+        assertEquals(OWN_SPRITES + "tab_row/hover", THEME.tabRow().hover());
+        assertEquals(OWN_SPRITES + "tab_row/selected", THEME.tabRow().selected());
+        assertEquals(OWN_SPRITES + "tab_row/selected_hover", THEME.tabRow().selectedHover());
+        assertEquals(PALE_GRAY, THEME.tabRow().labelColor());
+        assertEquals(PALE_YELLOW, THEME.tabRow().hoverLabelColor());
+        assertEquals(CHARCOAL, THEME.tabRow().selectedLabelColor());
+        assertFalse(THEME.tabRow().hasLabelShadow());
     }
 
     @Test

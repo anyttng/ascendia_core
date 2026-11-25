@@ -24,6 +24,7 @@ public final class RecordingCanvas implements Canvas {
     private final List<Rect> clips = new ArrayList<>();
     private int textWidthPixels;
     private int charWidthPixels;
+    private long frameTimeMillis;
 
     public void setTextWidth(int textWidthPixels) {
         this.textWidthPixels = textWidthPixels;
@@ -31,6 +32,10 @@ public final class RecordingCanvas implements Canvas {
 
     public void setCharWidthPixels(int charWidthPixels) {
         this.charWidthPixels = charWidthPixels;
+    }
+
+    public void setFrameTimeMillis(long frameTimeMillis) {
+        this.frameTimeMillis = frameTimeMillis;
     }
 
     public List<Sprite> sprites() {
@@ -93,6 +98,6 @@ public final class RecordingCanvas implements Canvas {
 
     @Override
     public long getFrameTimeMillis() {
-        return 0;
+        return frameTimeMillis;
     }
 }
