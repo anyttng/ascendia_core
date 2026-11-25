@@ -9,8 +9,13 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.ascendiacore.gui.base.component.model.AlertColors;
+import com.ascendiacore.gui.base.component.model.LevelColors;
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.draw.RecordingCanvas;
 import com.ascendiacore.gui.base.geometry.Size;
+import com.ascendiacore.gui.base.hint.Hint;
+import com.ascendiacore.gui.base.hint.model.HintValue;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.model.Key;
@@ -20,6 +25,7 @@ import com.ascendiacore.gui.base.property.Value;
 import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import com.ascendiacore.gui.widget.toggleswitch.model.ToggleSwitchStyle;
 
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 class ToggleSwitchTest {
@@ -29,6 +35,10 @@ class ToggleSwitchTest {
     private static final int MUTED_INK = 0xFF222222;
     private static final FillStyle FILL = new FillStyle(FillStyle.NO_FILL, INK, MUTED_INK, 0xFF333333, true);
     private static final Component LABEL = Component.literal("Guaranteed land");
+    private static final TooltipStyle TOOLTIP = new TooltipStyle(null, 0xFFFFFFFF, 0xFFFFFF55, 0xFFAAAAAA,
+            new AlertColors(0xFFFFAA00, 0xFFFF5555, 0xFFA0A0FF), new LevelColors(0xFF55FF55, 0xFFFFFF55, 0xFFFF5555),
+            0xFF55FF55, 0xFF5A5A5A);
+    private static final String CAPTION_KEY = "gui.example.guaranteed_land";
     private static final int LEFT = 40;
     private static final int TOP = 30;
     private static final int TEXT_WIDTH_PIXELS = 25;
@@ -124,9 +134,32 @@ class ToggleSwitchTest {
     }
 
     @Test
+    void hintListsOffAndOnWithTheirParagraphsAndNamesNoKey() {
+        ToggleSwitch toggle = toggle();
+        toggle.setHint(TOOLTIP, CAPTION_KEY);
+        assertEquals(hint(false), toggle.getTooltip());
+        assertEquals(TOOLTIP, toggle.getTooltipStyle());
+    }
+
+    @Test
+    void hintMarkFollowsTheValueAfterAToggle() {
+        ToggleSwitch toggle = toggle();
+        toggle.setHint(TOOLTIP, CAPTION_KEY);
+        toggle.tryPressPointer(press(ON_TRACK_X));
+        assertEquals(hint(true), toggle.getTooltip());
+    }
+
+    @Test
     void naturalSizeIsTheTrackTheGapAndTheLabel() {
         assertEquals(new Size(TRACK_WIDTH_PIXELS + LABEL_GAP_PIXELS + TEXT_WIDTH_PIXELS, TRACK_HEIGHT_PIXELS),
                 toggle().naturalSize(canvas));
+    }
+
+    private static Component hint(boolean isOn) {
+        return Hint.of(TOOLTIP).values(List.of(
+                new HintValue(CommonComponents.OPTION_OFF, Component.translatable(CAPTION_KEY + ".hint.off"), !isOn),
+                new HintValue(CommonComponents.OPTION_ON, Component.translatable(CAPTION_KEY + ".hint.on"), isOn)))
+                .build();
     }
 
     private String spriteOf(ToggleSwitch toggle, int pointerX) {
