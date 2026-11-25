@@ -5,6 +5,7 @@ import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import com.ascendiacore.gui.widget.panel.model.FrameStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
 import com.ascendiacore.gui.widget.slider.model.SliderStyle;
+import com.ascendiacore.gui.widget.tabrow.model.TabRowStyle;
 import com.ascendiacore.gui.widget.toggleswitch.model.ToggleSwitchStyle;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -26,6 +27,11 @@ public final class ThemeCodecs {
     public static final String NORMAL_KEY = "normal";
     public static final String HOVER_KEY = "hover";
     public static final String DISABLED_KEY = "disabled";
+    public static final String SELECTED_KEY = "selected";
+    public static final String SELECTED_HOVER_KEY = "selected_hover";
+    public static final String LABEL_KEY = "label";
+    public static final String SELECTED_LABEL_KEY = "selected_label";
+    public static final String HAS_LABEL_SHADOW_KEY = "has_label_shadow";
     private static final String SPRITE_KEY = "sprite";
     private static final String BORDER_PIXELS_KEY = "border_pixels";
     private static final String TRACK_KEY = "track";
@@ -40,6 +46,7 @@ public final class ThemeCodecs {
     private static final String HANDLE_KEY = "handle";
     private static final String HANDLE_HOVER_KEY = "handle_hover";
     private static final String HANDLE_DISABLED_KEY = "handle_disabled";
+    private static final String HOVER_LABEL_KEY = "hover_label";
 
     public static final Codec<Integer> COLOR = Codec.withAlternative(ExtraCodecs.STRING_RGB_COLOR, ExtraCodecs.STRING_ARGB_COLOR);
 
@@ -79,6 +86,17 @@ public final class ThemeCodecs {
             Codec.STRING.fieldOf(HANDLE_HOVER_KEY).forGetter(SliderStyle::handleHover),
             Codec.STRING.fieldOf(HANDLE_DISABLED_KEY).forGetter(SliderStyle::handleDisabled))
             .apply(instance, SliderStyle::new));
+
+    public static final Codec<TabRowStyle> TAB_ROW = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.fieldOf(NORMAL_KEY).forGetter(TabRowStyle::normal),
+            Codec.STRING.fieldOf(HOVER_KEY).forGetter(TabRowStyle::hover),
+            Codec.STRING.fieldOf(SELECTED_KEY).forGetter(TabRowStyle::selected),
+            Codec.STRING.fieldOf(SELECTED_HOVER_KEY).forGetter(TabRowStyle::selectedHover),
+            COLOR.fieldOf(LABEL_KEY).forGetter(TabRowStyle::labelColor),
+            COLOR.fieldOf(HOVER_LABEL_KEY).forGetter(TabRowStyle::hoverLabelColor),
+            COLOR.fieldOf(SELECTED_LABEL_KEY).forGetter(TabRowStyle::selectedLabelColor),
+            Codec.BOOL.fieldOf(HAS_LABEL_SHADOW_KEY).forGetter(TabRowStyle::hasLabelShadow))
+            .apply(instance, TabRowStyle::new));
 
     private ThemeCodecs() {
     }

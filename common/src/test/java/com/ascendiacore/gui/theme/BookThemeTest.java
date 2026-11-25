@@ -24,6 +24,8 @@ class BookThemeTest {
     private static final int SAND = 0xFF9F8661;
     private static final int PALE_RED = 0xFFFFACAC;
     private static final int DARK_RED = 0xFFAA0000;
+    private static final int PALE_LEATHER = 0xFFE9D7B4;
+    private static final int WHITE = 0xFFFFFFFF;
     private static final String OWN_SPRITES = "ascendia_core:theme/book/";
     private static final Theme THEME = TestThemes.BOOK;
 
@@ -49,6 +51,18 @@ class BookThemeTest {
                 THEME.slider().handleDisabled());
         assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
         assertEquals(sprites.size(), Set.copyOf(sprites).size());
+    }
+
+    @Test
+    void tabRowDrawsOurOwnFourSpritesAndLightensTheLabelUnderThePointer() {
+        assertEquals(OWN_SPRITES + "tab_row/normal", THEME.tabRow().normal());
+        assertEquals(OWN_SPRITES + "tab_row/hover", THEME.tabRow().hover());
+        assertEquals(OWN_SPRITES + "tab_row/selected", THEME.tabRow().selected());
+        assertEquals(OWN_SPRITES + "tab_row/selected_hover", THEME.tabRow().selectedHover());
+        assertEquals(PALE_LEATHER, THEME.tabRow().labelColor());
+        assertEquals(WHITE, THEME.tabRow().hoverLabelColor());
+        assertEquals(DARK_LEATHER, THEME.tabRow().selectedLabelColor());
+        assertFalse(THEME.tabRow().hasLabelShadow());
     }
 
     @Test

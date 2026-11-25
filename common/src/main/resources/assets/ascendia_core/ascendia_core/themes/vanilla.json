@@ -75,5 +75,15 @@
     "handle": "minecraft:widget/slider_handle",
     "handle_hover": "minecraft:widget/slider_handle_highlighted",
     "handle_disabled": "ascendia_core:theme/vanilla/slider/handle_disabled"
+  },
+  "tab_row": {
+    "normal": "ascendia_core:theme/vanilla/tab_row/normal",
+    "hover": "ascendia_core:theme/vanilla/tab_row/hover",
+    "selected": "ascendia_core:theme/vanilla/tab_row/selected",
+    "selected_hover": "ascendia_core:theme/vanilla/tab_row/selected_hover",
+    "label": "#E0E0E0",
+    "hover_label": "#FFFFA0",
+    "selected_label": "#3F3F3F",
+    "has_label_shadow": false
   }
 }
