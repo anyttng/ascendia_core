@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.ascendiacore.gui.theme.Themes;
+import com.ascendiacore.gui.theme.TestThemes;
 import com.ascendiacore.gui.widget.panel.Panel;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 
@@ -48,7 +48,7 @@ class ContainerTooltipTest {
         Panel panel = panel();
         Row row = new Row();
         row.setSize(CHILD_SIZE_PIXELS, CHILD_SIZE_PIXELS);
-        row.setTooltip(Themes.VANILLA.tooltip(), Component.literal(CHILD_TEXT));
+        row.setTooltip(TestThemes.VANILLA.tooltip(), Component.literal(CHILD_TEXT));
         panel.add(row);
         assertEquals(PANEL_TEXT, panel.getTooltipAt(ON_CHILD, ON_CHILD).getString());
     }
@@ -63,15 +63,15 @@ class ContainerTooltipTest {
     }
 
     private static Panel panel() {
-        Panel panel = new Panel(Themes.BOOK.panel(), FillKind.PARCHMENT);
+        Panel panel = new Panel(TestThemes.BOOK.panel(), FillKind.PARCHMENT);
         panel.setSize(PANEL_SIZE_PIXELS, PANEL_SIZE_PIXELS);
-        panel.setTooltip(Themes.BOOK.tooltip(), Component.literal(PANEL_TEXT));
+        panel.setTooltip(TestThemes.BOOK.tooltip(), Component.literal(PANEL_TEXT));
         return panel;
     }
 
     private static Box childWithTooltip() {
         Box child = new Box(CHILD_SIZE_PIXELS, CHILD_SIZE_PIXELS);
-        child.setTooltip(Themes.BOOK.tooltip(), Component.literal(CHILD_TEXT));
+        child.setTooltip(TestThemes.BOOK.tooltip(), Component.literal(CHILD_TEXT));
         return child;
     }
 }

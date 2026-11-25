@@ -1,4 +1,4 @@
-package com.ascendiacore.gui.theme.vanilla;
+package com.ascendiacore.gui.theme;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -9,20 +9,31 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import com.ascendiacore.gui.theme.Theme;
-import com.ascendiacore.gui.theme.Themes;
 import com.ascendiacore.gui.widget.list.model.RowStyle;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 
 class VanillaThemeTest {
+    private static final int WHITE = 0xFFFFFFFF;
+    private static final int YELLOW = 0xFFFFFF55;
+    private static final int PALE_GRAY = 0xFFE0E0E0;
+    private static final int LIGHT_GRAY = 0xFFC6C6C6;
+    private static final int GRAY = 0xFF8B8B8B;
+    private static final int DARK_GRAY = 0xFF373737;
+    private static final int CHARCOAL = 0xFF3F3F3F;
+    private static final int STONE_GRAY = 0xFF555555;
+    private static final int DISABLED_LABEL = 0xFFA0A0A0;
+    private static final int DISABLED_LINK = 0xFF707070;
+    private static final int BLUE = 0xFF2A3FC0;
+    private static final int PALE_BLUE = 0xFFA0A0FF;
+    private static final int RED = 0xFFFF5555;
+    private static final int DARK_RED = 0xFFAA0000;
     private static final String GAME_SPRITES = "minecraft:";
     private static final String OWN_SPRITES = "ascendia_core:theme/vanilla/";
-    private static final Theme THEME = VanillaTheme.THEME;
+    private static final Theme THEME = TestThemes.VANILLA;
 
     @Test
-    void themesNamesIt() {
-        assertEquals(THEME, Themes.VANILLA);
-        assertEquals("vanilla", THEME.name());
+    void itsIdIsItsFileName() {
+        assertEquals(Themes.VANILLA, THEME.id());
     }
 
     @Test
@@ -63,15 +74,15 @@ class VanillaThemeTest {
 
     @Test
     void textFieldColorsAreTheGamesFieldColors() {
-        assertEquals(VanillaPalette.PALE_GRAY, THEME.textField().textColor());
-        assertEquals(VanillaPalette.DISABLED_LINK, THEME.textField().disabledTextColor());
-        assertEquals(VanillaPalette.STONE_GRAY, THEME.textField().placeholderColor());
+        assertEquals(PALE_GRAY, THEME.textField().textColor());
+        assertEquals(DISABLED_LINK, THEME.textField().disabledTextColor());
+        assertEquals(STONE_GRAY, THEME.textField().placeholderColor());
         assertTrue(THEME.textField().hasTextShadow());
     }
 
     @Test
     void selectedButtonLabelIsYellow() {
-        assertEquals(VanillaPalette.YELLOW, THEME.button().selectedLabelColor());
+        assertEquals(YELLOW, THEME.button().selectedLabelColor());
     }
 
     @Test
@@ -83,11 +94,11 @@ class VanillaThemeTest {
 
     @Test
     void rowTextIsWhiteWithAShadowAndYellowOnTheSelectedButtonRow() {
-        assertEquals(VanillaPalette.WHITE, THEME.list().getText(RowStyle.FRAMED, false).ink());
-        assertEquals(VanillaPalette.WHITE, THEME.list().getText(RowStyle.FRAMED, true).ink());
-        assertEquals(VanillaPalette.WHITE, THEME.list().getText(RowStyle.BUTTON, false).ink());
-        assertEquals(VanillaPalette.YELLOW, THEME.list().getText(RowStyle.BUTTON, true).ink());
-        assertEquals(VanillaPalette.DISABLED_LABEL, THEME.list().getText(RowStyle.FRAMED, false).mutedInk());
+        assertEquals(WHITE, THEME.list().getText(RowStyle.FRAMED, false).ink());
+        assertEquals(WHITE, THEME.list().getText(RowStyle.FRAMED, true).ink());
+        assertEquals(WHITE, THEME.list().getText(RowStyle.BUTTON, false).ink());
+        assertEquals(YELLOW, THEME.list().getText(RowStyle.BUTTON, true).ink());
+        assertEquals(DISABLED_LABEL, THEME.list().getText(RowStyle.FRAMED, false).mutedInk());
         assertTrue(THEME.list().getText(RowStyle.FRAMED, false).hasInkShadow());
     }
 
@@ -95,31 +106,31 @@ class VanillaThemeTest {
     void panelDrawsNoFillBecauseTheGamesSpriteCarriesIt() {
         for (FillKind kind : FillKind.values()) {
             assertFalse(THEME.panel().fills().getFill(kind).isDrawn());
-            assertEquals(VanillaPalette.WHITE, THEME.panel().fills().getFill(kind).ink());
+            assertEquals(WHITE, THEME.panel().fills().getFill(kind).ink());
         }
     }
 
     @Test
     void insetFillsAreThreeGraysEachWithItsInk() {
-        assertEquals(VanillaPalette.LIGHT_GRAY, THEME.inset().fills().getFill(FillKind.PARCHMENT).color());
-        assertEquals(VanillaPalette.CHARCOAL, THEME.inset().fills().getFill(FillKind.PARCHMENT).ink());
-        assertEquals(VanillaPalette.GRAY, THEME.inset().fills().getFill(FillKind.PAGE).color());
-        assertEquals(VanillaPalette.DARK_GRAY, THEME.inset().fills().getFill(FillKind.DARK).color());
+        assertEquals(LIGHT_GRAY, THEME.inset().fills().getFill(FillKind.PARCHMENT).color());
+        assertEquals(CHARCOAL, THEME.inset().fills().getFill(FillKind.PARCHMENT).ink());
+        assertEquals(GRAY, THEME.inset().fills().getFill(FillKind.PAGE).color());
+        assertEquals(DARK_GRAY, THEME.inset().fills().getFill(FillKind.DARK).color());
     }
 
     @Test
     void errorInkIsDarkRedOnLightAndMidGrayAndRedOnDark() {
-        assertEquals(VanillaPalette.DARK_RED, THEME.inset().fills().getFill(FillKind.PARCHMENT).errorInk());
-        assertEquals(VanillaPalette.DARK_RED, THEME.inset().fills().getFill(FillKind.PAGE).errorInk());
-        assertEquals(VanillaPalette.RED, THEME.inset().fills().getFill(FillKind.DARK).errorInk());
+        assertEquals(DARK_RED, THEME.inset().fills().getFill(FillKind.PARCHMENT).errorInk());
+        assertEquals(DARK_RED, THEME.inset().fills().getFill(FillKind.PAGE).errorInk());
+        assertEquals(RED, THEME.inset().fills().getFill(FillKind.DARK).errorInk());
         for (FillKind kind : FillKind.values()) {
-            assertEquals(VanillaPalette.RED, THEME.panel().fills().getFill(kind).errorInk());
+            assertEquals(RED, THEME.panel().fills().getFill(kind).errorInk());
         }
     }
 
     @Test
     void linkIsBlueOnLightAndPaleBlueOnDark() {
-        assertEquals(VanillaPalette.BLUE, THEME.link().getColors(FillKind.PARCHMENT).normal());
-        assertEquals(VanillaPalette.PALE_BLUE, THEME.link().getColors(FillKind.DARK).normal());
+        assertEquals(BLUE, THEME.link().getColors(FillKind.PARCHMENT).normal());
+        assertEquals(PALE_BLUE, THEME.link().getColors(FillKind.DARK).normal());
     }
 }

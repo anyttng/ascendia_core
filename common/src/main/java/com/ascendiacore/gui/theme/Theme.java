@@ -11,7 +11,7 @@ import com.ascendiacore.gui.widget.textfield.model.TextFieldStyle;
 import com.ascendiacore.gui.widget.toggleswitch.model.ToggleSwitchStyle;
 
 public record Theme(
-        String name,
+        String id,
         ButtonStyle button,
         PanelStyle panel,
         InsetStyle inset,

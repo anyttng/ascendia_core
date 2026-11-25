@@ -12,7 +12,7 @@ import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
 import com.ascendiacore.gui.base.property.Value;
-import com.ascendiacore.gui.theme.Themes;
+import com.ascendiacore.gui.theme.TestThemes;
 import com.ascendiacore.gui.widget.panel.Panel;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 
@@ -59,7 +59,7 @@ class ContainerStateTest {
     @Test
     void paintingContainerIsMountedBeforeItsContentAndAPlainOneIsNot() {
         Column root = new Column();
-        Panel panel = new Panel(Themes.BOOK.panel(), FillKind.PARCHMENT);
+        Panel panel = new Panel(TestThemes.BOOK.panel(), FillKind.PARCHMENT);
         Row row = new Row();
         Box first = new Box(0, 0);
         Box second = new Box(0, 0);
@@ -72,7 +72,7 @@ class ContainerStateTest {
 
     @Test
     void paintingRootIsMountedItself() {
-        Panel panel = new Panel(Themes.BOOK.panel(), FillKind.PARCHMENT);
+        Panel panel = new Panel(TestThemes.BOOK.panel(), FillKind.PARCHMENT);
         Box box = new Box(0, 0);
         panel.add(box);
         assertEquals(List.of(panel, box), panel.getMountedComponents());
