@@ -11,11 +11,11 @@ import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.WheelInput;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
-import com.ascendiacore.gui.theme.Themes;
+import com.ascendiacore.gui.theme.TestThemes;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
 
 class ScrollbarTest {
-    private static final ScrollbarStyle STYLE = Themes.BOOK.scrollbar();
+    private static final ScrollbarStyle STYLE = TestThemes.BOOK.scrollbar();
     private static final int STEP_PIXELS = 22;
     private static final int LEFT = 10;
     private static final int TOP = 20;

@@ -12,7 +12,7 @@ import com.ascendiacore.gui.base.draw.RecordingCanvas;
 import com.ascendiacore.gui.base.draw.TextMetrics;
 import com.ascendiacore.gui.layout.Row;
 import com.ascendiacore.gui.layout.model.Length;
-import com.ascendiacore.gui.theme.Themes;
+import com.ascendiacore.gui.theme.TestThemes;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import com.ascendiacore.gui.widget.panel.model.InsetFrame;
@@ -31,7 +31,7 @@ class PanelTest {
 
     @Test
     void panelDrawsItsFillOnePixelInsideAndItsFrameOverTheWholeArea() {
-        PanelStyle style = Themes.BOOK.panel();
+        PanelStyle style = TestThemes.BOOK.panel();
         Panel panel = new Panel(style, FillKind.PAGE);
         place(panel);
         panel.draw(canvas, OUTSIDE, OUTSIDE);
@@ -42,7 +42,7 @@ class PanelTest {
 
     @Test
     void panelWhoseSpriteCarriesItsOwnFillDrawsNoFill() {
-        Panel panel = new Panel(Themes.VANILLA.panel(), FillKind.PARCHMENT);
+        Panel panel = new Panel(TestThemes.VANILLA.panel(), FillKind.PARCHMENT);
         place(panel);
         panel.draw(canvas, OUTSIDE, OUTSIDE);
         assertTrue(canvas.fills().isEmpty());
@@ -51,7 +51,7 @@ class PanelTest {
 
     @Test
     void contentStartsInsideTheFrame() {
-        PanelStyle style = Themes.BOOK.panel();
+        PanelStyle style = TestThemes.BOOK.panel();
         Panel panel = new Panel(style, FillKind.PARCHMENT);
         place(panel);
         Row content = new Row();
@@ -66,7 +66,7 @@ class PanelTest {
 
     @Test
     void insetDrawsTheFrameAndTheFillItWasGiven() {
-        InsetStyle style = Themes.BOOK.inset();
+        InsetStyle style = TestThemes.BOOK.inset();
         Inset inset = new Inset(style, InsetFrame.DARK, FillKind.DARK);
         place(inset);
         inset.draw(canvas, OUTSIDE, OUTSIDE);
@@ -77,7 +77,7 @@ class PanelTest {
 
     @Test
     void eachInsetFrameKindNamesItsOwnFrame() {
-        InsetStyle style = Themes.BOOK.inset();
+        InsetStyle style = TestThemes.BOOK.inset();
         assertEquals(style.light(), style.getFrame(InsetFrame.LIGHT));
         assertEquals(style.dark(), style.getFrame(InsetFrame.DARK));
         assertEquals(style.rim(), style.getFrame(InsetFrame.RIM));

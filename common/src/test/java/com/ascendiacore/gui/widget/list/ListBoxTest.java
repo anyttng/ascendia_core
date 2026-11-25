@@ -17,8 +17,8 @@ import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.model.Key;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
+import com.ascendiacore.gui.theme.TestThemes;
 import com.ascendiacore.gui.theme.Theme;
-import com.ascendiacore.gui.theme.Themes;
 import com.ascendiacore.gui.widget.button.Button;
 import com.ascendiacore.gui.widget.label.Label;
 import com.ascendiacore.gui.widget.label.model.LabelRole;
@@ -29,7 +29,7 @@ import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import net.minecraft.network.chat.Component;
 
 class ListBoxTest {
-    private static final Theme THEME = Themes.BOOK;
+    private static final Theme THEME = TestThemes.BOOK;
     private static final FillStyle FILL = THEME.panel().fills().getFill(FillKind.PARCHMENT);
     private static final TextMetrics NO_TEXT = text -> 0;
     private static final int LEFT = 10;

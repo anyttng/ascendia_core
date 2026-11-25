@@ -19,20 +19,24 @@ class ThemeSpritesTest {
     private static final String TOOLTIP_FRAME_SUFFIX = "_frame";
     private static final String PNG = ".png";
     private static final String MCMETA = ".png.mcmeta";
-    private static final List<Theme> THEMES = List.of(Themes.VANILLA, Themes.BOOK);
+    private static final List<Theme> THEMES = List.of(TestThemes.VANILLA, TestThemes.BOOK);
 
     @Test
     void everyOwnSpriteAThemeNamesShipsWithItsMcmeta() {
         List<String> missing = new ArrayList<>();
         for (Theme theme : THEMES) {
             List<String> sprites = new ArrayList<>();
-            collectSprites(theme, sprites);
-            assertFalse(sprites.isEmpty(), theme.name());
+            for (RecordComponent component : Theme.class.getRecordComponents()) {
+                if (read(theme, component) instanceof Record style) {
+                    collectSprites(style, sprites);
+                }
+            }
+            assertFalse(sprites.isEmpty(), theme.id());
             for (String sprite : sprites) {
                 String path = SPRITE_ROOT + sprite.substring(OWN_NAMESPACE.length());
                 if (ThemeSpritesTest.class.getResource(path + PNG) == null
                         || ThemeSpritesTest.class.getResource(path + MCMETA) == null) {
-                    missing.add(theme.name() + " " + sprite);
+                    missing.add(theme.id() + " " + sprite);
                 }
             }
         }

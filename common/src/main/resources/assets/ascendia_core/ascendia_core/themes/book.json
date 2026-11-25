@@ -1,0 +1,67 @@
+{
+  "roles": {
+    "light": { "fill": "#FBF3DF", "text": "#4C1A0B", "muted": "#A89A85", "error": "#AA0000", "has_text_shadow": false },
+    "mid": { "fill": "#F6E6BD", "text": "#534E47", "muted": "#A89A85", "error": "#AA0000", "has_text_shadow": false },
+    "dark": { "fill": "#534E47", "text": "#FBF3DF", "muted": "#A89A85", "error": "#FF5555", "has_text_shadow": false },
+    "accent": "#F7D98A",
+    "accent_hover": "#FFF0C0",
+    "link": "#853E29",
+    "link_hover": "#B8741A",
+    "success": "#A8CF7C",
+    "warning": "#E8A24A",
+    "danger": "#FF6B5E",
+    "requirement": "#B4B8E8",
+    "derived": "#9CC7D6",
+    "divider": "#6A5F52"
+  },
+  "button": {
+    "surface": "light",
+    "normal": "ascendia_core:theme/book/button/normal",
+    "hover": "ascendia_core:theme/book/button/hover",
+    "disabled": "ascendia_core:theme/book/button/disabled",
+    "selected": "ascendia_core:theme/book/button/selected",
+    "selected_hover": "ascendia_core:theme/book/button/selected_hover"
+  },
+  "panel": {
+    "frame": { "sprite": "ascendia_core:theme/book/panel/cover", "border_pixels": 8 }
+  },
+  "inset": {
+    "light": { "sprite": "ascendia_core:theme/book/inset/light", "border_pixels": 3 },
+    "dark": { "sprite": "ascendia_core:theme/book/inset/dark", "border_pixels": 4 },
+    "rim": { "sprite": "ascendia_core:theme/book/inset/rim", "border_pixels": 4 }
+  },
+  "list": {
+    "surface": "light",
+    "selected_surface": "dark",
+    "row": "ascendia_core:theme/book/list/row",
+    "row_hover": "ascendia_core:theme/book/list/row_hover",
+    "row_selected": "ascendia_core:theme/book/list/row_selected",
+    "framed_selected_text": { "muted": "#C5AB88" },
+    "button_selected_text": { "muted": "#C5AB88" }
+  },
+  "scrollbar": {
+    "track": "ascendia_core:theme/book/scrollbar/track",
+    "thumb": "ascendia_core:theme/book/scrollbar/thumb",
+    "thumb_hover": "ascendia_core:theme/book/scrollbar/thumb_hover"
+  },
+  "tooltip": {
+    "surface": "dark",
+    "sprites": "ascendia_core:book"
+  },
+  "text_field": {
+    "surface": "light",
+    "normal": "ascendia_core:theme/book/text_field/normal",
+    "focused": "ascendia_core:theme/book/text_field/focused",
+    "disabled": "ascendia_core:theme/book/text_field/disabled",
+    "text": "#3E3A35",
+    "placeholder": "#B9A78C"
+  },
+  "toggle_switch": {
+    "off": "ascendia_core:theme/book/toggle_switch/off",
+    "on": "ascendia_core:theme/book/toggle_switch/on",
+    "off_hover": "ascendia_core:theme/book/toggle_switch/off_hover",
+    "on_hover": "ascendia_core:theme/book/toggle_switch/on_hover",
+    "off_disabled": "ascendia_core:theme/book/toggle_switch/off_disabled",
+    "on_disabled": "ascendia_core:theme/book/toggle_switch/on_disabled"
+  }
+}
