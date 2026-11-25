@@ -1,11 +1,14 @@
 package com.ascendiacore.gui.widget.toggleswitch;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import com.ascendiacore.gui.base.component.GuiComponent;
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.draw.TextMetrics;
 import com.ascendiacore.gui.base.geometry.Size;
+import com.ascendiacore.gui.base.hint.ValueHint;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.property.Property;
@@ -13,6 +16,7 @@ import com.ascendiacore.gui.base.property.Value;
 import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import com.ascendiacore.gui.widget.toggleswitch.model.ToggleSwitchStyle;
 
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public final class ToggleSwitch extends GuiComponent {
@@ -20,6 +24,9 @@ public final class ToggleSwitch extends GuiComponent {
     private static final int TRACK_HEIGHT_PIXELS = 10;
     private static final int LABEL_GAP_PIXELS = 4;
     private static final int LINE_HEIGHT_PIXELS = 9;
+    private static final List<Boolean> VALUES = List.of(false, true);
+    private static final String HINT_ON = "on";
+    private static final String HINT_OFF = "off";
 
     private final ToggleSwitchStyle style;
     private final FillStyle fill;
@@ -51,6 +58,15 @@ public final class ToggleSwitch extends GuiComponent {
 
     public void setLabel(Property<Component> label) {
         this.label = label;
+    }
+
+    public void setHint(TooltipStyle style, String captionKey) {
+        setTooltip(style, () -> ValueHint.of(style, captionKey, VALUES, isOn(), ToggleSwitch::toValueName,
+                isOn -> ValueHint.text(captionKey, isOn ? HINT_ON : HINT_OFF)).build());
+    }
+
+    private static Component toValueName(boolean isOn) {
+        return isOn ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF;
     }
 
     @Override

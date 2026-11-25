@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.hint.Hint;
-import com.ascendiacore.gui.base.hint.model.HintValue;
+import com.ascendiacore.gui.base.hint.ValueHint;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.property.Property;
 import com.ascendiacore.gui.base.property.Value;
@@ -15,16 +15,12 @@ import com.ascendiacore.gui.layout.model.Axis;
 import com.ascendiacore.gui.widget.button.Button;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public final class CycleButton<T> extends Container {
     private static final int FORWARD = 1;
     private static final int BACK = -1;
-    private static final String HINT_PREFIX = ".hint.";
-    private static final String INTRO = "intro";
-    private static final String NOTE = "note";
     private static final String PREVIOUS_VALUE_KEY = "gui.ascendia_core.cycle_button.previous_value";
 
     private final Component name;
@@ -54,40 +50,26 @@ public final class CycleButton<T> extends Container {
     }
 
     public void setHint(TooltipStyle style, String captionKey, Function<T, String> valueKey, Consumer<Hint> otherKinds) {
-        String prefix = captionKey + HINT_PREFIX;
-        setHintOf(style, prefix, value -> Component.translatable(prefix + valueKey.apply(value)), otherKinds);
+        setHintOf(style, captionKey, value -> ValueHint.text(captionKey, valueKey.apply(value)), otherKinds);
     }
 
     public void setValueHints(TooltipStyle style, String captionKey, Function<T, Component> valueHint) {
-        setHintOf(style, captionKey + HINT_PREFIX, valueHint, hint -> {
+        setHintOf(style, captionKey, valueHint, hint -> {
         });
     }
 
-    private void setHintOf(TooltipStyle style, String prefix, Function<T, Component> valueHint,
+    private void setHintOf(TooltipStyle style, String captionKey, Function<T, Component> valueHint,
             Consumer<Hint> otherKinds) {
         button.setTooltip(style, () -> {
-            Hint hint = Hint.of(style)
-                    .intro(translateOptional(prefix + INTRO))
-                    .values(hintValues(valueHint))
-                    .note(translateOptional(prefix + NOTE))
+            Hint hint = ValueHint.of(style, captionKey, values.get(), chosen.get(), valueName, valueHint)
                     .keyHint(getKeyHint());
             otherKinds.accept(hint);
             return hint.build();
         });
     }
 
-    private List<HintValue> hintValues(Function<T, Component> valueHint) {
-        T current = chosen.get();
-        return values.get().stream().map(value -> new HintValue(valueName.apply(value), valueHint.apply(value),
-                value.equals(current))).toList();
-    }
-
     private Component getKeyHint() {
         return values.get().size() > 1 ? Component.translatable(PREVIOUS_VALUE_KEY) : Component.empty();
-    }
-
-    private static Component translateOptional(String key) {
-        return Language.getInstance().has(key) ? Component.translatable(key) : Component.empty();
     }
 
     public void showValueOnly() {
