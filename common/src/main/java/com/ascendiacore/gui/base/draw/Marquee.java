@@ -8,28 +8,28 @@ public final class Marquee {
     private Marquee() {
     }
 
-    public static int offset(int textWidth, int room, long timeMillis) {
-        int overflow = textWidth - room;
-        if (overflow <= 0) {
+    public static int offsetPixels(int textWidthPixels, int roomPixels, long timeMillis) {
+        int overflowPixels = textWidthPixels - roomPixels;
+        if (overflowPixels <= 0) {
             return 0;
         }
-        long travelMillis = overflow * MILLIS_PER_SECOND / PIXELS_PER_SECOND;
-        long phase = Math.floorMod(timeMillis, 2 * (PAUSE_MILLIS + travelMillis));
-        if (phase < PAUSE_MILLIS) {
+        long travelMillis = overflowPixels * MILLIS_PER_SECOND / PIXELS_PER_SECOND;
+        long phaseMillis = Math.floorMod(timeMillis, 2 * (PAUSE_MILLIS + travelMillis));
+        if (phaseMillis < PAUSE_MILLIS) {
             return 0;
         }
-        phase -= PAUSE_MILLIS;
-        if (phase < travelMillis) {
-            return travelled(phase);
+        phaseMillis -= PAUSE_MILLIS;
+        if (phaseMillis < travelMillis) {
+            return travelledPixels(phaseMillis);
         }
-        phase -= travelMillis;
-        if (phase < PAUSE_MILLIS) {
-            return overflow;
+        phaseMillis -= travelMillis;
+        if (phaseMillis < PAUSE_MILLIS) {
+            return overflowPixels;
         }
-        return overflow - travelled(phase - PAUSE_MILLIS);
+        return overflowPixels - travelledPixels(phaseMillis - PAUSE_MILLIS);
     }
 
-    private static int travelled(long millis) {
-        return (int) (millis * PIXELS_PER_SECOND / MILLIS_PER_SECOND);
+    private static int travelledPixels(long elapsedMillis) {
+        return (int) (elapsedMillis * PIXELS_PER_SECOND / MILLIS_PER_SECOND);
     }
 }

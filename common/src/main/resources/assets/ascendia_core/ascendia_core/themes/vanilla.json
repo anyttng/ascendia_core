@@ -1,0 +1,93 @@
+{
+  "roles": {
+    "light": { "fill": "#C6C6C6", "text": "#3F3F3F", "muted": "#6B6B6B", "error": "#AA0000", "has_text_shadow": false },
+    "mid": { "fill": "#A0A0A0", "text": "#232323", "muted": "#3E3E3E", "error": "#6A0000", "has_text_shadow": false },
+    "dark": { "fill": "#373737", "text": "#FFFFFF", "muted": "#A0A0A0", "error": "#FF7979", "has_text_shadow": true },
+    "accent": "#FFFF55",
+    "accent_hover": "#FFFFFF",
+    "link": "#2A3FC0",
+    "link_hover": "#2A3FC0",
+    "success": "#55FF55",
+    "warning": "#FFAA00",
+    "danger": "#FF7979",
+    "requirement": "#A0A0FF",
+    "derived": "#55FF55",
+    "divider": "#5A5A5A"
+  },
+  "button": {
+    "surface": "dark",
+    "normal": "minecraft:widget/button",
+    "hover": "minecraft:widget/button_highlighted",
+    "disabled": "minecraft:widget/button_disabled",
+    "selected": "ascendia_core:theme/vanilla/button/selected",
+    "selected_hover": "ascendia_core:theme/vanilla/button/selected_hover"
+  },
+  "panel": {
+    "frame": { "sprite": "minecraft:popup/background", "border_pixels": 6 },
+    "surface": "dark"
+  },
+  "inset": {
+    "light": { "sprite": "ascendia_core:theme/vanilla/inset/light", "border_pixels": 3 },
+    "dark": { "sprite": "ascendia_core:theme/vanilla/inset/dark", "border_pixels": 4 },
+    "rim": { "sprite": "ascendia_core:theme/vanilla/inset/rim", "border_pixels": 4 }
+  },
+  "link": {
+    "on_mid": { "normal": "#1B2A8A", "hover": "#1B2A8A" },
+    "on_dark": { "normal": "#A0A0FF", "disabled": "#838383" }
+  },
+  "list": {
+    "surface": "dark",
+    "selected_surface": "dark",
+    "row": "ascendia_core:theme/vanilla/list/row",
+    "row_hover": "ascendia_core:theme/vanilla/list/row_hover",
+    "row_selected": "ascendia_core:theme/vanilla/list/row_selected",
+    "button_text": { "muted": "#E0E0E0" },
+    "button_selected_text": { "muted": "#E0E0E0" }
+  },
+  "scrollbar": {
+    "track": "minecraft:widget/scroller_background",
+    "thumb": "minecraft:widget/scroller",
+    "thumb_hover": "minecraft:widget/scroller"
+  },
+  "tooltip": {
+    "surface": "dark",
+    "note": "#AAAAAA"
+  },
+  "text_field": {
+    "surface": "dark",
+    "normal": "minecraft:widget/text_field",
+    "focused": "minecraft:widget/text_field_highlighted",
+    "disabled": "ascendia_core:theme/vanilla/text_field/disabled",
+    "text": "#E0E0E0",
+    "disabled_text": "#9A9A9A",
+    "placeholder": "#838383"
+  },
+  "toggle_switch": {
+    "off": "ascendia_core:theme/vanilla/toggle_switch/off",
+    "on": "ascendia_core:theme/vanilla/toggle_switch/on",
+    "off_hover": "ascendia_core:theme/vanilla/toggle_switch/off_hover",
+    "on_hover": "ascendia_core:theme/vanilla/toggle_switch/on_hover",
+    "off_disabled": "ascendia_core:theme/vanilla/toggle_switch/off_disabled",
+    "on_disabled": "ascendia_core:theme/vanilla/toggle_switch/on_disabled"
+  },
+  "slider": {
+    "track": "minecraft:widget/slider",
+    "handle": "minecraft:widget/slider_handle",
+    "handle_hover": "minecraft:widget/slider_handle_highlighted",
+    "handle_disabled": "ascendia_core:theme/vanilla/slider/handle_disabled"
+  },
+  "tab_row": {
+    "normal": "ascendia_core:theme/vanilla/tab_row/normal",
+    "hover": "ascendia_core:theme/vanilla/tab_row/hover",
+    "selected": "ascendia_core:theme/vanilla/tab_row/selected",
+    "selected_hover": "ascendia_core:theme/vanilla/tab_row/selected_hover",
+    "label": "#E0E0E0",
+    "hover_label": "#FFFFA0",
+    "selected_label": "#3F3F3F",
+    "has_label_shadow": false
+  },
+  "progress_bar": {
+    "track": "ascendia_core:theme/vanilla/progress_bar/track",
+    "track_light": "ascendia_core:theme/vanilla/progress_bar/track_light"
+  }
+}

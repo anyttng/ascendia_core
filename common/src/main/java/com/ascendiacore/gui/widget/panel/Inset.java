@@ -15,17 +15,17 @@ public final class Inset extends OpenContainer {
 
     public Inset(InsetStyle style, InsetFrame frame, FillKind fill) {
         super(Axis.VERTICAL);
-        this.frame = style.frame(frame);
-        this.fill = style.fills().of(fill);
-        setPadding(this.frame.border());
+        this.frame = style.getFrame(frame);
+        this.fill = style.fills().getFill(fill);
+        setPaddingPixels(this.frame.borderPixels());
     }
 
-    public FillStyle fill() {
+    public FillStyle getFill() {
         return fill;
     }
 
     @Override
-    public boolean mountsItself() {
+    public boolean isMountingItself() {
         return true;
     }
 

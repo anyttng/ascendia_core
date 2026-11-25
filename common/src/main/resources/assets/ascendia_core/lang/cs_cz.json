@@ -1,0 +1,8 @@
+{
+  "key.category.ascendia_core.main": "Ascendia",
+
+  "gui.ascendia_core.number_field.too_small": "Příliš malá hodnota. Nejméně %s.",
+  "gui.ascendia_core.number_field.too_large": "Příliš velká hodnota. Nejvýše %s.",
+
+  "gui.ascendia_core.cycle_button.previous_value": "Shift + kliknutí: předchozí hodnota"
+}

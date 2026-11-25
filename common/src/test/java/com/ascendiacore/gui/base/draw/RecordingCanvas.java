@@ -9,32 +9,45 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 public final class RecordingCanvas implements Canvas {
-    public record Sprite(String sprite, int x, int y, int width, int height) {
+    public record Sprite(String sprite, int x, int y, int widthPixels, int heightPixels) {
     }
 
-    public record Fill(int x, int y, int width, int height, int color) {
+    public record Tint(String sprite, int color) {
     }
 
-    public record Text(Component text, int x, int y, int color, boolean shadow) {
+    public record Fill(int x, int y, int widthPixels, int heightPixels, int color) {
+    }
+
+    public record Text(Component text, int x, int y, int color, boolean hasShadow) {
     }
 
     private final List<Sprite> sprites = new ArrayList<>();
+    private final List<Tint> tints = new ArrayList<>();
     private final List<Fill> fills = new ArrayList<>();
     private final List<Text> texts = new ArrayList<>();
     private final List<Rect> clips = new ArrayList<>();
-    private int textWidth;
-    private int charWidth;
+    private int textWidthPixels;
+    private int charWidthPixels;
+    private long frameTimeMillis;
 
-    public void setTextWidth(int textWidth) {
-        this.textWidth = textWidth;
+    public void setTextWidth(int textWidthPixels) {
+        this.textWidthPixels = textWidthPixels;
     }
 
-    public void setCharWidth(int charWidth) {
-        this.charWidth = charWidth;
+    public void setCharWidthPixels(int charWidthPixels) {
+        this.charWidthPixels = charWidthPixels;
+    }
+
+    public void setFrameTimeMillis(long frameTimeMillis) {
+        this.frameTimeMillis = frameTimeMillis;
     }
 
     public List<Sprite> sprites() {
         return sprites;
+    }
+
+    public List<Tint> tints() {
+        return tints;
     }
 
     public List<Fill> fills() {
@@ -50,32 +63,33 @@ public final class RecordingCanvas implements Canvas {
     }
 
     @Override
-    public void sprite(String sprite, int x, int y, int width, int height) {
-        sprites.add(new Sprite(sprite, x, y, width, height));
+    public void sprite(String sprite, int x, int y, int widthPixels, int heightPixels) {
+        sprites.add(new Sprite(sprite, x, y, widthPixels, heightPixels));
     }
 
     @Override
-    public void sprite(String sprite, int x, int y, int width, int height, int tint) {
-        sprite(sprite, x, y, width, height);
+    public void sprite(String sprite, int x, int y, int widthPixels, int heightPixels, int tint) {
+        sprite(sprite, x, y, widthPixels, heightPixels);
+        tints.add(new Tint(sprite, tint));
     }
 
     @Override
-    public void fill(int x, int y, int width, int height, int color) {
-        fills.add(new Fill(x, y, width, height, color));
+    public void fill(int x, int y, int widthPixels, int heightPixels, int color) {
+        fills.add(new Fill(x, y, widthPixels, heightPixels, color));
     }
 
     @Override
-    public void text(Component text, int x, int y, int color, boolean shadow) {
-        texts.add(new Text(text, x, y, color, shadow));
+    public void text(Component text, int x, int y, int color, boolean hasShadow) {
+        texts.add(new Text(text, x, y, color, hasShadow));
     }
 
     @Override
-    public int textWidth(Component text) {
-        if (charWidth == 0) {
-            return textWidth;
+    public int textWidthPixels(Component text) {
+        if (charWidthPixels == 0) {
+            return textWidthPixels;
         }
         String plain = text.getString();
-        return plain.codePointCount(0, plain.length()) * charWidth;
+        return plain.codePointCount(0, plain.length()) * charWidthPixels;
     }
 
     @Override
@@ -83,8 +97,8 @@ public final class RecordingCanvas implements Canvas {
     }
 
     @Override
-    public void pushClip(int x, int y, int width, int height) {
-        clips.add(new Rect(x, y, width, height));
+    public void pushClip(int x, int y, int widthPixels, int heightPixels) {
+        clips.add(new Rect(x, y, widthPixels, heightPixels));
     }
 
     @Override
@@ -92,7 +106,7 @@ public final class RecordingCanvas implements Canvas {
     }
 
     @Override
-    public long frameTimeMillis() {
-        return 0;
+    public long getFrameTimeMillis() {
+        return frameTimeMillis;
     }
 }

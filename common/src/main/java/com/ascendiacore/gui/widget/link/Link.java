@@ -14,10 +14,10 @@ import com.ascendiacore.gui.widget.link.model.LinkColors;
 import net.minecraft.network.chat.Component;
 
 public final class Link extends GuiComponent {
-    private static final int LINE_HEIGHT = 9;
-    private static final int UNDERLINE_HEIGHT = 1;
-    private static final int ICON_SIZE = 8;
-    private static final int ICON_GAP = 2;
+    private static final int LINE_HEIGHT_PIXELS = 9;
+    private static final int UNDERLINE_HEIGHT_PIXELS = 1;
+    private static final int ICON_SIZE_PIXELS = 8;
+    private static final int ICON_GAP_PIXELS = 2;
 
     private final LinkColors colors;
     private final @Nullable String iconSprite;
@@ -44,26 +44,26 @@ public final class Link extends GuiComponent {
     }
 
     @Override
-    public Component narration() {
+    public Component getNarration() {
         return label.get();
     }
 
     @Override
     public Size naturalSize(TextMetrics metrics) {
-        return new Size(iconRoom() + metrics.textWidth(label.get()), LINE_HEIGHT + UNDERLINE_HEIGHT);
+        return new Size(getIconRoomPixels() + metrics.textWidthPixels(label.get()), LINE_HEIGHT_PIXELS + UNDERLINE_HEIGHT_PIXELS);
     }
 
     @Override
     protected void drawContent(Canvas canvas) {
         Component text = label.get();
-        int color = color();
-        int textLeft = x() + iconRoom();
+        int color = getColor();
+        int textLeft = getX() + getIconRoomPixels();
         if (iconSprite != null) {
-            canvas.sprite(iconSprite, x(), y() + (LINE_HEIGHT - ICON_SIZE) / 2, ICON_SIZE, ICON_SIZE);
+            canvas.sprite(iconSprite, getX(), getY() + (LINE_HEIGHT_PIXELS - ICON_SIZE_PIXELS) / 2, ICON_SIZE_PIXELS, ICON_SIZE_PIXELS);
         }
-        canvas.text(text, textLeft, y(), color, false);
-        if (highlighted()) {
-            canvas.fill(textLeft, y() + LINE_HEIGHT, canvas.textWidth(text), UNDERLINE_HEIGHT, color);
+        canvas.text(text, textLeft, getY(), color, false);
+        if (isHighlighted()) {
+            canvas.fill(textLeft, getY() + LINE_HEIGHT_PIXELS, canvas.textWidthPixels(text), UNDERLINE_HEIGHT_PIXELS, color);
         }
     }
 
@@ -73,7 +73,7 @@ public final class Link extends GuiComponent {
     }
 
     @Override
-    protected boolean onKey(KeyInput input) {
+    protected boolean tryHandleKey(KeyInput input) {
         if (!input.isSelection()) {
             return false;
         }
@@ -81,19 +81,19 @@ public final class Link extends GuiComponent {
         return true;
     }
 
-    private int color() {
-        if (!enabled()) {
+    private int getColor() {
+        if (!isEnabled()) {
             return colors.disabled();
         }
-        return highlighted() ? colors.hover() : colors.normal();
+        return isHighlighted() ? colors.hover() : colors.normal();
     }
 
-    private boolean highlighted() {
-        return enabled() && (hovered() || focused());
+    private boolean isHighlighted() {
+        return isEnabled() && (isHovered() || isFocused());
     }
 
-    private int iconRoom() {
-        return iconSprite == null ? 0 : ICON_SIZE + ICON_GAP;
+    private int getIconRoomPixels() {
+        return iconSprite == null ? 0 : ICON_SIZE_PIXELS + ICON_GAP_PIXELS;
     }
 
     private void activate() {

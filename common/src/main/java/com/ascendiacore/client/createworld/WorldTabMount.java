@@ -10,11 +10,11 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 
 public final class WorldTabMount {
     public static void insert(GridLayout.RowHelper helper, WorldCreationUiState state) {
-        for (WorldTabRow row : WorldTabRows.rows()) {
+        for (WorldTabRow row : WorldTabRows.getRows()) {
             for (Cell cell : WorldTabCells.of(row.build(state))) {
                 GuiComponent component = cell.component();
-                component.setSize(cell.width(), component.naturalSize(Minecraft.getInstance().font::width).height());
-                helper.addChild(ComponentTree.widgetOf(component), cell.span());
+                component.setSize(cell.getWidthPixels(), component.naturalSize(Minecraft.getInstance().font::width).heightPixels());
+                helper.addChild(ComponentTree.toWidget(component), cell.columnCount());
             }
         }
     }

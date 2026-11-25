@@ -1,54 +1,54 @@
 package com.ascendiacore.gui.widget.scrollbar;
 
 public final class Scroll {
-    private final int wheelStep;
-    private int content;
-    private int view;
-    private int offset;
+    private final int wheelStepPixels;
+    private int contentPixels;
+    private int viewPixels;
+    private int offsetPixels;
 
-    public Scroll(int wheelStep) {
-        this.wheelStep = wheelStep;
+    public Scroll(int wheelStepPixels) {
+        this.wheelStepPixels = wheelStepPixels;
     }
 
-    public int content() {
-        return content;
+    public int getContentPixels() {
+        return contentPixels;
     }
 
-    public int view() {
-        return view;
+    public int getViewPixels() {
+        return viewPixels;
     }
 
-    public int offset() {
-        return offset;
+    public int getOffsetPixels() {
+        return offsetPixels;
     }
 
-    public int maxOffset() {
-        return Math.max(0, content - view);
+    public int getMaxOffsetPixels() {
+        return Math.max(0, contentPixels - viewPixels);
     }
 
-    public boolean scrollable() {
-        return maxOffset() > 0;
+    public boolean isScrollable() {
+        return getMaxOffsetPixels() > 0;
     }
 
-    public void setContent(int content) {
-        this.content = Math.max(0, content);
-        scrollTo(offset);
+    public void setContentPixels(int contentPixels) {
+        this.contentPixels = Math.max(0, contentPixels);
+        scrollTo(offsetPixels);
     }
 
-    public void setView(int view) {
-        this.view = Math.max(0, view);
-        scrollTo(offset);
+    public void setViewPixels(int viewPixels) {
+        this.viewPixels = Math.max(0, viewPixels);
+        scrollTo(offsetPixels);
     }
 
-    public void scrollTo(int offset) {
-        this.offset = Math.clamp(offset, 0, maxOffset());
+    public void scrollTo(int offsetPixels) {
+        this.offsetPixels = Math.clamp(offsetPixels, 0, getMaxOffsetPixels());
     }
 
-    public void scrollBy(int delta) {
-        scrollTo(offset + delta);
+    public void scrollBy(int deltaPixels) {
+        scrollTo(offsetPixels + deltaPixels);
     }
 
-    public void wheel(double amount) {
-        scrollBy((int) Math.round(-amount * wheelStep));
+    public void wheel(double notches) {
+        scrollBy((int) Math.round(-notches * wheelStepPixels));
     }
 }

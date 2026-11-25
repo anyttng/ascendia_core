@@ -12,10 +12,10 @@ public sealed interface Length {
     record Natural() implements Length {
     }
 
-    record Flexible(int min, int preferred) implements Length {
+    record Flexible(int minPixels, int preferredPixels) implements Length {
         public Flexible {
-            if (min < 0 || min > preferred) {
-                throw new IllegalArgumentException("A flexible length needs 0 <= min <= preferred: " + min + ", " + preferred);
+            if (minPixels < 0 || minPixels > preferredPixels) {
+                throw new IllegalArgumentException("A flexible length needs 0 <= minPixels <= preferredPixels: " + minPixels + ", " + preferredPixels);
             }
         }
     }
@@ -36,8 +36,8 @@ public sealed interface Length {
         return new Natural();
     }
 
-    static Length flexible(int min, int preferred) {
-        return new Flexible(min, preferred);
+    static Length flexible(int minPixels, int preferredPixels) {
+        return new Flexible(minPixels, preferredPixels);
     }
 
     static Length fill() {

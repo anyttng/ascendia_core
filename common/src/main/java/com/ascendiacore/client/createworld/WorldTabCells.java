@@ -7,12 +7,12 @@ import com.ascendiacore.gui.layout.Container;
 
 final class WorldTabCells {
     static final int COLUMNS = 2;
-    static final int CELL_WIDTH = 150;
-    static final int COLUMN_GAP = 10;
+    static final int CELL_WIDTH_PIXELS = 150;
+    static final int COLUMN_GAP_PIXELS = 10;
 
-    record Cell(GuiComponent component, int span) {
-        int width() {
-            return span * CELL_WIDTH + (span - 1) * COLUMN_GAP;
+    record Cell(GuiComponent component, int columnCount) {
+        int getWidthPixels() {
+            return columnCount * CELL_WIDTH_PIXELS + (columnCount - 1) * COLUMN_GAP_PIXELS;
         }
     }
 
@@ -27,8 +27,8 @@ final class WorldTabCells {
                         + component.getClass().getName());
             }
         }
-        int span = components.size() == 1 ? COLUMNS : 1;
-        return components.stream().map(component -> new Cell(component, span)).toList();
+        int columnCount = components.size() == 1 ? COLUMNS : 1;
+        return components.stream().map(component -> new Cell(component, columnCount)).toList();
     }
 
     private WorldTabCells() {

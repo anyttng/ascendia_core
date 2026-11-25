@@ -9,5 +9,5 @@ public record ButtonStyle(
         int labelColor,
         int disabledLabelColor,
         int selectedLabelColor,
-        boolean labelShadow) {
+        boolean hasLabelShadow) {
 }

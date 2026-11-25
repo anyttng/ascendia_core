@@ -13,7 +13,7 @@ import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import net.minecraft.network.chat.Component;
 
 public final class Label extends GuiComponent {
-    private static final int LINE_HEIGHT = 9;
+    private static final int LINE_HEIGHT_PIXELS = 9;
 
     private final Property<FillStyle> fill;
     private Property<LabelRole> role;
@@ -43,34 +43,34 @@ public final class Label extends GuiComponent {
     }
 
     @Override
-    public boolean interactive() {
+    public boolean isInteractive() {
         return false;
     }
 
     @Override
-    public Component narration() {
+    public Component getNarration() {
         return text.get();
     }
 
     @Override
     public Size naturalSize(TextMetrics metrics) {
-        return new Size(metrics.textWidth(text.get()), LINE_HEIGHT);
+        return new Size(metrics.textWidthPixels(text.get()), LINE_HEIGHT_PIXELS);
     }
 
     @Override
     protected void drawContent(Canvas canvas) {
-        Component shown = TextFit.fit(text.get(), width(), canvas);
+        Component shown = TextFit.fit(text.get(), getWidthPixels(), canvas);
         FillStyle palette = fill.get();
-        int spare = width() - canvas.textWidth(shown);
+        int sparePixels = getWidthPixels() - canvas.textWidthPixels(shown);
         int left = switch (align) {
-            case LEFT -> x();
-            case CENTER -> x() + spare / 2;
-            case RIGHT -> x() + spare;
+            case LEFT -> getX();
+            case CENTER -> getX() + sparePixels / 2;
+            case RIGHT -> getX() + sparePixels;
         };
-        canvas.text(shown, left, y() + (height() - LINE_HEIGHT) / 2, color(palette), palette.inkShadow());
+        canvas.text(shown, left, getY() + (getHeightPixels() - LINE_HEIGHT_PIXELS) / 2, getColor(palette), palette.hasInkShadow());
     }
 
-    private int color(FillStyle palette) {
+    private int getColor(FillStyle palette) {
         return switch (role.get()) {
             case NORMAL -> palette.ink();
             case MUTED -> palette.mutedInk();

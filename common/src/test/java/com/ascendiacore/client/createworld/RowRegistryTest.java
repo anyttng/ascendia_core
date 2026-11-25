@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class RowRegistryTest {
     @Test
     void anEmptyRegistryHoldsNoRow() {
-        assertEquals(List.of(), new RowRegistry().rows(), "nothing registered means nothing to insert");
+        assertEquals(List.of(), new RowRegistry().getRows(), "nothing registered means nothing to insert");
     }
 
     @Test
@@ -22,6 +22,6 @@ class RowRegistryTest {
         registry.add(second);
         registry.add(third);
 
-        assertEquals(List.of(first, second, third), registry.rows(), "rows from several mods keep the order they came in");
+        assertEquals(List.of(first, second, third), registry.getRows(), "rows from several mods keep the order they came in");
     }
 }

@@ -18,17 +18,17 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
-    public String modVersion() {
+    public String getModVersion() {
         return modContainer.getModInfo().getVersion().toString();
     }
 
     @Override
-    public String loaderName() {
+    public String getLoaderName() {
         return "neoforge";
     }
 
     @Override
-    public String loaderVersion() {
+    public String getLoaderVersion() {
         return NeoForgeVersion.getVersion();
     }
 }

@@ -14,17 +14,17 @@ public final class IconView extends GuiComponent {
     }
 
     @Override
-    public boolean interactive() {
+    public boolean isInteractive() {
         return false;
     }
 
     @Override
     public Size naturalSize(TextMetrics metrics) {
-        return new Size(Icon.SIZE, Icon.SIZE);
+        return new Size(Icon.SIZE_PIXELS, Icon.SIZE_PIXELS);
     }
 
     @Override
     protected void drawContent(Canvas canvas) {
-        icon.draw(canvas, x() + (width() - Icon.SIZE) / 2, y() + (height() - Icon.SIZE) / 2);
+        icon.draw(canvas, getX() + (getWidthPixels() - Icon.SIZE_PIXELS) / 2, getY() + (getHeightPixels() - Icon.SIZE_PIXELS) / 2);
     }
 }

@@ -1,9 +1,16 @@
 package com.ascendiacore.client.gui;
 
+import java.util.List;
+import java.util.OptionalInt;
+
 import com.ascendiacore.client.gui.bridge.ComponentTree;
+import com.ascendiacore.gui.base.property.Value;
 import com.ascendiacore.gui.theme.Theme;
+import com.ascendiacore.gui.theme.Themes;
 import com.ascendiacore.gui.widget.panel.Panel;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
+import com.ascendiacore.gui.widget.tabrow.TabRow;
+import com.ascendiacore.gui.widget.tabrow.model.TabContent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,44 +18,64 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 
 public abstract class AscendiaScreen extends Screen {
-    private final Theme theme;
-    private final int panelWidth;
-    private final int panelHeight;
+    private final String themeId;
+    private final int panelWidthPixels;
+    private final int panelHeightPixels;
+    private final Value<Integer> selectedTabIndex = Value.of(0);
 
-    protected AscendiaScreen(Component title, Theme theme, int panelWidth, int panelHeight) {
+    protected AscendiaScreen(Component title, String themeId, int panelWidthPixels, int panelHeightPixels) {
         super(title);
-        this.theme = theme;
-        this.panelWidth = panelWidth;
-        this.panelHeight = panelHeight;
+        this.themeId = themeId;
+        this.panelWidthPixels = panelWidthPixels;
+        this.panelHeightPixels = panelHeightPixels;
     }
 
-    protected Theme theme() {
-        return theme;
+    protected Theme getTheme() {
+        return Themes.get(themeId);
     }
 
-    protected int panelWidth() {
-        return panelWidth;
+    protected int getPanelWidthPixels() {
+        return panelWidthPixels;
     }
 
-    protected int panelHeight() {
-        return panelHeight;
+    protected int getPanelHeightPixels() {
+        return panelHeightPixels;
     }
 
-    protected int panelLeft() {
-        return (this.width - panelWidth) / 2;
+    protected int getPanelLeft() {
+        return (this.width - panelWidthPixels) / 2;
     }
 
-    protected int panelTop() {
-        return (this.height - panelHeight) / 2;
+    protected int getPanelTop() {
+        return (this.height - panelHeightPixels) / 2;
+    }
+
+    protected List<TabContent> getTabs() {
+        return List.of();
+    }
+
+    protected OptionalInt getTabWidthPixels() {
+        return OptionalInt.empty();
+    }
+
+    protected int getSelectedTabIndex() {
+        return selectedTabIndex.get();
+    }
+
+    protected void onTabSelected(int index) {
     }
 
     @Override
     protected final void init() {
-        Panel panel = new Panel(theme.panel(), FillKind.PARCHMENT);
+        List<TabContent> tabs = getTabs();
+        if (!tabs.isEmpty()) {
+            mountTabs(tabs);
+        }
+        Panel panel = new Panel(getTheme().panel(), FillKind.PARCHMENT);
         fillPanel(panel);
         ComponentTree tree = new ComponentTree(panel);
-        tree.setSize(panelWidth, panelHeight);
-        tree.setPosition(panelLeft(), panelTop());
+        tree.setSize(panelWidthPixels, panelHeightPixels);
+        tree.setPosition(getPanelLeft(), getPanelTop());
         tree.visitWidgets(this::addRenderableWidget);
     }
 
@@ -66,5 +93,13 @@ public abstract class AscendiaScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    private void mountTabs(List<TabContent> tabs) {
+        TabRow row = new TabRow(getTheme().tabRow(), tabs, selectedTabIndex, getTabWidthPixels());
+        row.setOnChange(this::onTabSelected);
+        ComponentTree tree = new ComponentTree(row);
+        tree.setPosition(getPanelLeft() + TabRow.PANEL_INSET_PIXELS, getPanelTop() + TabRow.PANEL_OVERLAP_PIXELS - tree.getHeight());
+        tree.visitWidgets(this::addRenderableWidget);
     }
 }

@@ -19,24 +19,24 @@ import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 import net.minecraft.network.chat.Component;
 
 public final class Button extends GuiComponent {
-    private static final int LINE_HEIGHT = 9;
-    private static final int ICON_GAP = 4;
-    private static final int SIDE_PADDING = 8;
-    private static final int LABEL_MARGIN = 5;
-    private static final int HEIGHT = 20;
+    private static final int LINE_HEIGHT_PIXELS = 9;
+    private static final int ICON_GAP_PIXELS = 4;
+    private static final int SIDE_PADDING_PIXELS = 8;
+    private static final int LABEL_MARGIN_PIXELS = 5;
+    private static final int HEIGHT_PIXELS = 20;
 
     private final ButtonStyle style;
-    private final boolean labelDrawn;
+    private final boolean isLabelDrawn;
     private final @Nullable Icon icon;
     private final Consumer<Modifiers> action;
     private Property<Component> label;
     private Property<Boolean> selected = Property.of(false);
 
-    private Button(ButtonStyle style, Component label, boolean labelDrawn, @Nullable Icon icon,
+    private Button(ButtonStyle style, Component label, boolean isLabelDrawn, @Nullable Icon icon,
             Consumer<Modifiers> action) {
         this.style = style;
         this.label = Property.of(label);
-        this.labelDrawn = labelDrawn;
+        this.isLabelDrawn = isLabelDrawn;
         this.icon = icon;
         this.action = action;
     }
@@ -61,12 +61,12 @@ public final class Button extends GuiComponent {
         this.label = label;
     }
 
-    public boolean selected() {
+    public boolean isSelected() {
         return selected.get();
     }
 
-    public void setSelected(boolean selected) {
-        setSelected(Property.of(selected));
+    public void setSelected(boolean isSelected) {
+        setSelected(Property.of(isSelected));
     }
 
     public void setSelected(Property<Boolean> selected) {
@@ -74,32 +74,32 @@ public final class Button extends GuiComponent {
     }
 
     @Override
-    public Component narration() {
+    public Component getNarration() {
         return label.get();
     }
 
     @Override
     public Size naturalSize(TextMetrics metrics) {
-        if (!labelDrawn) {
-            return new Size(HEIGHT, HEIGHT);
+        if (!isLabelDrawn) {
+            return new Size(HEIGHT_PIXELS, HEIGHT_PIXELS);
         }
-        return new Size(iconRoom() + metrics.textWidth(label.get()) + 2 * SIDE_PADDING, HEIGHT);
+        return new Size(getIconRoomPixels() + metrics.textWidthPixels(label.get()) + 2 * SIDE_PADDING_PIXELS, HEIGHT_PIXELS);
     }
 
     @Override
     protected void drawContent(Canvas canvas) {
-        canvas.sprite(sprite(), x(), y(), width(), height());
-        if (!labelDrawn) {
-            drawIcon(canvas, x() + (width() - Icon.SIZE) / 2);
+        canvas.sprite(getSprite(), getX(), getY(), getWidthPixels(), getHeightPixels());
+        if (!isLabelDrawn) {
+            drawIcon(canvas, getX() + (getWidthPixels() - Icon.SIZE_PIXELS) / 2);
             return;
         }
         Component text = label.get();
-        int textWidth = canvas.textWidth(text);
-        int room = width() - 2 * LABEL_MARGIN - iconRoom();
-        if (textWidth > room) {
-            drawScrolling(canvas, text, textWidth, room);
+        int textWidthPixels = canvas.textWidthPixels(text);
+        int roomPixels = getWidthPixels() - 2 * LABEL_MARGIN_PIXELS - getIconRoomPixels();
+        if (textWidthPixels > roomPixels) {
+            drawScrolling(canvas, text, textWidthPixels, roomPixels);
         } else {
-            drawCentered(canvas, text, textWidth);
+            drawCentered(canvas, text, textWidthPixels);
         }
     }
 
@@ -109,7 +109,7 @@ public final class Button extends GuiComponent {
     }
 
     @Override
-    protected boolean onKey(KeyInput input) {
+    protected boolean tryHandleKey(KeyInput input) {
         if (!input.isSelection()) {
             return false;
         }
@@ -117,40 +117,40 @@ public final class Button extends GuiComponent {
         return true;
     }
 
-    private void drawCentered(Canvas canvas, Component text, int textWidth) {
-        int left = x() + (width() - iconRoom() - textWidth) / 2;
+    private void drawCentered(Canvas canvas, Component text, int textWidthPixels) {
+        int left = getX() + (getWidthPixels() - getIconRoomPixels() - textWidthPixels) / 2;
         drawIcon(canvas, left);
-        drawLabel(canvas, text, left + iconRoom());
+        drawLabel(canvas, text, left + getIconRoomPixels());
     }
 
-    private void drawScrolling(Canvas canvas, Component text, int textWidth, int room) {
-        int left = x() + LABEL_MARGIN;
+    private void drawScrolling(Canvas canvas, Component text, int textWidthPixels, int roomPixels) {
+        int left = getX() + LABEL_MARGIN_PIXELS;
         drawIcon(canvas, left);
-        int textLeft = left + iconRoom();
-        canvas.pushClip(textLeft, y(), room, height());
-        drawLabel(canvas, text, textLeft - Marquee.offset(textWidth, room, canvas.frameTimeMillis()));
+        int textLeft = left + getIconRoomPixels();
+        canvas.pushClip(textLeft, getY(), roomPixels, getHeightPixels());
+        drawLabel(canvas, text, textLeft - Marquee.offsetPixels(textWidthPixels, roomPixels, canvas.getFrameTimeMillis()));
         canvas.popClip();
     }
 
     private void drawIcon(Canvas canvas, int left) {
         if (icon != null) {
-            icon.draw(canvas, left, y() + (height() - Icon.SIZE) / 2);
+            icon.draw(canvas, left, getY() + (getHeightPixels() - Icon.SIZE_PIXELS) / 2);
         }
     }
 
     private void drawLabel(Canvas canvas, Component text, int left) {
-        canvas.text(text, left, y() + (height() - LINE_HEIGHT) / 2 + 1, labelColor(), style.labelShadow());
+        canvas.text(text, left, getY() + (getHeightPixels() - LINE_HEIGHT_PIXELS) / 2 + 1, getLabelColor(), style.hasLabelShadow());
     }
 
-    private int labelColor() {
-        if (!enabled()) {
+    private int getLabelColor() {
+        if (!isEnabled()) {
             return style.disabledLabelColor();
         }
-        return selected() ? style.selectedLabelColor() : style.labelColor();
+        return isSelected() ? style.selectedLabelColor() : style.labelColor();
     }
 
-    private int iconRoom() {
-        return icon == null ? 0 : Icon.SIZE + ICON_GAP;
+    private int getIconRoomPixels() {
+        return icon == null ? 0 : Icon.SIZE_PIXELS + ICON_GAP_PIXELS;
     }
 
     private void activate(Modifiers modifiers) {
@@ -158,14 +158,14 @@ public final class Button extends GuiComponent {
         action.accept(modifiers);
     }
 
-    private String sprite() {
-        if (!enabled()) {
+    private String getSprite() {
+        if (!isEnabled()) {
             return style.disabled();
         }
-        boolean highlighted = hovered() || focused();
-        if (selected()) {
-            return highlighted ? style.selectedHover() : style.selected();
+        boolean isHighlighted = isHovered() || isFocused();
+        if (isSelected()) {
+            return isHighlighted ? style.selectedHover() : style.selected();
         }
-        return highlighted ? style.hover() : style.normal();
+        return isHighlighted ? style.hover() : style.normal();
     }
 }

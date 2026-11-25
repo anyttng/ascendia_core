@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.hint.Hint;
-import com.ascendiacore.gui.base.hint.model.HintValue;
+import com.ascendiacore.gui.base.hint.ValueHint;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.property.Property;
 import com.ascendiacore.gui.base.property.Value;
@@ -15,16 +15,12 @@ import com.ascendiacore.gui.layout.model.Axis;
 import com.ascendiacore.gui.widget.button.Button;
 import com.ascendiacore.gui.widget.button.model.ButtonStyle;
 
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public final class CycleButton<T> extends Container {
     private static final int FORWARD = 1;
     private static final int BACK = -1;
-    private static final String HINT_PREFIX = ".hint.";
-    private static final String INTRO = "intro";
-    private static final String NOTE = "note";
     private static final String PREVIOUS_VALUE_KEY = "gui.ascendia_core.cycle_button.previous_value";
 
     private final Component name;
@@ -32,7 +28,7 @@ public final class CycleButton<T> extends Container {
     private final Value<T> chosen;
     private final Function<T, Component> valueName;
     private final Button button;
-    private boolean valueOnly;
+    private boolean isValueOnly;
     private Consumer<T> onChange = picked -> {
     };
 
@@ -44,7 +40,7 @@ public final class CycleButton<T> extends Container {
         this.chosen = chosen;
         this.valueName = valueName;
         this.button = Button.text(style, name, this::step);
-        this.button.setLabel(this::label);
+        this.button.setLabel(this::getLabel);
         add(button);
     }
 
@@ -54,43 +50,39 @@ public final class CycleButton<T> extends Container {
     }
 
     public void setHint(TooltipStyle style, String captionKey, Function<T, String> valueKey, Consumer<Hint> otherKinds) {
-        String prefix = captionKey + HINT_PREFIX;
+        setHintOf(style, captionKey, value -> ValueHint.text(captionKey, valueKey.apply(value)), otherKinds);
+    }
+
+    public void setValueHints(TooltipStyle style, String captionKey, Function<T, Component> valueHint) {
+        setHintOf(style, captionKey, valueHint, hint -> {
+        });
+    }
+
+    private void setHintOf(TooltipStyle style, String captionKey, Function<T, Component> valueHint,
+            Consumer<Hint> otherKinds) {
         button.setTooltip(style, () -> {
-            Hint hint = Hint.of(style)
-                    .intro(optional(prefix + INTRO))
-                    .values(hintValues(prefix, valueKey))
-                    .note(optional(prefix + NOTE))
-                    .keyHint(keyHint());
+            Hint hint = ValueHint.of(style, captionKey, values.get(), chosen.get(), valueName, valueHint)
+                    .keyHint(getKeyHint());
             otherKinds.accept(hint);
             return hint.build();
         });
     }
 
-    private List<HintValue> hintValues(String prefix, Function<T, String> valueKey) {
-        T current = chosen.get();
-        return values.get().stream().map(value -> new HintValue(valueName.apply(value),
-                Component.translatable(prefix + valueKey.apply(value)), value.equals(current))).toList();
-    }
-
-    private Component keyHint() {
+    private Component getKeyHint() {
         return values.get().size() > 1 ? Component.translatable(PREVIOUS_VALUE_KEY) : Component.empty();
     }
 
-    private static Component optional(String key) {
-        return Language.getInstance().has(key) ? Component.translatable(key) : Component.empty();
-    }
-
     public void showValueOnly() {
-        valueOnly = true;
+        isValueOnly = true;
     }
 
     public void setOnChange(Consumer<T> onChange) {
         this.onChange = onChange;
     }
 
-    private Component label() {
+    private Component getLabel() {
         Component value = valueName.apply(chosen.get());
-        return valueOnly ? value : CommonComponents.optionNameValue(name, value);
+        return isValueOnly ? value : CommonComponents.optionNameValue(name, value);
     }
 
     private void step(Modifiers modifiers) {
@@ -98,16 +90,16 @@ public final class CycleButton<T> extends Container {
         if (list.isEmpty()) {
             return;
         }
-        int delta = modifiers.shift() ? BACK : FORWARD;
+        int delta = modifiers.isShiftDown() ? BACK : FORWARD;
         T picked = list.get(nextIndex(list.indexOf(chosen.get()), delta, list.size()));
         chosen.set(picked);
         onChange.accept(picked);
     }
 
-    private static int nextIndex(int index, int delta, int size) {
+    private static int nextIndex(int index, int delta, int valueCount) {
         if (index < 0) {
-            return delta == FORWARD ? 0 : size - 1;
+            return delta == FORWARD ? 0 : valueCount - 1;
         }
-        return Math.floorMod(index + delta, size);
+        return Math.floorMod(index + delta, valueCount);
     }
 }
