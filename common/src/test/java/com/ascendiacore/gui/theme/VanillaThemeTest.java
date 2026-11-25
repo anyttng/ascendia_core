@@ -17,15 +17,16 @@ class VanillaThemeTest {
     private static final int YELLOW = 0xFFFFFF55;
     private static final int PALE_GRAY = 0xFFE0E0E0;
     private static final int LIGHT_GRAY = 0xFFC6C6C6;
-    private static final int GRAY = 0xFF8B8B8B;
+    private static final int GRAY = 0xFFA0A0A0;
     private static final int DARK_GRAY = 0xFF373737;
     private static final int CHARCOAL = 0xFF3F3F3F;
-    private static final int STONE_GRAY = 0xFF555555;
     private static final int DISABLED_LABEL = 0xFFA0A0A0;
-    private static final int DISABLED_LINK = 0xFF707070;
+    private static final int FIELD_GRAY = 0xFF838383;
     private static final int BLUE = 0xFF2A3FC0;
     private static final int PALE_BLUE = 0xFFA0A0FF;
-    private static final int RED = 0xFFFF5555;
+    private static final int PALE_RED = 0xFFFF7979;
+    private static final int MAROON = 0xFF6A0000;
+    private static final int NAVY = 0xFF1B2A8A;
     private static final int DARK_RED = 0xFFAA0000;
     private static final String GAME_SPRITES = "minecraft:";
     private static final String OWN_SPRITES = "ascendia_core:theme/vanilla/";
@@ -73,10 +74,10 @@ class VanillaThemeTest {
     }
 
     @Test
-    void textFieldColorsAreTheGamesFieldColors() {
+    void textFieldTextIsPaleGrayAndItsDisabledTextAndPlaceholderShareOneGray() {
         assertEquals(PALE_GRAY, THEME.textField().textColor());
-        assertEquals(DISABLED_LINK, THEME.textField().disabledTextColor());
-        assertEquals(STONE_GRAY, THEME.textField().placeholderColor());
+        assertEquals(FIELD_GRAY, THEME.textField().disabledTextColor());
+        assertEquals(FIELD_GRAY, THEME.textField().placeholderColor());
         assertTrue(THEME.textField().hasTextShadow());
     }
 
@@ -119,18 +120,20 @@ class VanillaThemeTest {
     }
 
     @Test
-    void errorInkIsDarkRedOnLightAndMidGrayAndRedOnDark() {
+    void errorInkIsDarkRedOnLightMaroonOnMidGrayAndPaleRedOnDark() {
         assertEquals(DARK_RED, THEME.inset().fills().getFill(FillKind.PARCHMENT).errorInk());
-        assertEquals(DARK_RED, THEME.inset().fills().getFill(FillKind.PAGE).errorInk());
-        assertEquals(RED, THEME.inset().fills().getFill(FillKind.DARK).errorInk());
+        assertEquals(MAROON, THEME.inset().fills().getFill(FillKind.PAGE).errorInk());
+        assertEquals(PALE_RED, THEME.inset().fills().getFill(FillKind.DARK).errorInk());
         for (FillKind kind : FillKind.values()) {
-            assertEquals(RED, THEME.panel().fills().getFill(kind).errorInk());
+            assertEquals(PALE_RED, THEME.panel().fills().getFill(kind).errorInk());
         }
     }
 
     @Test
-    void linkIsBlueOnLightAndPaleBlueOnDark() {
+    void linkIsBlueOnLightNavyOnMidAndPaleBlueOnDark() {
         assertEquals(BLUE, THEME.link().getColors(FillKind.PARCHMENT).normal());
+        assertEquals(NAVY, THEME.link().getColors(FillKind.PAGE).normal());
+        assertEquals(NAVY, THEME.link().getColors(FillKind.PAGE).hover());
         assertEquals(PALE_BLUE, THEME.link().getColors(FillKind.DARK).normal());
     }
 }

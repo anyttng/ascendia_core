@@ -18,11 +18,11 @@ class BookThemeTest {
     private static final int DARK_LEATHER = 0xFF4C1A0B;
     private static final int LEATHER = 0xFF853E29;
     private static final int GOLD = 0xFFF7D98A;
-    private static final int FADED = 0xFFA89A85;
+    private static final int FADED = 0xFF908067;
     private static final int TAN = 0xFFC5AB88;
     private static final int CHARCOAL = 0xFF3E3A35;
-    private static final int SAND = 0xFFB9A78C;
-    private static final int RED = 0xFFFF5555;
+    private static final int SAND = 0xFF9F8661;
+    private static final int PALE_RED = 0xFFFFACAC;
     private static final int DARK_RED = 0xFFAA0000;
     private static final String OWN_SPRITES = "ascendia_core:theme/book/";
     private static final Theme THEME = TestThemes.BOOK;
@@ -84,10 +84,10 @@ class BookThemeTest {
     }
 
     @Test
-    void errorInkIsDarkRedOnTheLightFillsAndRedOnSlate() {
+    void errorInkIsDarkRedOnTheLightFillsAndPaleRedOnSlate() {
         assertEquals(DARK_RED, THEME.panel().fills().getFill(FillKind.PARCHMENT).errorInk());
         assertEquals(DARK_RED, THEME.panel().fills().getFill(FillKind.PAGE).errorInk());
-        assertEquals(RED, THEME.panel().fills().getFill(FillKind.DARK).errorInk());
+        assertEquals(PALE_RED, THEME.panel().fills().getFill(FillKind.DARK).errorInk());
     }
 
     @Test
