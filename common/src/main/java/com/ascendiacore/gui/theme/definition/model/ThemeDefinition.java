@@ -1,6 +1,7 @@
 package com.ascendiacore.gui.theme.definition.model;
 
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
+import com.ascendiacore.gui.widget.slider.model.SliderStyle;
 import com.ascendiacore.gui.widget.toggleswitch.model.ToggleSwitchStyle;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -15,7 +16,8 @@ public record ThemeDefinition(
         ScrollbarStyle scrollbar,
         TooltipSection tooltip,
         TextFieldSection textField,
-        ToggleSwitchStyle toggleSwitch) {
+        ToggleSwitchStyle toggleSwitch,
+        SliderStyle slider) {
     private static final String ROLES_KEY = "roles";
     private static final String BUTTON_KEY = "button";
     private static final String PANEL_KEY = "panel";
@@ -26,6 +28,7 @@ public record ThemeDefinition(
     private static final String TOOLTIP_KEY = "tooltip";
     private static final String TEXT_FIELD_KEY = "text_field";
     private static final String TOGGLE_SWITCH_KEY = "toggle_switch";
+    private static final String SLIDER_KEY = "slider";
 
     public static final Codec<ThemeDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ColorRoles.CODEC.fieldOf(ROLES_KEY).forGetter(ThemeDefinition::roles),
@@ -37,6 +40,7 @@ public record ThemeDefinition(
             ThemeCodecs.SCROLLBAR.fieldOf(SCROLLBAR_KEY).forGetter(ThemeDefinition::scrollbar),
             TooltipSection.CODEC.fieldOf(TOOLTIP_KEY).forGetter(ThemeDefinition::tooltip),
             TextFieldSection.CODEC.fieldOf(TEXT_FIELD_KEY).forGetter(ThemeDefinition::textField),
-            ThemeCodecs.TOGGLE_SWITCH.fieldOf(TOGGLE_SWITCH_KEY).forGetter(ThemeDefinition::toggleSwitch))
+            ThemeCodecs.TOGGLE_SWITCH.fieldOf(TOGGLE_SWITCH_KEY).forGetter(ThemeDefinition::toggleSwitch),
+            ThemeCodecs.SLIDER.fieldOf(SLIDER_KEY).forGetter(ThemeDefinition::slider))
             .apply(instance, ThemeDefinition::new));
 }

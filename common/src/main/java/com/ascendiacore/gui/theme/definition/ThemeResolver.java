@@ -33,7 +33,8 @@ public final class ThemeResolver {
         return new Theme(id, button(definition.button(), roles), panel(definition.panel(), roles),
                 inset(definition.inset(), roles), link(definition.link(), roles),
                 list(definition.list(), definition.button().surface(), roles), definition.scrollbar(),
-                tooltip(definition.tooltip(), roles), textField(definition.textField(), roles), definition.toggleSwitch());
+                tooltip(definition.tooltip(), roles), textField(definition.textField(), roles), definition.toggleSwitch(),
+                definition.slider());
     }
 
     private static ButtonStyle button(ButtonSection section, ColorRoles roles) {

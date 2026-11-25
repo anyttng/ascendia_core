@@ -4,6 +4,7 @@ import com.ascendiacore.gui.widget.panel.model.FillKind;
 import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import com.ascendiacore.gui.widget.panel.model.FrameStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
+import com.ascendiacore.gui.widget.slider.model.SliderStyle;
 import com.ascendiacore.gui.widget.toggleswitch.model.ToggleSwitchStyle;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -36,6 +37,9 @@ public final class ThemeCodecs {
     private static final String ON_HOVER_KEY = "on_hover";
     private static final String OFF_DISABLED_KEY = "off_disabled";
     private static final String ON_DISABLED_KEY = "on_disabled";
+    private static final String HANDLE_KEY = "handle";
+    private static final String HANDLE_HOVER_KEY = "handle_hover";
+    private static final String HANDLE_DISABLED_KEY = "handle_disabled";
 
     public static final Codec<Integer> COLOR = Codec.withAlternative(ExtraCodecs.STRING_RGB_COLOR, ExtraCodecs.STRING_ARGB_COLOR);
 
@@ -68,6 +72,13 @@ public final class ThemeCodecs {
             Codec.STRING.fieldOf(OFF_DISABLED_KEY).forGetter(ToggleSwitchStyle::offDisabled),
             Codec.STRING.fieldOf(ON_DISABLED_KEY).forGetter(ToggleSwitchStyle::onDisabled))
             .apply(instance, ToggleSwitchStyle::new));
+
+    public static final Codec<SliderStyle> SLIDER = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.fieldOf(TRACK_KEY).forGetter(SliderStyle::track),
+            Codec.STRING.fieldOf(HANDLE_KEY).forGetter(SliderStyle::handle),
+            Codec.STRING.fieldOf(HANDLE_HOVER_KEY).forGetter(SliderStyle::handleHover),
+            Codec.STRING.fieldOf(HANDLE_DISABLED_KEY).forGetter(SliderStyle::handleDisabled))
+            .apply(instance, SliderStyle::new));
 
     private ThemeCodecs() {
     }

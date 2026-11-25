@@ -69,5 +69,11 @@
     "on_hover": "ascendia_core:theme/vanilla/toggle_switch/on_hover",
     "off_disabled": "ascendia_core:theme/vanilla/toggle_switch/off_disabled",
     "on_disabled": "ascendia_core:theme/vanilla/toggle_switch/on_disabled"
+  },
+  "slider": {
+    "track": "minecraft:widget/slider",
+    "handle": "minecraft:widget/slider_handle",
+    "handle_hover": "minecraft:widget/slider_handle_highlighted",
+    "handle_disabled": "ascendia_core:theme/vanilla/slider/handle_disabled"
   }
 }

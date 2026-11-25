@@ -7,6 +7,7 @@ import com.ascendiacore.gui.widget.list.model.ListStyle;
 import com.ascendiacore.gui.widget.panel.model.InsetStyle;
 import com.ascendiacore.gui.widget.panel.model.PanelStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
+import com.ascendiacore.gui.widget.slider.model.SliderStyle;
 import com.ascendiacore.gui.widget.textfield.model.TextFieldStyle;
 import com.ascendiacore.gui.widget.toggleswitch.model.ToggleSwitchStyle;
 
@@ -20,5 +21,6 @@ public record Theme(
         ScrollbarStyle scrollbar,
         TooltipStyle tooltip,
         TextFieldStyle textField,
-        ToggleSwitchStyle toggleSwitch) {
+        ToggleSwitchStyle toggleSwitch,
+        SliderStyle slider) {
 }
