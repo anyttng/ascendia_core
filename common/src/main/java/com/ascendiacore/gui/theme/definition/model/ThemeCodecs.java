@@ -1,8 +1,10 @@
 package com.ascendiacore.gui.theme.definition.model;
 
+import com.ascendiacore.AscendiaCore;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 import com.ascendiacore.gui.widget.panel.model.FillStyle;
 import com.ascendiacore.gui.widget.panel.model.FrameStyle;
+import com.ascendiacore.gui.widget.progressbar.model.ProgressBarStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
 import com.ascendiacore.gui.widget.slider.model.SliderStyle;
 import com.ascendiacore.gui.widget.tabrow.model.TabRowStyle;
@@ -32,6 +34,7 @@ public final class ThemeCodecs {
     public static final String LABEL_KEY = "label";
     public static final String SELECTED_LABEL_KEY = "selected_label";
     public static final String HAS_LABEL_SHADOW_KEY = "has_label_shadow";
+    public static final String SHARED_PROGRESS_BAR_FILL = AscendiaCore.MODID + ":theme/shared/progress_bar/fill";
     private static final String SPRITE_KEY = "sprite";
     private static final String BORDER_PIXELS_KEY = "border_pixels";
     private static final String TRACK_KEY = "track";
@@ -47,6 +50,7 @@ public final class ThemeCodecs {
     private static final String HANDLE_HOVER_KEY = "handle_hover";
     private static final String HANDLE_DISABLED_KEY = "handle_disabled";
     private static final String HOVER_LABEL_KEY = "hover_label";
+    private static final String TRACK_LIGHT_KEY = "track_light";
 
     public static final Codec<Integer> COLOR = Codec.withAlternative(ExtraCodecs.STRING_RGB_COLOR, ExtraCodecs.STRING_ARGB_COLOR);
 
@@ -97,6 +101,12 @@ public final class ThemeCodecs {
             COLOR.fieldOf(SELECTED_LABEL_KEY).forGetter(TabRowStyle::selectedLabelColor),
             Codec.BOOL.fieldOf(HAS_LABEL_SHADOW_KEY).forGetter(TabRowStyle::hasLabelShadow))
             .apply(instance, TabRowStyle::new));
+
+    public static final Codec<ProgressBarStyle> PROGRESS_BAR = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.fieldOf(TRACK_KEY).forGetter(ProgressBarStyle::track),
+            Codec.STRING.fieldOf(TRACK_LIGHT_KEY).forGetter(ProgressBarStyle::trackLight),
+            Codec.STRING.optionalFieldOf(FILL_KEY, SHARED_PROGRESS_BAR_FILL).forGetter(ProgressBarStyle::fill))
+            .apply(instance, ProgressBarStyle::new));
 
     private ThemeCodecs() {
     }

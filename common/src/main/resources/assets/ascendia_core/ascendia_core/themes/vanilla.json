@@ -85,5 +85,9 @@
     "hover_label": "#FFFFA0",
     "selected_label": "#3F3F3F",
     "has_label_shadow": false
+  },
+  "progress_bar": {
+    "track": "ascendia_core:theme/vanilla/progress_bar/track",
+    "track_light": "ascendia_core:theme/vanilla/progress_bar/track_light"
   }
 }
