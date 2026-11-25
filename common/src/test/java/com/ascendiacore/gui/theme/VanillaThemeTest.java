@@ -21,7 +21,8 @@ class VanillaThemeTest {
     private static final int DARK_GRAY = 0xFF373737;
     private static final int CHARCOAL = 0xFF3F3F3F;
     private static final int DISABLED_LABEL = 0xFFA0A0A0;
-    private static final int FIELD_GRAY = 0xFF838383;
+    private static final int DISABLED_FIELD_GRAY = 0xFF9A9A9A;
+    private static final int PLACEHOLDER_GRAY = 0xFF838383;
     private static final int BLUE = 0xFF2A3FC0;
     private static final int PALE_BLUE = 0xFFA0A0FF;
     private static final int PALE_RED = 0xFFFF7979;
@@ -67,17 +68,17 @@ class VanillaThemeTest {
     }
 
     @Test
-    void textFieldDrawsWithTheGamesSpritesAndKeepsItsFrameWhenDisabled() {
+    void textFieldDrawsWithTheGamesSpritesAndOurOwnWhenDisabledSinceTheGameHasNone() {
         assertEquals("minecraft:widget/text_field", THEME.textField().normal());
         assertEquals("minecraft:widget/text_field_highlighted", THEME.textField().focused());
-        assertEquals(THEME.textField().normal(), THEME.textField().disabled());
+        assertEquals(OWN_SPRITES + "text_field/disabled", THEME.textField().disabled());
     }
 
     @Test
-    void textFieldTextIsPaleGrayAndItsDisabledTextAndPlaceholderShareOneGray() {
+    void textFieldTextIsPaleGrayAndItsDisabledTextIsLighterThanItsPlaceholder() {
         assertEquals(PALE_GRAY, THEME.textField().textColor());
-        assertEquals(FIELD_GRAY, THEME.textField().disabledTextColor());
-        assertEquals(FIELD_GRAY, THEME.textField().placeholderColor());
+        assertEquals(DISABLED_FIELD_GRAY, THEME.textField().disabledTextColor());
+        assertEquals(PLACEHOLDER_GRAY, THEME.textField().placeholderColor());
         assertTrue(THEME.textField().hasTextShadow());
     }
 

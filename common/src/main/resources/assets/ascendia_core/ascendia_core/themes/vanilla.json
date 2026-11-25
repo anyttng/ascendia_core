@@ -57,9 +57,9 @@
     "surface": "dark",
     "normal": "minecraft:widget/text_field",
     "focused": "minecraft:widget/text_field_highlighted",
-    "disabled": "minecraft:widget/text_field",
+    "disabled": "ascendia_core:theme/vanilla/text_field/disabled",
     "text": "#E0E0E0",
-    "disabled_text": "#838383",
+    "disabled_text": "#9A9A9A",
     "placeholder": "#838383"
   },
   "toggle_switch": {
