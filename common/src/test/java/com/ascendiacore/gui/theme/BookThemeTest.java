@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import com.ascendiacore.gui.theme.definition.model.ThemeCodecs;
 import com.ascendiacore.gui.widget.list.model.RowStyle;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 
@@ -51,6 +52,13 @@ class BookThemeTest {
                 THEME.slider().handleDisabled());
         assertTrue(sprites.stream().allMatch(sprite -> sprite.startsWith(OWN_SPRITES)));
         assertEquals(sprites.size(), Set.copyOf(sprites).size());
+    }
+
+    @Test
+    void progressBarDrawsOurOwnTwoTracksAndTakesTheSharedFill() {
+        assertEquals(OWN_SPRITES + "progress_bar/track", THEME.progressBar().track());
+        assertEquals(OWN_SPRITES + "progress_bar/track_light", THEME.progressBar().trackLight());
+        assertEquals(ThemeCodecs.SHARED_PROGRESS_BAR_FILL, THEME.progressBar().fill());
     }
 
     @Test

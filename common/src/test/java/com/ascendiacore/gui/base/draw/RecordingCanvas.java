@@ -12,6 +12,9 @@ public final class RecordingCanvas implements Canvas {
     public record Sprite(String sprite, int x, int y, int widthPixels, int heightPixels) {
     }
 
+    public record Tint(String sprite, int color) {
+    }
+
     public record Fill(int x, int y, int widthPixels, int heightPixels, int color) {
     }
 
@@ -19,6 +22,7 @@ public final class RecordingCanvas implements Canvas {
     }
 
     private final List<Sprite> sprites = new ArrayList<>();
+    private final List<Tint> tints = new ArrayList<>();
     private final List<Fill> fills = new ArrayList<>();
     private final List<Text> texts = new ArrayList<>();
     private final List<Rect> clips = new ArrayList<>();
@@ -42,6 +46,10 @@ public final class RecordingCanvas implements Canvas {
         return sprites;
     }
 
+    public List<Tint> tints() {
+        return tints;
+    }
+
     public List<Fill> fills() {
         return fills;
     }
@@ -62,6 +70,7 @@ public final class RecordingCanvas implements Canvas {
     @Override
     public void sprite(String sprite, int x, int y, int widthPixels, int heightPixels, int tint) {
         sprite(sprite, x, y, widthPixels, heightPixels);
+        tints.add(new Tint(sprite, tint));
     }
 
     @Override

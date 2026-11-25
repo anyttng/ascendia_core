@@ -77,6 +77,12 @@ class VanillaThemeTest {
     }
 
     @Test
+    void progressBarTracksAreOurOwnSinceTheGameHasNoGeneralBar() {
+        assertEquals(OWN_SPRITES + "progress_bar/track", THEME.progressBar().track());
+        assertEquals(OWN_SPRITES + "progress_bar/track_light", THEME.progressBar().trackLight());
+    }
+
+    @Test
     void tabRowDrawsOurOwnStoneSpritesSinceTheGamesSelectedTabIsAnEmptyFrame() {
         assertEquals(OWN_SPRITES + "tab_row/normal", THEME.tabRow().normal());
         assertEquals(OWN_SPRITES + "tab_row/hover", THEME.tabRow().hover());

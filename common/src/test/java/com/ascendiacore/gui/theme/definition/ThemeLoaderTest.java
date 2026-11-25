@@ -16,6 +16,8 @@ import com.ascendiacore.gui.theme.definition.model.ThemeSource;
 
 class ThemeLoaderTest {
     private static final String INLINE_PACK = "inline";
+    private static final String TRACK_LIGHT_LINE = "\"track_light\": \"ascendia_core:theme/book/progress_bar/track_light\"";
+    private static final String OWN_FILL = "example_mod:theme/example/progress_bar/fill";
 
     @Test
     void aBrokenFileOnTopGivesWayToTheOneBelow() {
@@ -39,6 +41,14 @@ class ThemeLoaderTest {
         String file = TestThemes.text(Themes.BOOK).replace("\"text\": \"#3E3A35\",", "\"text\": \"#123456\",");
         Theme theme = ThemeLoader.load(Themes.BOOK, List.of(inlineSource(file))).orElseThrow();
         assertEquals(0xFF123456, theme.textField().textColor());
+    }
+
+    @Test
+    void aNamedProgressBarFillTakesThePlaceOfTheSharedOne() {
+        String file = TestThemes.text(Themes.BOOK).replace(TRACK_LIGHT_LINE,
+                TRACK_LIGHT_LINE + ", \"fill\": \"" + OWN_FILL + "\"");
+        Theme theme = ThemeLoader.load(Themes.BOOK, List.of(inlineSource(file))).orElseThrow();
+        assertEquals(OWN_FILL, theme.progressBar().fill());
     }
 
     private static ThemeSource inlineSource(String json) {

@@ -34,7 +34,7 @@ public final class ThemeResolver {
                 inset(definition.inset(), roles), link(definition.link(), roles),
                 list(definition.list(), definition.button().surface(), roles), definition.scrollbar(),
                 tooltip(definition.tooltip(), roles), textField(definition.textField(), roles), definition.toggleSwitch(),
-                definition.slider(), definition.tabRow());
+                definition.slider(), definition.tabRow(), definition.progressBar());
     }
 
     private static ButtonStyle button(ButtonSection section, ColorRoles roles) {
