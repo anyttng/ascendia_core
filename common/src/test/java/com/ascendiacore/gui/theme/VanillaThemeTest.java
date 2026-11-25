@@ -68,6 +68,14 @@ class VanillaThemeTest {
     }
 
     @Test
+    void sliderDrawsWithTheGamesSpritesAndOurOwnHandleWhenDisabledSinceTheGameHasNone() {
+        assertEquals("minecraft:widget/slider", THEME.slider().track());
+        assertEquals("minecraft:widget/slider_handle", THEME.slider().handle());
+        assertEquals("minecraft:widget/slider_handle_highlighted", THEME.slider().handleHover());
+        assertEquals(OWN_SPRITES + "slider/handle_disabled", THEME.slider().handleDisabled());
+    }
+
+    @Test
     void textFieldDrawsWithTheGamesSpritesAndOurOwnWhenDisabledSinceTheGameHasNone() {
         assertEquals("minecraft:widget/text_field", THEME.textField().normal());
         assertEquals("minecraft:widget/text_field_highlighted", THEME.textField().focused());

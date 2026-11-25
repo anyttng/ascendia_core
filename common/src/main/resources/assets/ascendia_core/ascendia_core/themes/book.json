@@ -63,5 +63,11 @@
     "on_hover": "ascendia_core:theme/book/toggle_switch/on_hover",
     "off_disabled": "ascendia_core:theme/book/toggle_switch/off_disabled",
     "on_disabled": "ascendia_core:theme/book/toggle_switch/on_disabled"
+  },
+  "slider": {
+    "track": "ascendia_core:theme/book/slider/track",
+    "handle": "ascendia_core:theme/book/slider/handle",
+    "handle_hover": "ascendia_core:theme/book/slider/handle_hover",
+    "handle_disabled": "ascendia_core:theme/book/slider/handle_disabled"
   }
 }
