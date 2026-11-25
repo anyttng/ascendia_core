@@ -15,7 +15,7 @@ import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.model.Key;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
-import com.ascendiacore.gui.theme.Themes;
+import com.ascendiacore.gui.theme.TestThemes;
 import com.ascendiacore.gui.widget.link.model.LinkColors;
 import com.ascendiacore.gui.widget.link.model.LinkStyle;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
@@ -102,7 +102,7 @@ class LinkTest {
 
     @Test
     void styleGivesTheDarkColorsOnADarkFillAndTheLightOnesElsewhere() {
-        LinkStyle style = Themes.BOOK.link();
+        LinkStyle style = TestThemes.BOOK.link();
         assertEquals(style.onDark(), style.getColors(FillKind.DARK));
         assertEquals(style.onLight(), style.getColors(FillKind.PARCHMENT));
         assertEquals(style.onLight(), style.getColors(FillKind.PAGE));

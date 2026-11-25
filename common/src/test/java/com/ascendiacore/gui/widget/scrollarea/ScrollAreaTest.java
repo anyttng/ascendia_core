@@ -19,7 +19,7 @@ import com.ascendiacore.gui.base.input.WheelInput;
 import com.ascendiacore.gui.base.input.model.Modifiers;
 import com.ascendiacore.gui.base.input.model.PointerButton;
 import com.ascendiacore.gui.layout.Column;
-import com.ascendiacore.gui.theme.Themes;
+import com.ascendiacore.gui.theme.TestThemes;
 import com.ascendiacore.gui.widget.scrollbar.Scrollbar;
 
 class ScrollAreaTest {
@@ -148,7 +148,7 @@ class ScrollAreaTest {
         Column content = new Column();
         List<Item> items = IntStream.range(0, count).mapToObj(index -> new Item(isInteractive)).toList();
         items.forEach(content::add);
-        ScrollArea area = new ScrollArea(Themes.BOOK.scrollbar(), content);
+        ScrollArea area = new ScrollArea(TestThemes.BOOK.scrollbar(), content);
         area.setPosition(LEFT, TOP);
         area.setSize(WIDTH_PIXELS, HEIGHT_PIXELS);
         Stage stage = new Stage(area, items);
