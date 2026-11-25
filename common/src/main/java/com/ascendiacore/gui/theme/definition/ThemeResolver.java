@@ -19,6 +19,7 @@ import com.ascendiacore.gui.widget.link.model.LinkStyle;
 import com.ascendiacore.gui.widget.list.model.ListStyle;
 import com.ascendiacore.gui.widget.panel.model.FillKind;
 import com.ascendiacore.gui.widget.panel.model.FillStyle;
+import com.ascendiacore.gui.widget.panel.model.Fills;
 import com.ascendiacore.gui.widget.panel.model.InsetStyle;
 import com.ascendiacore.gui.widget.panel.model.PanelStyle;
 import com.ascendiacore.gui.widget.textfield.model.TextFieldStyle;
@@ -44,7 +45,13 @@ public final class ThemeResolver {
     }
 
     private static PanelStyle panel(PanelSection section, ColorRoles roles) {
-        return new PanelStyle(section.frame(), section.fills().applyTo(roles.getSurfaces()));
+        Fills base = section.surface().map(kind -> textOnSprite(roles.getSurface(kind))).orElse(roles.getSurfaces());
+        return new PanelStyle(section.frame(), section.fills().applyTo(base));
+    }
+
+    private static Fills textOnSprite(FillStyle surface) {
+        FillStyle text = textOn(surface);
+        return new Fills(text, text, text);
     }
 
     private static InsetStyle inset(InsetSection section, ColorRoles roles) {
@@ -54,6 +61,7 @@ public final class ThemeResolver {
     private static LinkStyle link(LinkSection section, ColorRoles roles) {
         return new LinkStyle(
                 section.onLight().applyTo(new LinkColors(roles.link(), roles.linkHover(), roles.light().mutedInk())),
+                section.onMid().applyTo(new LinkColors(roles.link(), roles.linkHover(), roles.mid().mutedInk())),
                 section.onDark().applyTo(new LinkColors(roles.accent(), roles.accentHover(), roles.dark().mutedInk())));
     }
 
