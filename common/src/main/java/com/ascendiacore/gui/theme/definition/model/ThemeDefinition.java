@@ -1,5 +1,6 @@
 package com.ascendiacore.gui.theme.definition.model;
 
+import com.ascendiacore.gui.widget.progressbar.model.ProgressBarStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
 import com.ascendiacore.gui.widget.slider.model.SliderStyle;
 import com.ascendiacore.gui.widget.tabrow.model.TabRowStyle;
@@ -19,7 +20,8 @@ public record ThemeDefinition(
         TextFieldSection textField,
         ToggleSwitchStyle toggleSwitch,
         SliderStyle slider,
-        TabRowStyle tabRow) {
+        TabRowStyle tabRow,
+        ProgressBarStyle progressBar) {
     private static final String ROLES_KEY = "roles";
     private static final String BUTTON_KEY = "button";
     private static final String PANEL_KEY = "panel";
@@ -32,6 +34,7 @@ public record ThemeDefinition(
     private static final String TOGGLE_SWITCH_KEY = "toggle_switch";
     private static final String SLIDER_KEY = "slider";
     private static final String TAB_ROW_KEY = "tab_row";
+    private static final String PROGRESS_BAR_KEY = "progress_bar";
 
     public static final Codec<ThemeDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ColorRoles.CODEC.fieldOf(ROLES_KEY).forGetter(ThemeDefinition::roles),
@@ -45,6 +48,7 @@ public record ThemeDefinition(
             TextFieldSection.CODEC.fieldOf(TEXT_FIELD_KEY).forGetter(ThemeDefinition::textField),
             ThemeCodecs.TOGGLE_SWITCH.fieldOf(TOGGLE_SWITCH_KEY).forGetter(ThemeDefinition::toggleSwitch),
             ThemeCodecs.SLIDER.fieldOf(SLIDER_KEY).forGetter(ThemeDefinition::slider),
-            ThemeCodecs.TAB_ROW.fieldOf(TAB_ROW_KEY).forGetter(ThemeDefinition::tabRow))
+            ThemeCodecs.TAB_ROW.fieldOf(TAB_ROW_KEY).forGetter(ThemeDefinition::tabRow),
+            ThemeCodecs.PROGRESS_BAR.fieldOf(PROGRESS_BAR_KEY).forGetter(ThemeDefinition::progressBar))
             .apply(instance, ThemeDefinition::new));
 }

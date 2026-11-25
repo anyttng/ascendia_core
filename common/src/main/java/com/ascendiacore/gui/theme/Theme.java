@@ -6,6 +6,7 @@ import com.ascendiacore.gui.widget.link.model.LinkStyle;
 import com.ascendiacore.gui.widget.list.model.ListStyle;
 import com.ascendiacore.gui.widget.panel.model.InsetStyle;
 import com.ascendiacore.gui.widget.panel.model.PanelStyle;
+import com.ascendiacore.gui.widget.progressbar.model.ProgressBarStyle;
 import com.ascendiacore.gui.widget.scrollbar.model.ScrollbarStyle;
 import com.ascendiacore.gui.widget.slider.model.SliderStyle;
 import com.ascendiacore.gui.widget.tabrow.model.TabRowStyle;
@@ -24,5 +25,6 @@ public record Theme(
         TextFieldStyle textField,
         ToggleSwitchStyle toggleSwitch,
         SliderStyle slider,
-        TabRowStyle tabRow) {
+        TabRowStyle tabRow,
+        ProgressBarStyle progressBar) {
 }
