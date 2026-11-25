@@ -69,5 +69,15 @@
     "handle": "ascendia_core:theme/book/slider/handle",
     "handle_hover": "ascendia_core:theme/book/slider/handle_hover",
     "handle_disabled": "ascendia_core:theme/book/slider/handle_disabled"
+  },
+  "tab_row": {
+    "normal": "ascendia_core:theme/book/tab_row/normal",
+    "hover": "ascendia_core:theme/book/tab_row/hover",
+    "selected": "ascendia_core:theme/book/tab_row/selected",
+    "selected_hover": "ascendia_core:theme/book/tab_row/selected_hover",
+    "label": "#E9D7B4",
+    "hover_label": "#FFFFFF",
+    "selected_label": "#4C1A0B",
+    "has_label_shadow": false
   }
 }
