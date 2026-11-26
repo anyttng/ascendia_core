@@ -84,6 +84,28 @@ class TextFieldTest {
     }
 
     @Test
+    void disabledFieldShowsTheDisabledTextAndEnabledItsOwnValue() {
+        TextField field = field();
+        field.setValue("6");
+        field.setDisabledText(() -> "6.24");
+        assertEquals("6", field.getShownValue());
+        field.setEnabled(false);
+        assertEquals("6.24", field.getShownValue());
+        assertEquals("6", field.getValue());
+        assertTrue(draw(field).texts().isEmpty());
+    }
+
+    @Test
+    void anEditWhileDisabledChangesNothing() {
+        TextField field = field();
+        field.setValue("6");
+        field.setEnabled(false);
+        field.edited("6.24");
+        assertEquals("6", field.getValue());
+        assertTrue(reported.isEmpty());
+    }
+
+    @Test
     void acceptedKeepsOnlyTheCharactersTheRuleLets() {
         TextField field = field();
         assertEquals("a1-", field.filterAccepted("a1-"));

@@ -3,6 +3,8 @@ package com.ascendiacore.gui.widget.textfield;
 import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 
+import org.jspecify.annotations.Nullable;
+
 import com.ascendiacore.gui.base.component.GuiComponent;
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.draw.TextMetrics;
@@ -26,6 +28,7 @@ public final class TextField extends GuiComponent implements Validated {
     private IntPredicate accepted = character -> true;
     private Component placeholder = Component.empty();
     private Property<Boolean> valid = Property.of(true);
+    private @Nullable Property<String> disabledText;
 
     public TextField(TextFieldStyle style, Consumer<String> onChange) {
         this.style = style;
@@ -42,6 +45,15 @@ public final class TextField extends GuiComponent implements Validated {
 
     public void setValue(String value) {
         this.value = cut(value);
+    }
+
+    public void setDisabledText(Property<String> disabledText) {
+        this.disabledText = disabledText;
+    }
+
+    public String getShownValue() {
+        Property<String> shown = disabledText;
+        return shown == null || isEnabled() ? value : shown.get();
     }
 
     public int getMaxCharacterCount() {
@@ -81,7 +93,7 @@ public final class TextField extends GuiComponent implements Validated {
     }
 
     public void edited(String value) {
-        if (value.equals(this.value)) {
+        if (!isEnabled() || value.equals(this.value)) {
             return;
         }
         this.value = value;
@@ -122,7 +134,7 @@ public final class TextField extends GuiComponent implements Validated {
     @Override
     protected void drawContent(Canvas canvas) {
         canvas.sprite(getSprite(), getX(), getY(), getWidthPixels(), getHeightPixels());
-        if (value.isEmpty()) {
+        if (getShownValue().isEmpty()) {
             drawPlaceholder(canvas);
         }
     }

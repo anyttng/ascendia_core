@@ -59,6 +59,10 @@ public final class NumberField extends Container {
         text.setValue(String.valueOf(value));
     }
 
+    public void setDisabledText(Property<String> disabledText) {
+        text.setDisabledText(disabledText);
+    }
+
     public void setText(String shown) {
         text.setValue(shown);
     }

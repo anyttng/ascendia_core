@@ -6,12 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
+import com.ascendiacore.gui.base.component.model.AlertColors;
+import com.ascendiacore.gui.base.component.model.LevelColors;
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.draw.RecordingCanvas;
 import com.ascendiacore.gui.base.geometry.Rect;
 import com.ascendiacore.gui.base.geometry.Size;
+import com.ascendiacore.gui.base.hint.Hint;
+import com.ascendiacore.gui.base.hint.model.HintValue;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.input.model.Key;
@@ -30,6 +36,10 @@ class SegmentedControlTest {
             "test:selected", "test:selected_hover", LABEL_COLOR, DISABLED_LABEL_COLOR, SELECTED_LABEL_COLOR, false);
     private static final List<String> VALUES = List.of("Off", "Auto", "Strong");
     private static final Component NAME = Component.literal("Compact biomes");
+    private static final TooltipStyle TOOLTIP = new TooltipStyle(null, 0xFFFFFFFF, 0xFFFFFF55, 0xFFAAAAAA,
+            new AlertColors(0xFFFFAA00, 0xFFFF5555, 0xFFA0A0FF), new LevelColors(0xFF55FF55, 0xFFFFFF55, 0xFFFF5555),
+            0xFF55FF55, 0xFF5A5A5A);
+    private static final String CAPTION_KEY = "gui.example.compact_biomes";
     private static final int LEFT = 100;
     private static final int TOP = 50;
     private static final int WIDTH_PIXELS = 120;
@@ -156,6 +166,41 @@ class SegmentedControlTest {
         SegmentedControl<String> control = control();
         Size natural = control.naturalSize(text -> text.getString().length());
         assertEquals(new Size(VALUES.size() * ("Strong".length() + 2 * SIDE_PADDING_PIXELS), HEIGHT_PIXELS), natural);
+    }
+
+    @Test
+    void hintNamesTheSegmentUnderThePointer() {
+        SegmentedControl<String> control = control();
+        control.setHint(TOOLTIP, CAPTION_KEY, SegmentedControlTest::valueKey);
+        assertEquals(hint("Off"), control.getTooltipAt(LEFT + 5, INSIDE_Y));
+        assertEquals(hint("Auto"), control.getTooltipAt(ON_SECOND_X, INSIDE_Y));
+        assertEquals(hint("Strong"), control.getTooltipAt(THIRD_LEFT + 5, INSIDE_Y));
+        assertEquals(TOOLTIP, control.getTooltipStyle());
+    }
+
+    @Test
+    void hintFollowsThePointerNotThePick() {
+        SegmentedControl<String> control = control();
+        control.setHint(TOOLTIP, CAPTION_KEY, SegmentedControlTest::valueKey);
+        control.tryPressPointer(press(ON_SECOND_X));
+        assertEquals(hint("Off"), control.getTooltipAt(LEFT + 5, INSIDE_Y));
+    }
+
+    @Test
+    void hintAwayFromThePointerNamesTheChosenValue() {
+        SegmentedControl<String> control = control();
+        control.setHint(TOOLTIP, CAPTION_KEY, SegmentedControlTest::valueKey);
+        chosen.set("Strong");
+        assertEquals(hint("Strong"), control.getTooltipAt(OUTSIDE_X, INSIDE_Y));
+    }
+
+    private static Component hint(String value) {
+        return Hint.of(TOOLTIP).values(List.of(new HintValue(Component.literal(value),
+                Component.translatable(CAPTION_KEY + ".hint." + valueKey(value)), false))).build();
+    }
+
+    private static String valueKey(String value) {
+        return value.toLowerCase(Locale.ROOT);
     }
 
     private SegmentedControl<String> control() {

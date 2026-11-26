@@ -119,8 +119,9 @@ public final class TextFieldWidget extends EditBox {
             maxCharacterCount = field.getMaxCharacterCount();
             setMaxLength(maxCharacterCount);
         }
-        if (!getValue().equals(field.getValue())) {
-            setValue(field.getValue());
+        String shown = field.getShownValue();
+        if (!getValue().equals(shown)) {
+            setValue(shown);
         }
         boolean isEnabled = field.isEnabled();
         if (isEditable != isEnabled) {

@@ -6,11 +6,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
+import org.jspecify.annotations.Nullable;
+
 import com.ascendiacore.gui.base.component.GuiComponent;
+import com.ascendiacore.gui.base.component.model.TooltipStyle;
 import com.ascendiacore.gui.base.draw.Canvas;
 import com.ascendiacore.gui.base.draw.Marquee;
 import com.ascendiacore.gui.base.draw.TextMetrics;
 import com.ascendiacore.gui.base.geometry.Size;
+import com.ascendiacore.gui.base.hint.ValueHint;
 import com.ascendiacore.gui.base.input.KeyInput;
 import com.ascendiacore.gui.base.input.PointerInput;
 import com.ascendiacore.gui.base.property.Property;
@@ -38,6 +42,7 @@ public final class SegmentedControl<T> extends GuiComponent {
     private final Function<T, Component> valueName;
     private Consumer<T> onChange = picked -> {
     };
+    private @Nullable Function<T, Component> segmentHint;
 
     public SegmentedControl(ButtonStyle style, Component name, Property<List<T>> values, Value<T> chosen,
             Function<T, Component> valueName) {
@@ -50,6 +55,26 @@ public final class SegmentedControl<T> extends GuiComponent {
 
     public void setOnChange(Consumer<T> onChange) {
         this.onChange = onChange;
+    }
+
+    public void setHint(TooltipStyle style, String captionKey, Function<T, String> valueKey) {
+        setTooltip(style, Component.empty());
+        segmentHint = value -> ValueHint.ofOneValue(style, captionKey, valueName.apply(value),
+                ValueHint.text(captionKey, valueKey.apply(value))).build();
+    }
+
+    @Override
+    public Component getTooltipAt(double pointX, double pointY) {
+        Function<T, Component> hint = segmentHint;
+        if (hint == null) {
+            return super.getTooltipAt(pointX, pointY);
+        }
+        if (!isContaining(pointX, pointY)) {
+            return hint.apply(chosen.get());
+        }
+        List<T> list = values.get();
+        int index = getSegmentAt(pointX, list.size());
+        return index == NONE ? Component.empty() : hint.apply(list.get(index));
     }
 
     @Override
