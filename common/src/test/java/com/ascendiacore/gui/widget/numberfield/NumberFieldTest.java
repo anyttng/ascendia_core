@@ -60,6 +60,18 @@ class NumberFieldTest {
     }
 
     @Test
+    void disabledTextLeavesTheOwnNumberForWhenItIsEnabledAgain() {
+        NumberField field = field();
+        field.setText("64");
+        field.setDisabledText(() -> "6.24");
+        field.setEnabled(false);
+        assertEquals("6.24", textField(field).getShownValue());
+        assertEquals(64, field.getValue());
+        field.setEnabled(true);
+        assertEquals("64", textField(field).getShownValue());
+    }
+
+    @Test
     void bothEndsAreInside() {
         NumberField field = field();
         field.setValue(SIZE_PIXELS.min());

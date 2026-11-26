@@ -28,6 +28,12 @@ public final class ValueHint {
                 .note(translateOptional(hintKey(captionKey, NOTE)));
     }
 
+    public static Hint ofOneValue(TooltipStyle style, String captionKey, Component name, Component text) {
+        return Hint.of(style)
+                .values(List.of(new HintValue(name, text, false)))
+                .note(translateOptional(hintKey(captionKey, NOTE)));
+    }
+
     public static Component text(String captionKey, String key) {
         return Component.translatable(hintKey(captionKey, key));
     }
